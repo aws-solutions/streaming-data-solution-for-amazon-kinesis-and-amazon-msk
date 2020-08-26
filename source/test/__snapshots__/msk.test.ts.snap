@@ -1,0 +1,214 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`creates a MSK cluster 1`] = `
+Object {
+  "Resources": Object {
+    "TestClusterKafkaCluster51D15A93": Object {
+      "Properties": Object {
+        "BrokerNodeGroupInfo": Object {
+          "BrokerAZDistribution": "DEFAULT",
+          "ClientSubnets": Array [
+            "subnet-a",
+            "subnet-b",
+          ],
+          "InstanceType": "kafka.m5.large",
+        },
+        "ClusterName": Object {
+          "Fn::Join": Array [
+            "",
+            Array [
+              Object {
+                "Ref": "AWS::StackName",
+              },
+              "-kafka-cluster",
+            ],
+          ],
+        },
+        "EncryptionInfo": Object {
+          "EncryptionAtRest": Object {
+            "DataVolumeKMSKeyId": "alias/aws/kafka",
+          },
+          "EncryptionInTransit": Object {
+            "ClientBroker": "TLS",
+            "InCluster": true,
+          },
+        },
+        "EnhancedMonitoring": "DEFAULT",
+        "KafkaVersion": "2.2.1",
+        "LoggingInfo": Object {
+          "BrokerLogs": Object {
+            "CloudWatchLogs": Object {
+              "Enabled": true,
+              "LogGroup": Object {
+                "Ref": "TestClusterLogGroup2CE8BB39",
+              },
+            },
+          },
+        },
+        "NumberOfBrokerNodes": 2,
+        "OpenMonitoring": Object {
+          "Prometheus": Object {
+            "JmxExporter": Object {
+              "EnabledInBroker": true,
+            },
+            "NodeExporter": Object {
+              "EnabledInBroker": true,
+            },
+          },
+        },
+      },
+      "Type": "AWS::MSK::Cluster",
+    },
+    "TestClusterLogGroup2CE8BB39": Object {
+      "DeletionPolicy": "Retain",
+      "Properties": Object {
+        "RetentionInDays": 7,
+      },
+      "Type": "AWS::Logs::LogGroup",
+      "UpdateReplacePolicy": "Retain",
+    },
+  },
+}
+`;
+
+exports[`creates a MSK cluster 2`] = `
+Object {
+  "Resources": Object {
+    "TestClusterKafkaCluster51D15A93": Object {
+      "Properties": Object {
+        "BrokerNodeGroupInfo": Object {
+          "BrokerAZDistribution": "DEFAULT",
+          "ClientSubnets": Array [
+            "subnet-a",
+            "subnet-b",
+          ],
+          "InstanceType": "kafka.m5.large",
+        },
+        "ClusterName": Object {
+          "Fn::Join": Array [
+            "",
+            Array [
+              Object {
+                "Ref": "AWS::StackName",
+              },
+              "-kafka-cluster",
+            ],
+          ],
+        },
+        "EncryptionInfo": Object {
+          "EncryptionAtRest": Object {
+            "DataVolumeKMSKeyId": "alias/aws/kafka",
+          },
+          "EncryptionInTransit": Object {
+            "ClientBroker": "TLS",
+            "InCluster": true,
+          },
+        },
+        "EnhancedMonitoring": "DEFAULT",
+        "KafkaVersion": "2.2.1",
+        "LoggingInfo": Object {
+          "BrokerLogs": Object {
+            "CloudWatchLogs": Object {
+              "Enabled": true,
+              "LogGroup": Object {
+                "Ref": "TestClusterLogGroup2CE8BB39",
+              },
+            },
+          },
+        },
+        "NumberOfBrokerNodes": 4,
+        "OpenMonitoring": Object {
+          "Prometheus": Object {
+            "JmxExporter": Object {
+              "EnabledInBroker": true,
+            },
+            "NodeExporter": Object {
+              "EnabledInBroker": true,
+            },
+          },
+        },
+      },
+      "Type": "AWS::MSK::Cluster",
+    },
+    "TestClusterLogGroup2CE8BB39": Object {
+      "DeletionPolicy": "Retain",
+      "Properties": Object {
+        "RetentionInDays": 7,
+      },
+      "Type": "AWS::Logs::LogGroup",
+      "UpdateReplacePolicy": "Retain",
+    },
+  },
+}
+`;
+
+exports[`creates a MSK cluster 3`] = `
+Object {
+  "Resources": Object {
+    "TestClusterKafkaCluster51D15A93": Object {
+      "Properties": Object {
+        "BrokerNodeGroupInfo": Object {
+          "BrokerAZDistribution": "DEFAULT",
+          "ClientSubnets": Array [
+            "subnet-a",
+            "subnet-b",
+          ],
+          "InstanceType": "kafka.m5.large",
+        },
+        "ClusterName": Object {
+          "Fn::Join": Array [
+            "",
+            Array [
+              Object {
+                "Ref": "AWS::StackName",
+              },
+              "-kafka-cluster",
+            ],
+          ],
+        },
+        "EncryptionInfo": Object {
+          "EncryptionAtRest": Object {
+            "DataVolumeKMSKeyId": "alias/aws/kafka",
+          },
+          "EncryptionInTransit": Object {
+            "ClientBroker": "TLS",
+            "InCluster": true,
+          },
+        },
+        "EnhancedMonitoring": "DEFAULT",
+        "KafkaVersion": "2.2.1",
+        "LoggingInfo": Object {
+          "BrokerLogs": Object {
+            "CloudWatchLogs": Object {
+              "Enabled": true,
+              "LogGroup": Object {
+                "Ref": "TestClusterLogGroup2CE8BB39",
+              },
+            },
+          },
+        },
+        "NumberOfBrokerNodes": 6,
+        "OpenMonitoring": Object {
+          "Prometheus": Object {
+            "JmxExporter": Object {
+              "EnabledInBroker": true,
+            },
+            "NodeExporter": Object {
+              "EnabledInBroker": true,
+            },
+          },
+        },
+      },
+      "Type": "AWS::MSK::Cluster",
+    },
+    "TestClusterLogGroup2CE8BB39": Object {
+      "DeletionPolicy": "Retain",
+      "Properties": Object {
+        "RetentionInDays": 7,
+      },
+      "Type": "AWS::Logs::LogGroup",
+      "UpdateReplacePolicy": "Retain",
+    },
+  },
+}
+`;

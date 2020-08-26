@@ -1,0 +1,183 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`creates a dashboard for KDS stream 1`] = `
+Object {
+  "Resources": Object {
+    "TestAlarmsDashboard18A0A3E9": Object {
+      "Properties": Object {
+        "DashboardBody": Object {
+          "Fn::Join": Array [
+            "",
+            Array [
+              "{\\"widgets\\":[{\\"type\\":\\"text\\",\\"width\\":24,\\"height\\":1,\\"x\\":0,\\"y\\":0,\\"properties\\":{\\"markdown\\":\\"\\\\n# Kinesis Stream Metrics\\\\n\\"}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":0,\\"y\\":1,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Get records iterator age (Milliseconds)\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"metrics\\":[[\\"AWS/Kinesis\\",\\"GetRecords.IteratorAgeMilliseconds\\",\\"StreamName\\",\\"test-stream\\",{\\"period\\":60,\\"stat\\":\\"Maximum\\"}]],\\"annotations\\":{\\"horizontal\\":[{\\"label\\":\\"Iterator age threshold\\",\\"value\\":60000,\\"yAxis\\":\\"left\\"}]},\\"yAxis\\":{}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":6,\\"y\\":1,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Read throughput exceeded (Percent)\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"metrics\\":[[\\"AWS/Kinesis\\",\\"ReadProvisionedThroughputExceeded\\",\\"StreamName\\",\\"test-stream\\",{\\"period\\":60}]],\\"annotations\\":{\\"horizontal\\":[{\\"label\\":\\"Read throughput threshold\\",\\"value\\":0.01,\\"yAxis\\":\\"left\\"}]},\\"yAxis\\":{}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":12,\\"y\\":1,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Write throughput exceeded (Percent)\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"metrics\\":[[\\"AWS/Kinesis\\",\\"WriteProvisionedThroughputExceeded\\",\\"StreamName\\",\\"test-stream\\",{\\"period\\":60}]],\\"annotations\\":{\\"horizontal\\":[{\\"label\\":\\"Write throughput threshold\\",\\"value\\":0.01,\\"yAxis\\":\\"left\\"}]},\\"yAxis\\":{}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":18,\\"y\\":1,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Put record success (Percent)\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"metrics\\":[[\\"AWS/Kinesis\\",\\"PutRecord.Success\\",\\"StreamName\\",\\"test-stream\\",{\\"period\\":60}]],\\"annotations\\":{\\"horizontal\\":[{\\"label\\":\\"Put record threshold\\",\\"value\\":0.95,\\"yAxis\\":\\"left\\"}]},\\"yAxis\\":{}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":0,\\"y\\":7,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Put records success (Percent)\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"metrics\\":[[\\"AWS/Kinesis\\",\\"PutRecords.Success\\",\\"StreamName\\",\\"test-stream\\",{\\"period\\":60}]],\\"annotations\\":{\\"horizontal\\":[{\\"label\\":\\"Put records threshold\\",\\"value\\":0.95,\\"yAxis\\":\\"left\\"}]},\\"yAxis\\":{}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":6,\\"y\\":7,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Get records success (Percent)\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"metrics\\":[[\\"AWS/Kinesis\\",\\"GetRecords.Success\\",\\"StreamName\\",\\"test-stream\\",{\\"period\\":60}]],\\"annotations\\":{\\"horizontal\\":[{\\"label\\":\\"Get records threshold\\",\\"value\\":0.98,\\"yAxis\\":\\"left\\"}]},\\"yAxis\\":{}}},{\\"type\\":\\"text\\",\\"width\\":24,\\"height\\":1,\\"x\\":0,\\"y\\":13,\\"properties\\":{\\"markdown\\":\\"\\\\n# Lambda Metrics\\\\n\\"}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":0,\\"y\\":14,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Invocations\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"metrics\\":[[\\"AWS/Lambda\\",\\"Invocations\\",\\"FunctionName\\",\\"test-function\\",\\"Resource\\",\\"test-function\\",{\\"period\\":60,\\"stat\\":\\"Sum\\"}]],\\"yAxis\\":{}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":6,\\"y\\":14,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Duration\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"metrics\\":[[\\"AWS/Lambda\\",\\"Duration\\",\\"FunctionName\\",\\"test-function\\",\\"Resource\\",\\"test-function\\",{\\"period\\":60,\\"stat\\":\\"Minimum\\"}],[\\"AWS/Lambda\\",\\"Duration\\",\\"FunctionName\\",\\"test-function\\",\\"Resource\\",\\"test-function\\",{\\"period\\":60}],[\\"AWS/Lambda\\",\\"Duration\\",\\"FunctionName\\",\\"test-function\\",\\"Resource\\",\\"test-function\\",{\\"period\\":60,\\"stat\\":\\"Maximum\\"}]],\\"yAxis\\":{}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":12,\\"y\\":14,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Error count and success rate (%)\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"metrics\\":[[\\"AWS/Lambda\\",\\"Errors\\",\\"FunctionName\\",\\"test-function\\",\\"Resource\\",\\"test-function\\",{\\"color\\":\\"#d62728\\",\\"period\\":60,\\"stat\\":\\"Maximum\\",\\"id\\":\\"errors\\"}],[{\\"label\\":\\"Success rate (%)\\",\\"color\\":\\"#2ca02c\\",\\"expression\\":\\"100 - 100 * errors / MAX([errors, invocations])\\",\\"yAxis\\":\\"right\\"}],[\\"AWS/Lambda\\",\\"Invocations\\",\\"FunctionName\\",\\"test-function\\",\\"Resource\\",\\"test-function\\",{\\"label\\":\\"\\",\\"period\\":60,\\"stat\\":\\"Sum\\",\\"visible\\":false,\\"id\\":\\"invocations\\"}]],\\"yAxis\\":{\\"right\\":{\\"max\\":100}}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":18,\\"y\\":14,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Throttles\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"metrics\\":[[\\"AWS/Lambda\\",\\"Throttles\\",\\"FunctionName\\",\\"test-function\\",\\"Resource\\",\\"test-function\\",{\\"period\\":60,\\"stat\\":\\"Sum\\"}]],\\"yAxis\\":{}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":0,\\"y\\":20,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"IteratorAge\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"metrics\\":[[\\"AWS/Lambda\\",\\"IteratorAge\\",\\"FunctionName\\",\\"test-function\\",\\"Resource\\",\\"test-function\\",{\\"period\\":60,\\"stat\\":\\"Maximum\\"}]],\\"yAxis\\":{}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":6,\\"y\\":20,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Concurrent executions\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"metrics\\":[[\\"AWS/Lambda\\",\\"ConcurrentExecutions\\",\\"FunctionName\\",\\"test-function\\",\\"Resource\\",\\"test-function\\",{\\"period\\":60,\\"stat\\":\\"Maximum\\"}]],\\"yAxis\\":{}}}]}",
+            ],
+          ],
+        },
+      },
+      "Type": "AWS::CloudWatch::Dashboard",
+    },
+    "TestAlarmsGetRecordsAlarm290BD33C": Object {
+      "Properties": Object {
+        "ComparisonOperator": "LessThanOrEqualToThreshold",
+        "Dimensions": Array [
+          Object {
+            "Name": "StreamName",
+            "Value": "test-stream",
+          },
+        ],
+        "EvaluationPeriods": 1,
+        "MetricName": "GetRecords.Success",
+        "Namespace": "AWS/Kinesis",
+        "Period": 60,
+        "Statistic": "Average",
+        "Threshold": 0.98,
+        "TreatMissingData": "breaching",
+      },
+      "Type": "AWS::CloudWatch::Alarm",
+    },
+    "TestAlarmsIteratorAgeAlarmBF680DFE": Object {
+      "Properties": Object {
+        "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+        "Dimensions": Array [
+          Object {
+            "Name": "StreamName",
+            "Value": "test-stream",
+          },
+        ],
+        "EvaluationPeriods": 1,
+        "MetricName": "GetRecords.IteratorAgeMilliseconds",
+        "Namespace": "AWS/Kinesis",
+        "Period": 60,
+        "Statistic": "Maximum",
+        "Threshold": 60000,
+        "TreatMissingData": "breaching",
+      },
+      "Type": "AWS::CloudWatch::Alarm",
+    },
+    "TestAlarmsPutRecordAlarm1AF127B3": Object {
+      "Properties": Object {
+        "ComparisonOperator": "LessThanOrEqualToThreshold",
+        "Dimensions": Array [
+          Object {
+            "Name": "StreamName",
+            "Value": "test-stream",
+          },
+        ],
+        "EvaluationPeriods": 1,
+        "MetricName": "PutRecord.Success",
+        "Namespace": "AWS/Kinesis",
+        "Period": 60,
+        "Statistic": "Average",
+        "Threshold": 0.95,
+        "TreatMissingData": "notBreaching",
+      },
+      "Type": "AWS::CloudWatch::Alarm",
+    },
+    "TestAlarmsPutRecordsAlarm99FEAF3C": Object {
+      "Properties": Object {
+        "ComparisonOperator": "LessThanOrEqualToThreshold",
+        "Dimensions": Array [
+          Object {
+            "Name": "StreamName",
+            "Value": "test-stream",
+          },
+        ],
+        "EvaluationPeriods": 1,
+        "MetricName": "PutRecords.Success",
+        "Namespace": "AWS/Kinesis",
+        "Period": 60,
+        "Statistic": "Average",
+        "Threshold": 0.95,
+        "TreatMissingData": "notBreaching",
+      },
+      "Type": "AWS::CloudWatch::Alarm",
+    },
+    "TestAlarmsReadProvisionedAlarmB69D839B": Object {
+      "Properties": Object {
+        "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+        "Dimensions": Array [
+          Object {
+            "Name": "StreamName",
+            "Value": "test-stream",
+          },
+        ],
+        "EvaluationPeriods": 1,
+        "MetricName": "ReadProvisionedThroughputExceeded",
+        "Namespace": "AWS/Kinesis",
+        "Period": 60,
+        "Statistic": "Average",
+        "Threshold": 0.01,
+        "TreatMissingData": "breaching",
+      },
+      "Type": "AWS::CloudWatch::Alarm",
+    },
+    "TestAlarmsWriteProvisionedAlarmC7CB3AAD": Object {
+      "Properties": Object {
+        "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+        "Dimensions": Array [
+          Object {
+            "Name": "StreamName",
+            "Value": "test-stream",
+          },
+        ],
+        "EvaluationPeriods": 1,
+        "MetricName": "WriteProvisionedThroughputExceeded",
+        "Namespace": "AWS/Kinesis",
+        "Period": 60,
+        "Statistic": "Average",
+        "Threshold": 0.01,
+        "TreatMissingData": "breaching",
+      },
+      "Type": "AWS::CloudWatch::Alarm",
+    },
+  },
+}
+`;

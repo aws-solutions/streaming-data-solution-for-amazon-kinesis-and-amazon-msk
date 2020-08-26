@@ -1,0 +1,623 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`successful scenarios creates a proxy API for Kinesis 1`] = `
+Object {
+  "Conditions": Object {
+    "AwsCdkKinesisEncryptedStreamsUnsupportedRegions": Object {
+      "Fn::Or": Array [
+        Object {
+          "Fn::Equals": Array [
+            Object {
+              "Ref": "AWS::Region",
+            },
+            "cn-north-1",
+          ],
+        },
+        Object {
+          "Fn::Equals": Array [
+            Object {
+              "Ref": "AWS::Region",
+            },
+            "cn-northwest-1",
+          ],
+        },
+      ],
+    },
+  },
+  "Outputs": Object {
+    "TestApiEndpointC789B270": Object {
+      "Value": Object {
+        "Fn::Join": Array [
+          "",
+          Array [
+            "https://",
+            Object {
+              "Ref": "TestApiC9C18F5F",
+            },
+            ".execute-api.",
+            Object {
+              "Ref": "AWS::Region",
+            },
+            ".",
+            Object {
+              "Ref": "AWS::URLSuffix",
+            },
+            "/",
+            Object {
+              "Ref": "TestApiDeploymentStageprodF668568D",
+            },
+            "/",
+          ],
+        ],
+      },
+    },
+  },
+  "Resources": Object {
+    "TestApiAccessLogsC7BA5491": Object {
+      "DeletionPolicy": "Retain",
+      "Properties": Object {
+        "RetentionInDays": 7,
+      },
+      "Type": "AWS::Logs::LogGroup",
+      "UpdateReplacePolicy": "Retain",
+    },
+    "TestApiAccount4BDA02C2": Object {
+      "DependsOn": Array [
+        "TestApiC9C18F5F",
+      ],
+      "Properties": Object {
+        "CloudWatchRoleArn": Object {
+          "Fn::GetAtt": Array [
+            "TestApiCloudWatchRoleA3BEC446",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "AWS::ApiGateway::Account",
+    },
+    "TestApiApiGatewayRole5819F962": Object {
+      "Properties": Object {
+        "AssumeRolePolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": Object {
+                "Service": "apigateway.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "TestApiApiGatewayRoleDefaultPolicy76B65131": Object {
+      "Properties": Object {
+        "PolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": Array [
+                "kinesis:ListShards",
+                "kinesis:PutRecord",
+                "kinesis:PutRecords",
+              ],
+              "Effect": "Allow",
+              "Resource": Object {
+                "Fn::GetAtt": Array [
+                  "TestStreamE6F40222",
+                  "Arn",
+                ],
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "TestApiApiGatewayRoleDefaultPolicy76B65131",
+        "Roles": Array [
+          Object {
+            "Ref": "TestApiApiGatewayRole5819F962",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "TestApiC9C18F5F": Object {
+      "Properties": Object {
+        "Name": Object {
+          "Fn::Join": Array [
+            "",
+            Array [
+              Object {
+                "Ref": "AWS::StackName",
+              },
+              "-kinesis-proxy",
+            ],
+          ],
+        },
+      },
+      "Type": "AWS::ApiGateway::RestApi",
+    },
+    "TestApiCloudWatchRoleA3BEC446": Object {
+      "Properties": Object {
+        "AssumeRolePolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": Object {
+                "Service": "apigateway.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": Array [
+          Object {
+            "Fn::Join": Array [
+              "",
+              Array [
+                "arn:",
+                Object {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs",
+              ],
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "TestApiDeploymentBC0C43ADd69b57fd15a7b4bd0bce05ee008c060a": Object {
+      "DependsOn": Array [
+        "TestApirecordOPTIONS16FD6C23",
+        "TestApirecordPUT7D5C36EC",
+        "TestApirecord6E9B2923",
+        "TestApirecordsOPTIONS50080610",
+        "TestApirecordsPUTEB989000",
+        "TestApirecordsCA61DDD3",
+        "TestApiPutRecordModel948379D1",
+        "TestApiPutRecordsModelD298C048",
+        "TestApiValidator606D2DAC",
+      ],
+      "Metadata": Object {
+        "cfn_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "W68",
+              "reason": "Default usage plan can be used for this API",
+            },
+          ],
+        },
+      },
+      "Properties": Object {
+        "Description": "Automatically created by the RestApi construct",
+        "RestApiId": Object {
+          "Ref": "TestApiC9C18F5F",
+        },
+      },
+      "Type": "AWS::ApiGateway::Deployment",
+    },
+    "TestApiDeploymentStageprodF668568D": Object {
+      "Metadata": Object {
+        "cfn_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "W64",
+              "reason": "Default usage plan can be used for this API",
+            },
+          ],
+        },
+      },
+      "Properties": Object {
+        "AccessLogSetting": Object {
+          "DestinationArn": Object {
+            "Fn::GetAtt": Array [
+              "TestApiAccessLogsC7BA5491",
+              "Arn",
+            ],
+          },
+          "Format": "$context.identity.sourceIp $context.identity.caller $context.identity.user [$context.requestTime] \\"$context.httpMethod $context.resourcePath $context.protocol\\" $context.status $context.responseLength $context.requestId",
+        },
+        "DeploymentId": Object {
+          "Ref": "TestApiDeploymentBC0C43ADd69b57fd15a7b4bd0bce05ee008c060a",
+        },
+        "MethodSettings": Array [
+          Object {
+            "HttpMethod": "*",
+            "ResourcePath": "/*",
+            "ThrottlingBurstLimit": 50,
+            "ThrottlingRateLimit": 100,
+          },
+        ],
+        "RestApiId": Object {
+          "Ref": "TestApiC9C18F5F",
+        },
+        "StageName": "prod",
+      },
+      "Type": "AWS::ApiGateway::Stage",
+    },
+    "TestApiPutRecordModel948379D1": Object {
+      "Properties": Object {
+        "ContentType": "application/json",
+        "Description": "PutRecord proxy single-record payload",
+        "Name": "PutRecordModel",
+        "RestApiId": Object {
+          "Ref": "TestApiC9C18F5F",
+        },
+        "Schema": Object {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "properties": Object {
+            "data": Object {
+              "type": "string",
+            },
+            "partitionKey": Object {
+              "type": "string",
+            },
+          },
+          "required": Array [
+            "data",
+            "partitionKey",
+          ],
+          "title": "PutRecord proxy single-record payload",
+          "type": "object",
+        },
+      },
+      "Type": "AWS::ApiGateway::Model",
+    },
+    "TestApiPutRecordsModelD298C048": Object {
+      "Properties": Object {
+        "ContentType": "application/json",
+        "Description": "PutRecords proxy payload data",
+        "Name": "PutRecordsModel",
+        "RestApiId": Object {
+          "Ref": "TestApiC9C18F5F",
+        },
+        "Schema": Object {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "properties": Object {
+            "records": Object {
+              "items": Object {
+                "properties": Object {
+                  "data": Object {
+                    "type": "string",
+                  },
+                  "partitionKey": Object {
+                    "type": "string",
+                  },
+                },
+                "required": Array [
+                  "data",
+                  "partitionKey",
+                ],
+                "type": "object",
+              },
+              "type": "array",
+            },
+          },
+          "required": Array [
+            "records",
+          ],
+          "title": "PutRecords proxy payload data",
+          "type": "object",
+        },
+      },
+      "Type": "AWS::ApiGateway::Model",
+    },
+    "TestApiValidator606D2DAC": Object {
+      "Properties": Object {
+        "Name": "default-validator",
+        "RestApiId": Object {
+          "Ref": "TestApiC9C18F5F",
+        },
+        "ValidateRequestBody": true,
+      },
+      "Type": "AWS::ApiGateway::RequestValidator",
+    },
+    "TestApirecord6E9B2923": Object {
+      "Properties": Object {
+        "ParentId": Object {
+          "Fn::GetAtt": Array [
+            "TestApiC9C18F5F",
+            "RootResourceId",
+          ],
+        },
+        "PathPart": "record",
+        "RestApiId": Object {
+          "Ref": "TestApiC9C18F5F",
+        },
+      },
+      "Type": "AWS::ApiGateway::Resource",
+    },
+    "TestApirecordOPTIONS16FD6C23": Object {
+      "Properties": Object {
+        "AuthorizationType": "NONE",
+        "HttpMethod": "OPTIONS",
+        "Integration": Object {
+          "IntegrationResponses": Array [
+            Object {
+              "ResponseParameters": Object {
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                "method.response.header.Access-Control-Allow-Methods": "'PUT'",
+                "method.response.header.Access-Control-Allow-Origin": "'*'",
+              },
+              "StatusCode": "204",
+            },
+          ],
+          "RequestTemplates": Object {
+            "application/json": "{ statusCode: 200 }",
+          },
+          "Type": "MOCK",
+        },
+        "MethodResponses": Array [
+          Object {
+            "ResponseParameters": Object {
+              "method.response.header.Access-Control-Allow-Headers": true,
+              "method.response.header.Access-Control-Allow-Methods": true,
+              "method.response.header.Access-Control-Allow-Origin": true,
+            },
+            "StatusCode": "204",
+          },
+        ],
+        "ResourceId": Object {
+          "Ref": "TestApirecord6E9B2923",
+        },
+        "RestApiId": Object {
+          "Ref": "TestApiC9C18F5F",
+        },
+      },
+      "Type": "AWS::ApiGateway::Method",
+    },
+    "TestApirecordPUT7D5C36EC": Object {
+      "Properties": Object {
+        "AuthorizationType": "AWS_IAM",
+        "HttpMethod": "PUT",
+        "Integration": Object {
+          "Credentials": Object {
+            "Fn::GetAtt": Array [
+              "TestApiApiGatewayRole5819F962",
+              "Arn",
+            ],
+          },
+          "IntegrationHttpMethod": "POST",
+          "IntegrationResponses": Array [
+            Object {
+              "StatusCode": "200",
+            },
+            Object {
+              "SelectionPattern": "5\\\\d{2}",
+              "StatusCode": "500",
+            },
+          ],
+          "PassthroughBehavior": "NEVER",
+          "RequestParameters": Object {
+            "integration.request.header.Content-Type": "'x-amz-json-1.1'",
+          },
+          "RequestTemplates": Object {
+            "application/json": Object {
+              "Fn::Join": Array [
+                "",
+                Array [
+                  "{ \\"StreamName\\": \\"",
+                  Object {
+                    "Ref": "TestStreamE6F40222",
+                  },
+                  "\\", \\"Data\\": \\"$util.base64Encode($input.json('$.data'))\\", \\"PartitionKey\\": \\"$input.path('$.partitionKey')\\" }",
+                ],
+              ],
+            },
+          },
+          "Type": "AWS",
+          "Uri": Object {
+            "Fn::Join": Array [
+              "",
+              Array [
+                "arn:",
+                Object {
+                  "Ref": "AWS::Partition",
+                },
+                ":apigateway:",
+                Object {
+                  "Ref": "AWS::Region",
+                },
+                ":kinesis:action/PutRecord",
+              ],
+            ],
+          },
+        },
+        "MethodResponses": Array [
+          Object {
+            "ResponseParameters": Object {
+              "method.response.header.Content-Type": true,
+            },
+            "StatusCode": "200",
+          },
+          Object {
+            "ResponseParameters": Object {
+              "method.response.header.Content-Type": true,
+            },
+            "StatusCode": "500",
+          },
+        ],
+        "RequestModels": Object {
+          "application/json": Object {
+            "Ref": "TestApiPutRecordModel948379D1",
+          },
+        },
+        "RequestValidatorId": Object {
+          "Ref": "TestApiValidator606D2DAC",
+        },
+        "ResourceId": Object {
+          "Ref": "TestApirecord6E9B2923",
+        },
+        "RestApiId": Object {
+          "Ref": "TestApiC9C18F5F",
+        },
+      },
+      "Type": "AWS::ApiGateway::Method",
+    },
+    "TestApirecordsCA61DDD3": Object {
+      "Properties": Object {
+        "ParentId": Object {
+          "Fn::GetAtt": Array [
+            "TestApiC9C18F5F",
+            "RootResourceId",
+          ],
+        },
+        "PathPart": "records",
+        "RestApiId": Object {
+          "Ref": "TestApiC9C18F5F",
+        },
+      },
+      "Type": "AWS::ApiGateway::Resource",
+    },
+    "TestApirecordsOPTIONS50080610": Object {
+      "Properties": Object {
+        "AuthorizationType": "NONE",
+        "HttpMethod": "OPTIONS",
+        "Integration": Object {
+          "IntegrationResponses": Array [
+            Object {
+              "ResponseParameters": Object {
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                "method.response.header.Access-Control-Allow-Methods": "'PUT'",
+                "method.response.header.Access-Control-Allow-Origin": "'*'",
+              },
+              "StatusCode": "204",
+            },
+          ],
+          "RequestTemplates": Object {
+            "application/json": "{ statusCode: 200 }",
+          },
+          "Type": "MOCK",
+        },
+        "MethodResponses": Array [
+          Object {
+            "ResponseParameters": Object {
+              "method.response.header.Access-Control-Allow-Headers": true,
+              "method.response.header.Access-Control-Allow-Methods": true,
+              "method.response.header.Access-Control-Allow-Origin": true,
+            },
+            "StatusCode": "204",
+          },
+        ],
+        "ResourceId": Object {
+          "Ref": "TestApirecordsCA61DDD3",
+        },
+        "RestApiId": Object {
+          "Ref": "TestApiC9C18F5F",
+        },
+      },
+      "Type": "AWS::ApiGateway::Method",
+    },
+    "TestApirecordsPUTEB989000": Object {
+      "Properties": Object {
+        "AuthorizationType": "AWS_IAM",
+        "HttpMethod": "PUT",
+        "Integration": Object {
+          "Credentials": Object {
+            "Fn::GetAtt": Array [
+              "TestApiApiGatewayRole5819F962",
+              "Arn",
+            ],
+          },
+          "IntegrationHttpMethod": "POST",
+          "IntegrationResponses": Array [
+            Object {
+              "StatusCode": "200",
+            },
+            Object {
+              "SelectionPattern": "5\\\\d{2}",
+              "StatusCode": "500",
+            },
+          ],
+          "PassthroughBehavior": "NEVER",
+          "RequestParameters": Object {
+            "integration.request.header.Content-Type": "'x-amz-json-1.1'",
+          },
+          "RequestTemplates": Object {
+            "application/json": Object {
+              "Fn::Join": Array [
+                "",
+                Array [
+                  "{ \\"StreamName\\": \\"",
+                  Object {
+                    "Ref": "TestStreamE6F40222",
+                  },
+                  "\\", \\"Records\\": [ #foreach($elem in $input.path('$.records')) { \\"Data\\": \\"$util.base64Encode($elem.data)\\", \\"PartitionKey\\": \\"$elem.partitionKey\\"}#if($foreach.hasNext),#end #end ] }",
+                ],
+              ],
+            },
+          },
+          "Type": "AWS",
+          "Uri": Object {
+            "Fn::Join": Array [
+              "",
+              Array [
+                "arn:",
+                Object {
+                  "Ref": "AWS::Partition",
+                },
+                ":apigateway:",
+                Object {
+                  "Ref": "AWS::Region",
+                },
+                ":kinesis:action/PutRecords",
+              ],
+            ],
+          },
+        },
+        "MethodResponses": Array [
+          Object {
+            "ResponseParameters": Object {
+              "method.response.header.Content-Type": true,
+            },
+            "StatusCode": "200",
+          },
+          Object {
+            "ResponseParameters": Object {
+              "method.response.header.Content-Type": true,
+            },
+            "StatusCode": "500",
+          },
+        ],
+        "RequestModels": Object {
+          "application/json": Object {
+            "Ref": "TestApiPutRecordsModelD298C048",
+          },
+        },
+        "RequestValidatorId": Object {
+          "Ref": "TestApiValidator606D2DAC",
+        },
+        "ResourceId": Object {
+          "Ref": "TestApirecordsCA61DDD3",
+        },
+        "RestApiId": Object {
+          "Ref": "TestApiC9C18F5F",
+        },
+      },
+      "Type": "AWS::ApiGateway::Method",
+    },
+    "TestStreamE6F40222": Object {
+      "Properties": Object {
+        "RetentionPeriodHours": 24,
+        "ShardCount": 1,
+        "StreamEncryption": Object {
+          "Fn::If": Array [
+            "AwsCdkKinesisEncryptedStreamsUnsupportedRegions",
+            Object {
+              "Ref": "AWS::NoValue",
+            },
+            Object {
+              "EncryptionType": "KMS",
+              "KeyId": "alias/aws/kinesis",
+            },
+          ],
+        },
+      },
+      "Type": "AWS::Kinesis::Stream",
+    },
+  },
+}
+`;

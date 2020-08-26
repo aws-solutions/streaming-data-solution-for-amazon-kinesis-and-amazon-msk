@@ -1,0 +1,599 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`successful scenarios creates a KDA flink application 1`] = `
+Object {
+  "Conditions": Object {
+    "AwsCdkKinesisEncryptedStreamsUnsupportedRegions": Object {
+      "Fn::Or": Array [
+        Object {
+          "Fn::Equals": Array [
+            Object {
+              "Ref": "AWS::Region",
+            },
+            "cn-north-1",
+          ],
+        },
+        Object {
+          "Fn::Equals": Array [
+            Object {
+              "Ref": "AWS::Region",
+            },
+            "cn-northwest-1",
+          ],
+        },
+      ],
+    },
+    "TestApplicationEnableAutoScaling3998F3DF": Object {
+      "Fn::Equals": Array [
+        "true",
+        "true",
+      ],
+    },
+    "TestApplicationEnableSnapshotsB729B643": Object {
+      "Fn::Equals": Array [
+        "true",
+        "true",
+      ],
+    },
+  },
+  "Parameters": Object {
+    "AssetParameters6467ddf591ee8d331757e026c674b30fde5ccf2b7239abd2a53645055b04fd29ArtifactHashA929B04E": Object {
+      "Description": "Artifact hash for asset \\"6467ddf591ee8d331757e026c674b30fde5ccf2b7239abd2a53645055b04fd29\\"",
+      "Type": "String",
+    },
+    "AssetParameters6467ddf591ee8d331757e026c674b30fde5ccf2b7239abd2a53645055b04fd29S3Bucket6CBC124E": Object {
+      "Description": "S3 bucket for asset \\"6467ddf591ee8d331757e026c674b30fde5ccf2b7239abd2a53645055b04fd29\\"",
+      "Type": "String",
+    },
+    "AssetParameters6467ddf591ee8d331757e026c674b30fde5ccf2b7239abd2a53645055b04fd29S3VersionKey35BC6A36": Object {
+      "Description": "S3 key for asset version \\"6467ddf591ee8d331757e026c674b30fde5ccf2b7239abd2a53645055b04fd29\\"",
+      "Type": "String",
+    },
+  },
+  "Resources": Object {
+    "TestApplicationAppRoleDefaultPolicy4584665A": Object {
+      "Properties": Object {
+        "PolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": Array [
+                "kinesis:DescribeStreamSummary",
+                "kinesis:GetRecords",
+                "kinesis:GetShardIterator",
+                "kinesis:ListShards",
+                "kinesis:SubscribeToShard",
+              ],
+              "Effect": "Allow",
+              "Resource": Object {
+                "Fn::GetAtt": Array [
+                  "TestStreamE6F40222",
+                  "Arn",
+                ],
+              },
+            },
+            Object {
+              "Action": Array [
+                "s3:GetObject*",
+                "s3:GetBucket*",
+                "s3:List*",
+                "s3:DeleteObject*",
+                "s3:PutObject*",
+                "s3:Abort*",
+              ],
+              "Effect": "Allow",
+              "Resource": Array [
+                Object {
+                  "Fn::GetAtt": Array [
+                    "TestBucket560B80BC",
+                    "Arn",
+                  ],
+                },
+                Object {
+                  "Fn::Join": Array [
+                    "",
+                    Array [
+                      Object {
+                        "Fn::GetAtt": Array [
+                          "TestBucket560B80BC",
+                          "Arn",
+                        ],
+                      },
+                      "/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "TestApplicationAppRoleDefaultPolicy4584665A",
+        "Roles": Array [
+          Object {
+            "Ref": "TestApplicationAppRoleF109DF67",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "TestApplicationAppRoleF109DF67": Object {
+      "Properties": Object {
+        "AssumeRolePolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": Object {
+                "Service": "kinesisanalytics.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "TestApplicationCodePolicy8796F599": Object {
+      "Properties": Object {
+        "PolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": Array [
+                "s3:GetObjectVersion",
+                "s3:GetObject",
+              ],
+              "Effect": "Allow",
+              "Resource": "arn:aws:s3:::some-bucket/some-key.zip",
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "TestApplicationCodePolicy8796F599",
+        "Roles": Array [
+          Object {
+            "Ref": "TestApplicationAppRoleF109DF67",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "TestApplicationCustomResource71741B78": Object {
+      "DependsOn": Array [
+        "TestApplicationCustomResourceRoleC6612C60",
+      ],
+      "Properties": Object {
+        "Code": Object {
+          "S3Bucket": Object {
+            "Ref": "AssetParameters6467ddf591ee8d331757e026c674b30fde5ccf2b7239abd2a53645055b04fd29S3Bucket6CBC124E",
+          },
+          "S3Key": Object {
+            "Fn::Join": Array [
+              "",
+              Array [
+                Object {
+                  "Fn::Select": Array [
+                    0,
+                    Object {
+                      "Fn::Split": Array [
+                        "||",
+                        Object {
+                          "Ref": "AssetParameters6467ddf591ee8d331757e026c674b30fde5ccf2b7239abd2a53645055b04fd29S3VersionKey35BC6A36",
+                        },
+                      ],
+                    },
+                  ],
+                },
+                Object {
+                  "Fn::Select": Array [
+                    1,
+                    Object {
+                      "Fn::Split": Array [
+                        "||",
+                        Object {
+                          "Ref": "AssetParameters6467ddf591ee8d331757e026c674b30fde5ccf2b7239abd2a53645055b04fd29S3VersionKey35BC6A36",
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            ],
+          },
+        },
+        "Handler": "lambda_function.handler",
+        "Role": Object {
+          "Fn::GetAtt": Array [
+            "TestApplicationCustomResourceRoleC6612C60",
+            "Arn",
+          ],
+        },
+        "Runtime": "python3.8",
+        "Timeout": 30,
+      },
+      "Type": "AWS::Lambda::Function",
+    },
+    "TestApplicationCustomResourceRoleC6612C60": Object {
+      "Properties": Object {
+        "AssumeRolePolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": Object {
+                "Service": "lambda.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "Policies": Array [
+          Object {
+            "PolicyDocument": Object {
+              "Statement": Array [
+                Object {
+                  "Action": Array [
+                    "logs:CreateLogGroup",
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents",
+                  ],
+                  "Effect": "Allow",
+                  "Resource": Object {
+                    "Fn::Join": Array [
+                      "",
+                      Array [
+                        "arn:",
+                        Object {
+                          "Ref": "AWS::Partition",
+                        },
+                        ":logs:",
+                        Object {
+                          "Ref": "AWS::Region",
+                        },
+                        ":",
+                        Object {
+                          "Ref": "AWS::AccountId",
+                        },
+                        ":log-group:/aws/lambda/*",
+                      ],
+                    ],
+                  },
+                },
+              ],
+              "Version": "2012-10-17",
+            },
+            "PolicyName": "CloudWatchLogsPolicy",
+          },
+          Object {
+            "PolicyDocument": Object {
+              "Statement": Array [
+                Object {
+                  "Action": Array [
+                    "kinesisanalytics:AddApplicationVpcConfiguration",
+                    "kinesisanalytics:DeleteApplicationVpcConfiguration",
+                    "kinesisanalytics:DescribeApplication",
+                  ],
+                  "Effect": "Allow",
+                  "Resource": Object {
+                    "Fn::Join": Array [
+                      "",
+                      Array [
+                        "arn:",
+                        Object {
+                          "Ref": "AWS::Partition",
+                        },
+                        ":kinesisanalytics:",
+                        Object {
+                          "Ref": "AWS::Region",
+                        },
+                        ":",
+                        Object {
+                          "Ref": "AWS::AccountId",
+                        },
+                        ":application/",
+                        Object {
+                          "Ref": "TestApplicationFF75924F",
+                        },
+                      ],
+                    ],
+                  },
+                },
+              ],
+              "Version": "2012-10-17",
+            },
+            "PolicyName": "VpcConfigPolicy",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "TestApplicationFF75924F": Object {
+      "Properties": Object {
+        "ApplicationConfiguration": Object {
+          "ApplicationCodeConfiguration": Object {
+            "CodeContent": Object {
+              "S3ContentLocation": Object {
+                "BucketARN": "arn:aws:s3:::some-bucket",
+                "FileKey": "some-key.zip",
+              },
+            },
+            "CodeContentType": "ZIPFILE",
+          },
+          "ApplicationSnapshotConfiguration": Object {
+            "SnapshotsEnabled": Object {
+              "Fn::If": Array [
+                "TestApplicationEnableSnapshotsB729B643",
+                true,
+                false,
+              ],
+            },
+          },
+          "EnvironmentProperties": Object {
+            "PropertyGroups": Array [
+              Object {
+                "PropertyGroupId": "FlinkApplicationProperties",
+                "PropertyMap": Object {
+                  "InputStreamName": Object {
+                    "Ref": "TestStreamE6F40222",
+                  },
+                  "OutputBucketName": Object {
+                    "Ref": "TestBucket560B80BC",
+                  },
+                  "Region": Object {
+                    "Ref": "AWS::Region",
+                  },
+                },
+              },
+            ],
+          },
+          "FlinkApplicationConfiguration": Object {
+            "CheckpointConfiguration": Object {
+              "ConfigurationType": "DEFAULT",
+            },
+            "MonitoringConfiguration": Object {
+              "ConfigurationType": "CUSTOM",
+              "LogLevel": "INFO",
+              "MetricsLevel": "APPLICATION",
+            },
+            "ParallelismConfiguration": Object {
+              "AutoScalingEnabled": Object {
+                "Fn::If": Array [
+                  "TestApplicationEnableAutoScaling3998F3DF",
+                  true,
+                  false,
+                ],
+              },
+              "ConfigurationType": "CUSTOM",
+            },
+          },
+        },
+        "RuntimeEnvironment": "FLINK-1_8",
+        "ServiceExecutionRole": Object {
+          "Fn::GetAtt": Array [
+            "TestApplicationAppRoleF109DF67",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "AWS::KinesisAnalyticsV2::Application",
+    },
+    "TestApplicationLogGroup970A3DC7": Object {
+      "DeletionPolicy": "Retain",
+      "Properties": Object {
+        "RetentionInDays": 7,
+      },
+      "Type": "AWS::Logs::LogGroup",
+      "UpdateReplacePolicy": "Retain",
+    },
+    "TestApplicationLogStream41304A53": Object {
+      "DeletionPolicy": "Retain",
+      "Properties": Object {
+        "LogGroupName": Object {
+          "Ref": "TestApplicationLogGroup970A3DC7",
+        },
+      },
+      "Type": "AWS::Logs::LogStream",
+      "UpdateReplacePolicy": "Retain",
+    },
+    "TestApplicationLoggingB343A6A7": Object {
+      "Properties": Object {
+        "ApplicationName": Object {
+          "Ref": "TestApplicationFF75924F",
+        },
+        "CloudWatchLoggingOption": Object {
+          "LogStreamARN": Object {
+            "Fn::Join": Array [
+              "",
+              Array [
+                "arn:",
+                Object {
+                  "Ref": "AWS::Partition",
+                },
+                ":logs:",
+                Object {
+                  "Ref": "AWS::Region",
+                },
+                ":",
+                Object {
+                  "Ref": "AWS::AccountId",
+                },
+                ":log-group:",
+                Object {
+                  "Ref": "TestApplicationLogGroup970A3DC7",
+                },
+                ":log-stream:",
+                Object {
+                  "Ref": "TestApplicationLogStream41304A53",
+                },
+              ],
+            ],
+          },
+        },
+      },
+      "Type": "AWS::KinesisAnalyticsV2::ApplicationCloudWatchLoggingOption",
+    },
+    "TestApplicationLogsPolicyAFC3EE65": Object {
+      "Properties": Object {
+        "PolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": "logs:DescribeLogGroups",
+              "Effect": "Allow",
+              "Resource": Object {
+                "Fn::Join": Array [
+                  "",
+                  Array [
+                    "arn:",
+                    Object {
+                      "Ref": "AWS::Partition",
+                    },
+                    ":logs:",
+                    Object {
+                      "Ref": "AWS::Region",
+                    },
+                    ":",
+                    Object {
+                      "Ref": "AWS::AccountId",
+                    },
+                    ":log-group:*",
+                  ],
+                ],
+              },
+            },
+            Object {
+              "Action": Array [
+                "logs:DescribeLogStreams",
+                "logs:PutLogEvents",
+              ],
+              "Effect": "Allow",
+              "Resource": Object {
+                "Fn::GetAtt": Array [
+                  "TestApplicationLogGroup970A3DC7",
+                  "Arn",
+                ],
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "TestApplicationLogsPolicyAFC3EE65",
+        "Roles": Array [
+          Object {
+            "Ref": "TestApplicationAppRoleF109DF67",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "TestApplicationVpcConfiguration6BA87B39": Object {
+      "DeletionPolicy": "Delete",
+      "Properties": Object {
+        "ApplicationName": Object {
+          "Ref": "TestApplicationFF75924F",
+        },
+        "SecurityGroupIds": Array [
+          "sg-123",
+        ],
+        "ServiceToken": Object {
+          "Fn::GetAtt": Array [
+            "TestApplicationCustomResource71741B78",
+            "Arn",
+          ],
+        },
+        "SubnetIds": Array [
+          "subnet-a",
+          "subnet-b",
+        ],
+      },
+      "Type": "Custom::VpcConfiguration",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "TestApplicationVpcPolicy7E12ABFD": Object {
+      "Metadata": Object {
+        "cfn_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "W12",
+              "reason": "Actions do not support resource level permissions",
+            },
+          ],
+        },
+      },
+      "Properties": Object {
+        "PolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": Array [
+                "ec2:CreateNetworkInterface",
+                "ec2:DescribeNetworkInterfaces",
+                "ec2:DescribeVpcs",
+                "ec2:DeleteNetworkInterface",
+                "ec2:DescribeDhcpOptions",
+                "ec2:DescribeSubnets",
+                "ec2:DescribeSecurityGroups",
+              ],
+              "Effect": "Allow",
+              "Resource": "*",
+            },
+            Object {
+              "Action": "ec2:CreateNetworkInterfacePermission",
+              "Effect": "Allow",
+              "Resource": Object {
+                "Fn::Join": Array [
+                  "",
+                  Array [
+                    "arn:",
+                    Object {
+                      "Ref": "AWS::Partition",
+                    },
+                    ":ec2:",
+                    Object {
+                      "Ref": "AWS::Region",
+                    },
+                    ":",
+                    Object {
+                      "Ref": "AWS::AccountId",
+                    },
+                    ":network-interface/*",
+                  ],
+                ],
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "TestApplicationVpcPolicy7E12ABFD",
+        "Roles": Array [
+          Object {
+            "Ref": "TestApplicationAppRoleF109DF67",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "TestBucket560B80BC": Object {
+      "DeletionPolicy": "Retain",
+      "Type": "AWS::S3::Bucket",
+      "UpdateReplacePolicy": "Retain",
+    },
+    "TestStreamE6F40222": Object {
+      "Properties": Object {
+        "RetentionPeriodHours": 24,
+        "ShardCount": 1,
+        "StreamEncryption": Object {
+          "Fn::If": Array [
+            "AwsCdkKinesisEncryptedStreamsUnsupportedRegions",
+            Object {
+              "Ref": "AWS::NoValue",
+            },
+            Object {
+              "EncryptionType": "KMS",
+              "KeyId": "alias/aws/kinesis",
+            },
+          ],
+        },
+      },
+      "Type": "AWS::Kinesis::Stream",
+    },
+  },
+}
+`;

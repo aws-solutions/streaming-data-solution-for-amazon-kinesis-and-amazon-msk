@@ -1,0 +1,31 @@
+AWS Streaming Data Solution for Amazon Kinesis
+
+Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+**********************
+THIRD PARTY COMPONENTS
+**********************
+This software includes third party software subject to the following copyrights:
+
+aws-sdk under the Apache License Version 2.0
+crhelper under the Apache License Version 2.0
+Coverage.py under the Apache License Version 2.0
+chai under the Massachusetts Institute of Technology (MIT) license
+mocha under the Massachusetts Institute of Technology (MIT) license
+nyc under the ISC license
+requests under the Apache License Version 2.0
+
+Amazon Kinesis Client Library For Java under the Apache License Version 2.0
+Amazon Kinesis Producer Library under the Apache License Version 2.0
+Apache Maven Compiler Plugin under the Apache License Version 2.0
+Apache Maven Shade Plugin under the Apache License Version 2.0
+AWS Java SDK For Amazon CloudWatch Logs under the Apache License Version 2.0
+AWS Kinesis Analytics Java Flink Connectors under the Apache License Version 2.0
+AWS Kinesis Analytics Java Flink Runtime under the Apache License Version 2.0
+AWS SDK For Java BOM under the Apache License Version 2.0
+Flink Connector Kafka under the Apache License Version 2.0
+Flink Connector Kinesis under the Apache License Version 2.0
+Flink Streaming Java under the Apache License Version 2.0
+JSON In Java under the JSON License
+SLF4J LOG4J-12 Binding under the Massachusetts Institute of Technology (MIT) license
+SLF4J Simple Binding under the Massachusetts Institute of Technology (MIT) license

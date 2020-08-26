@@ -1,0 +1,12 @@
+{
+  "name": "cdk-solution-helper",
+  "version": "1.0.0",
+  "dependencies": {
+    "fs": "0.0.1-security"
+  },
+  "private": true,
+  "license": "Apache-2.0",
+  "author": {
+    "name": "aws-solutions-builder"
+  }
+}

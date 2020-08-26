@@ -1,0 +1,3 @@
+{
+  "app": "npx ts-node bin/streaming-data-solution.ts"
+}
