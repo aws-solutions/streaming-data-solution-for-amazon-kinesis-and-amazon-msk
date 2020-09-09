@@ -153,7 +153,7 @@ aws s3 sync ./regional-s3-assets s3://$ARTIFACT_BUCKET-us-east-1/$SOLUTION_NAME/
 - [Kinesis Producer Library](https://github.com/awslabs/amazon-kinesis-producer)
 - [Amazon Kinesis Data Analytics Java Examples](https://github.com/aws-samples/amazon-kinesis-data-analytics-java-examples)
 - [Flink: Hands-on Training](https://ci.apache.org/projects/flink/flink-docs-master/learn-flink/)
-- [Streaming Analytics Workshop](https://streaming-analytics.workshop.aws/en)
+- [Streaming Analytics Workshop](https://streaming-analytics.workshop.aws/flink-on-kda/)
 - [Kinesis Scaling Utility](https://github.com/awslabs/amazon-kinesis-scaling-utils)
 
 ***
