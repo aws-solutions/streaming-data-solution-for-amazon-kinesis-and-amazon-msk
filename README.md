@@ -62,7 +62,7 @@ aws kinesisanalyticsv2 start-application --application-name <application-name> -
 > **Note**: Stream name is an output of the CloudFormation stack.
 
 ```
-sudo java -jar /tmp/aws-kpl-demo-1.0.0.jar <stream-name> <aws-region> <seconds-to-run>
+sudo java -jar /tmp/aws-kpl-demo.jar <stream-name> <aws-region> <seconds-to-run>
 ```
 
 ## Project structure

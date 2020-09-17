@@ -26,4 +26,4 @@ mvn clean install --quiet -Pinclude-kinesis -DskipTests -Dfast --projects flink-
 
 cd $OLDPWD
 mvn clean package --quiet -Dflink.version=$flink_version
-zip -jq9 $zip_path target/aws-kda-flink-demo-*.jar
+zip -jq9 $zip_path target/aws-kda-flink-demo.jar

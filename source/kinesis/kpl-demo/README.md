@@ -50,5 +50,5 @@ mvn clean package
 
 ### 4. Run the application
 ```
-java -jar target/aws-kpl-demo-1.0.0.jar <stream-name> <aws-region> <seconds-to-run>
+java -jar target/aws-kpl-demo.jar <stream-name> <aws-region> <seconds-to-run>
 ```

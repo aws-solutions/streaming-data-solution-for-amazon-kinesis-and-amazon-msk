@@ -12,9 +12,8 @@
  *********************************************************************************************************************/
 
 import * as cdk from '@aws-cdk/core';
-import * as cwlogs from '@aws-cdk/aws-logs';
+import { ApiGatewayToKinesisStreams } from '@aws-solutions-constructs/aws-apigateway-kinesisstreams';
 
-import { ProxyApi } from '../lib/kds-apigw-proxy';
 import { DataStream } from '../lib/kds-data-stream';
 import { LambdaConsumer } from '../lib/kds-lambda-consumer';
 import { SolutionHelper } from '../lib/solution-helper';
@@ -24,6 +23,9 @@ import { StreamMonitoring } from '../lib/kds-monitoring';
 export class ApiGwKdsLambda extends cdk.Stack {
     constructor(scope: cdk.Construct, id: string, props: SolutionStackProps) {
         super(scope, id, props);
+
+        //---------------------------------------------------------------------
+        // Kinesis Data Stream configuration
 
         const shardCount = new cdk.CfnParameter(this, 'ShardCount', {
             type: 'Number',
@@ -51,6 +53,9 @@ export class ApiGwKdsLambda extends cdk.Stack {
             enableEnhancedMonitoring: enhancedMonitoring.valueAsString
         });
 
+        //---------------------------------------------------------------------
+        // API Gateway configuration
+
         const rateLimit = new cdk.CfnParameter(this, 'ThrottlingRateLimit', {
             type: 'Number',
             default: 100,
@@ -65,12 +70,23 @@ export class ApiGwKdsLambda extends cdk.Stack {
             maxValue: 5000
         });
 
-        const apigw = new ProxyApi(this, 'ApiGW', {
-            stream: kds.Stream,
-            throttlingRateLimit: rateLimit.valueAsNumber,
-            throttlingBurstLimit: burstLimit.valueAsNumber,
-            accessLogsRetention: cwlogs.RetentionDays.ONE_YEAR
+        const apiGwToKds = new ApiGatewayToKinesisStreams(this, 'ApiGwKds', {
+            apiGatewayProps: {
+                restApiName: `${cdk.Aws.STACK_NAME}-kinesis-proxy`,
+                deployOptions: {
+                    methodOptions: {
+                        '/*/*': {
+                            throttlingRateLimit: rateLimit.valueAsNumber,
+                            throttlingBurstLimit: burstLimit.valueAsNumber
+                        }
+                    }
+                }
+            },
+            existingStreamObj: kds.Stream
         });
+
+        //---------------------------------------------------------------------
+        // Lambda function configuration
 
         const batchSize = new cdk.CfnParameter(this, 'BatchSize', {
             type: 'Number',
@@ -101,10 +117,16 @@ export class ApiGwKdsLambda extends cdk.Stack {
             timeout: cdk.Duration.minutes(5)
         });
 
+        //---------------------------------------------------------------------
+        // Monitoring (dashboard and alarms) configuration
+
         new StreamMonitoring(this, 'Monitoring', {
             streamName: kds.Stream.streamName,
             lambdaFunctionName: lambda.Function.functionName
         });
+
+        //---------------------------------------------------------------------
+        // Solution metrics
 
         new SolutionHelper(this, 'SolutionHelper', {
             solutionId: props.solutionId,
@@ -114,6 +136,9 @@ export class ApiGwKdsLambda extends cdk.Stack {
             retentionHours: dataRetention.valueAsNumber,
             enhancedMonitoring: enhancedMonitoring.valueAsString
         });
+
+        //---------------------------------------------------------------------
+        // Template metadata
 
         this.templateOptions.metadata = {
             'AWS::CloudFormation::Interface': {
@@ -162,14 +187,17 @@ export class ApiGwKdsLambda extends cdk.Stack {
             }
         };
 
+        //---------------------------------------------------------------------
+        // Stack outputs
+
         new cdk.CfnOutput(this, 'ProxyApiId', {
             description: 'ID of the proxy API',
-            value: apigw.Api.restApiId
+            value: apiGwToKds.apiGateway.restApiId
         });
 
         new cdk.CfnOutput(this, 'ProxyApiEndpoint', {
             description: 'Deployed URL of the proxy API',
-            value: apigw.Api.url
+            value: apiGwToKds.apiGateway.url
         });
 
         new cdk.CfnOutput(this, 'DataStreamName', {

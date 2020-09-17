@@ -6,7 +6,7 @@
 
     <groupId>com.demo</groupId>
     <artifactId>aws-kda-flink-demo</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -80,6 +80,7 @@
     </dependencies>
 
     <build>
+        <finalName>${project.artifactId}</finalName>
         <plugins>
             <!-- Java Compiler -->
             <plugin>

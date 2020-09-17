@@ -16,4 +16,4 @@ fi
 zip_path="$1"
 
 mvn clean package --quiet
-zip -jq9 $zip_path target/aws-kpl-demo-*.jar
+zip -jq9 $zip_path target/aws-kpl-demo.jar

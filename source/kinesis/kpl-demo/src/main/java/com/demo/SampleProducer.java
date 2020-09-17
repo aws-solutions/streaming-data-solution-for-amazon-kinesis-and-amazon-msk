@@ -76,7 +76,7 @@ public class SampleProducer {
      *  3. The duration of the test in seconds, 5 is the default.
      *
      * Sample usage:
-     * java -jar aws-kpl-demo-1.0.0.jar my-stream us-east-1 10
+     * java -jar aws-kpl-demo.jar my-stream us-east-1 10
      */
     public static void main(String[] args) throws Exception {
         final String streamName = getArgIfPresent(args, 0, STREAM_NAME);

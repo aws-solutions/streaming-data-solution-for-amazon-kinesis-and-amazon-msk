@@ -28,6 +28,9 @@ export class KplKdsKda extends cdk.Stack {
     constructor(scope: cdk.Construct, id: string, props: SolutionStackProps) {
         super(scope, id, props);
 
+        //---------------------------------------------------------------------
+        // Kinesis Data Stream configuration
+
         const shardCount = new cdk.CfnParameter(this, 'ShardCount', {
             type: 'Number',
             default: 2,
@@ -54,6 +57,9 @@ export class KplKdsKda extends cdk.Stack {
             enableEnhancedMonitoring: enhancedMonitoring.valueAsString
         });
 
+        //---------------------------------------------------------------------
+        // Kinesis Producer Library configuration
+
         const producerVpc = new cdk.CfnParameter(this, 'ProducerVpcId', {
             type: 'AWS::EC2::VPC::Id'
         });
@@ -75,6 +81,9 @@ export class KplKdsKda extends cdk.Stack {
             codeBucketName: cdk.Fn.join('-', ['%%BUCKET_NAME%%', cdk.Aws.REGION]),
             codeFileKey: cdk.Fn.join('/', ['%%SOLUTION_NAME%%/%%VERSION%%', 'kpl-demo.zip'])
         });
+
+        //---------------------------------------------------------------------
+        // Kinesis Data Analytics configuration
 
         const outputBucket = new EncryptedBucket(this, 'Output', {
             enableIntelligentTiering: true
@@ -130,6 +139,9 @@ export class KplKdsKda extends cdk.Stack {
             securityGroupIds: securityGroups.valueAsList
         });
 
+        //---------------------------------------------------------------------
+        // Solution metrics
+
         new SolutionHelper(this, 'SolutionHelper', {
             solutionId: props.solutionId,
             pattern: KplKdsKda.name,
@@ -139,11 +151,17 @@ export class KplKdsKda extends cdk.Stack {
             enhancedMonitoring: enhancedMonitoring.valueAsString
         });
 
+        //---------------------------------------------------------------------
+        // Monitoring (dashboard and alarms) configuration
+
         new ApplicationMonitoring(this, 'Monitoring', {
             applicationName: kda.ApplicationName,
             logGroupName: kda.LogGroupName,
             inputStreamName: kds.Stream.streamName
         });
+
+        //---------------------------------------------------------------------
+        // Template metadata
 
         this.templateOptions.metadata = {
             'AWS::CloudFormation::Interface': {
@@ -210,6 +228,9 @@ export class KplKdsKda extends cdk.Stack {
                 }
             }
         };
+
+        //---------------------------------------------------------------------
+        // Stack outputs
 
         new cdk.CfnOutput(this, 'ProducerInstance', {
             description: 'ID of the KPL EC2 instance',

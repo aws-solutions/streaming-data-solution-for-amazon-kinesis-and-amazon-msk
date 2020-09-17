@@ -117,6 +117,16 @@ Object {
       "Type": "AWS::IAM::Policy",
     },
     "TestApplicationAppRoleF109DF67": Object {
+      "Metadata": Object {
+        "cfn_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "W11",
+              "reason": "EC2 actions in VPC policy do not support resource level permissions",
+            },
+          ],
+        },
+      },
       "Properties": Object {
         "AssumeRolePolicyDocument": Object {
           "Statement": Array [
@@ -130,32 +140,116 @@ Object {
           ],
           "Version": "2012-10-17",
         },
-      },
-      "Type": "AWS::IAM::Role",
-    },
-    "TestApplicationCodePolicy8796F599": Object {
-      "Properties": Object {
-        "PolicyDocument": Object {
-          "Statement": Array [
-            Object {
-              "Action": Array [
-                "s3:GetObjectVersion",
-                "s3:GetObject",
-              ],
-              "Effect": "Allow",
-              "Resource": "arn:aws:s3:::some-bucket/some-key.zip",
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-        "PolicyName": "TestApplicationCodePolicy8796F599",
-        "Roles": Array [
+        "Policies": Array [
           Object {
-            "Ref": "TestApplicationAppRoleF109DF67",
+            "PolicyDocument": Object {
+              "Statement": Array [
+                Object {
+                  "Action": Array [
+                    "s3:GetObjectVersion",
+                    "s3:GetObject",
+                  ],
+                  "Effect": "Allow",
+                  "Resource": "arn:aws:s3:::some-bucket/some-key.zip",
+                },
+              ],
+              "Version": "2012-10-17",
+            },
+            "PolicyName": "S3Policy",
+          },
+          Object {
+            "PolicyDocument": Object {
+              "Statement": Array [
+                Object {
+                  "Action": "logs:DescribeLogGroups",
+                  "Effect": "Allow",
+                  "Resource": Object {
+                    "Fn::Join": Array [
+                      "",
+                      Array [
+                        "arn:",
+                        Object {
+                          "Ref": "AWS::Partition",
+                        },
+                        ":logs:",
+                        Object {
+                          "Ref": "AWS::Region",
+                        },
+                        ":",
+                        Object {
+                          "Ref": "AWS::AccountId",
+                        },
+                        ":log-group:*",
+                      ],
+                    ],
+                  },
+                },
+                Object {
+                  "Action": Array [
+                    "logs:DescribeLogStreams",
+                    "logs:PutLogEvents",
+                  ],
+                  "Effect": "Allow",
+                  "Resource": Object {
+                    "Fn::GetAtt": Array [
+                      "TestApplicationLogGroup970A3DC7",
+                      "Arn",
+                    ],
+                  },
+                },
+              ],
+              "Version": "2012-10-17",
+            },
+            "PolicyName": "LogsPolicy",
+          },
+          Object {
+            "PolicyDocument": Object {
+              "Statement": Array [
+                Object {
+                  "Action": Array [
+                    "ec2:CreateNetworkInterface",
+                    "ec2:DescribeNetworkInterfaces",
+                    "ec2:DescribeVpcs",
+                    "ec2:DeleteNetworkInterface",
+                    "ec2:DescribeDhcpOptions",
+                    "ec2:DescribeSubnets",
+                    "ec2:DescribeSecurityGroups",
+                  ],
+                  "Effect": "Allow",
+                  "Resource": "*",
+                },
+                Object {
+                  "Action": "ec2:CreateNetworkInterfacePermission",
+                  "Effect": "Allow",
+                  "Resource": Object {
+                    "Fn::Join": Array [
+                      "",
+                      Array [
+                        "arn:",
+                        Object {
+                          "Ref": "AWS::Partition",
+                        },
+                        ":ec2:",
+                        Object {
+                          "Ref": "AWS::Region",
+                        },
+                        ":",
+                        Object {
+                          "Ref": "AWS::AccountId",
+                        },
+                        ":network-interface/*",
+                      ],
+                    ],
+                  },
+                },
+              ],
+              "Version": "2012-10-17",
+            },
+            "PolicyName": "VpcPolicy",
           },
         ],
       },
-      "Type": "AWS::IAM::Policy",
+      "Type": "AWS::IAM::Role",
     },
     "TestApplicationCustomResource71741B78": Object {
       "DependsOn": Array [
@@ -431,59 +525,6 @@ Object {
       },
       "Type": "AWS::KinesisAnalyticsV2::ApplicationCloudWatchLoggingOption",
     },
-    "TestApplicationLogsPolicyAFC3EE65": Object {
-      "Properties": Object {
-        "PolicyDocument": Object {
-          "Statement": Array [
-            Object {
-              "Action": "logs:DescribeLogGroups",
-              "Effect": "Allow",
-              "Resource": Object {
-                "Fn::Join": Array [
-                  "",
-                  Array [
-                    "arn:",
-                    Object {
-                      "Ref": "AWS::Partition",
-                    },
-                    ":logs:",
-                    Object {
-                      "Ref": "AWS::Region",
-                    },
-                    ":",
-                    Object {
-                      "Ref": "AWS::AccountId",
-                    },
-                    ":log-group:*",
-                  ],
-                ],
-              },
-            },
-            Object {
-              "Action": Array [
-                "logs:DescribeLogStreams",
-                "logs:PutLogEvents",
-              ],
-              "Effect": "Allow",
-              "Resource": Object {
-                "Fn::GetAtt": Array [
-                  "TestApplicationLogGroup970A3DC7",
-                  "Arn",
-                ],
-              },
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-        "PolicyName": "TestApplicationLogsPolicyAFC3EE65",
-        "Roles": Array [
-          Object {
-            "Ref": "TestApplicationAppRoleF109DF67",
-          },
-        ],
-      },
-      "Type": "AWS::IAM::Policy",
-    },
     "TestApplicationVpcConfiguration6BA87B39": Object {
       "DeletionPolicy": "Delete",
       "Properties": Object {
@@ -506,69 +547,6 @@ Object {
       },
       "Type": "Custom::VpcConfiguration",
       "UpdateReplacePolicy": "Delete",
-    },
-    "TestApplicationVpcPolicy7E12ABFD": Object {
-      "Metadata": Object {
-        "cfn_nag": Object {
-          "rules_to_suppress": Array [
-            Object {
-              "id": "W12",
-              "reason": "Actions do not support resource level permissions",
-            },
-          ],
-        },
-      },
-      "Properties": Object {
-        "PolicyDocument": Object {
-          "Statement": Array [
-            Object {
-              "Action": Array [
-                "ec2:CreateNetworkInterface",
-                "ec2:DescribeNetworkInterfaces",
-                "ec2:DescribeVpcs",
-                "ec2:DeleteNetworkInterface",
-                "ec2:DescribeDhcpOptions",
-                "ec2:DescribeSubnets",
-                "ec2:DescribeSecurityGroups",
-              ],
-              "Effect": "Allow",
-              "Resource": "*",
-            },
-            Object {
-              "Action": "ec2:CreateNetworkInterfacePermission",
-              "Effect": "Allow",
-              "Resource": Object {
-                "Fn::Join": Array [
-                  "",
-                  Array [
-                    "arn:",
-                    Object {
-                      "Ref": "AWS::Partition",
-                    },
-                    ":ec2:",
-                    Object {
-                      "Ref": "AWS::Region",
-                    },
-                    ":",
-                    Object {
-                      "Ref": "AWS::AccountId",
-                    },
-                    ":network-interface/*",
-                  ],
-                ],
-              },
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-        "PolicyName": "TestApplicationVpcPolicy7E12ABFD",
-        "Roles": Array [
-          Object {
-            "Ref": "TestApplicationAppRoleF109DF67",
-          },
-        ],
-      },
-      "Type": "AWS::IAM::Policy",
     },
     "TestBucket560B80BC": Object {
       "DeletionPolicy": "Retain",

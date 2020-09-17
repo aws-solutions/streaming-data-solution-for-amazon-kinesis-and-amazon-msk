@@ -47,11 +47,11 @@ test('adds cfn_nag suppressions', () => {
         shardCount: 2
     });
 
-    expectCDK(stack).to(haveResource('AWS::IAM::Policy', {
+    expectCDK(stack).to(haveResource('AWS::IAM::Role', {
         Metadata: {
             cfn_nag: {
                 rules_to_suppress: [{
-                    id: 'W12',
+                    id: 'W11',
                     reason: 'Kinesis enhanced monitoring actions do not support resource level permissions'
                 }]
             }

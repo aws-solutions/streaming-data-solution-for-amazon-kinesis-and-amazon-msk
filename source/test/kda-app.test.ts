@@ -15,7 +15,7 @@ import * as cdk from '@aws-cdk/core';
 import * as logs from '@aws-cdk/aws-logs';
 import * as kinesis from '@aws-cdk/aws-kinesis';
 import * as s3 from '@aws-cdk/aws-s3';
-import { expect as expectCDK, haveResource, haveResourceLike, ResourcePart, SynthUtils } from '@aws-cdk/assert';
+import { expect as expectCDK, haveResource, ResourcePart, SynthUtils } from '@aws-cdk/assert';
 
 import { FlinkApplication } from '../lib/kda-flink-application';
 
@@ -71,66 +71,15 @@ describe('successful scenarios', () => {
                 Version: '2012-10-17'
             }
         }));
-
-        expectCDK(stack).to(haveResourceLike('AWS::IAM::Policy', {
-            PolicyDocument: {
-                Statement: [
-                    {
-                        Action: [
-                            'kinesis:DescribeStreamSummary',
-                            'kinesis:GetRecords',
-                            'kinesis:GetShardIterator',
-                            'kinesis:ListShards',
-                            'kinesis:SubscribeToShard'
-                        ],
-                        Effect: 'Allow'
-                    },
-                    {
-                        Action: [
-                            's3:GetObject*',
-                            's3:GetBucket*',
-                            's3:List*',
-                            's3:DeleteObject*',
-                            's3:PutObject*',
-                            's3:Abort*'
-                        ],
-                        Effect: 'Allow'
-                    }
-                ]
-            }
-        }));
-
-        expectCDK(stack).to(haveResourceLike('AWS::IAM::Policy', {
-            PolicyDocument: {
-                Statement: [
-                    {
-                        Action: [
-                            'ec2:CreateNetworkInterface',
-                            'ec2:DescribeNetworkInterfaces',
-                            'ec2:DescribeVpcs',
-                            'ec2:DeleteNetworkInterface',
-                            'ec2:DescribeDhcpOptions',
-                            'ec2:DescribeSubnets',
-                            'ec2:DescribeSecurityGroups'
-                        ],
-                        Effect: 'Allow'
-                    },
-                    {
-                        Action: 'ec2:CreateNetworkInterfacePermission',
-                        Effect: 'Allow'
-                    }
-                ]
-            }
-        }));
     });
 
     test('adds cfn_nag suppressions', () => {
-        expectCDK(stack).to(haveResource('AWS::IAM::Policy', {
+        expectCDK(stack).to(haveResource('AWS::IAM::Role', {
             Metadata: {
                 cfn_nag: {
                     rules_to_suppress: [{
-                        id: 'W12',
-                        reason: 'Actions do not support resource level permissions'
+                        id: 'W11',
+                        reason: 'EC2 actions in VPC policy do not support resource level permissions'
                     }]
                 }
             }

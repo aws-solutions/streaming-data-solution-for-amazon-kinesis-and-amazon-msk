@@ -66,7 +66,7 @@ export class FlinkApplication extends cdk.Construct {
             throw new Error(`Unknown log level: ${props.logLevel}`);
         }
 
-        if (!cdk.Token.isUnresolved(props.metricsLevel) &&!FlinkApplication.AllowedMetricLevels.includes(props.metricsLevel)) {
+        if (!cdk.Token.isUnresolved(props.metricsLevel) && !FlinkApplication.AllowedMetricLevels.includes(props.metricsLevel)) {
             throw new Error(`Unknown metrics level: ${props.metricsLevel}`);
         }
 
@@ -141,19 +141,14 @@ export class FlinkApplication extends cdk.Construct {
     }
 
     private createRole(bucketArn: string, fileKey: string): iam.IRole {
-        const role = new iam.Role(this, 'AppRole', {
-            assumedBy: new iam.ServicePrincipal('kinesisanalytics.amazonaws.com')
-        });
-
-        const s3Policy = new iam.Policy(this, 'CodePolicy', {
+        const s3CodePolicy = new iam.PolicyDocument({
             statements: [new iam.PolicyStatement({
                 resources: [`${bucketArn}/${fileKey}`],
                 actions: ['s3:GetObjectVersion', 's3:GetObject']
             })]
         });
-        s3Policy.attachToRole(role);
 
-        const logsPolicy = new iam.Policy(this, 'LogsPolicy', {
+        const logsPolicy = new iam.PolicyDocument({
             statements: [
                 new iam.PolicyStatement({
                     resources: [`arn:${cdk.Aws.PARTITION}:logs:${cdk.Aws.REGION}:${cdk.Aws.ACCOUNT_ID}:log-group:*`],
@@ -165,9 +160,8 @@ export class FlinkApplication extends cdk.Construct {
                 })
             ]
         });
-        logsPolicy.attachToRole(role);
 
-        const vpcPolicy = new iam.Policy(this, 'VpcPolicy', {
+        const vpcPolicy = new iam.PolicyDocument({
             statements: [
                 new iam.PolicyStatement({
                     resources: ['*'],
@@ -187,14 +181,22 @@ export class FlinkApplication extends cdk.Construct {
                 })
             ]
         });
-        vpcPolicy.attachToRole(role);
 
-        const cfnPolicy = vpcPolicy.node.defaultChild as iam.CfnPolicy;
-        cfnPolicy.cfnOptions.metadata = {
+        const role = new iam.Role(this, 'AppRole', {
+            assumedBy: new iam.ServicePrincipal('kinesisanalytics.amazonaws.com'),
+            inlinePolicies: {
+                S3Policy: s3CodePolicy,
+                LogsPolicy: logsPolicy,
+                VpcPolicy: vpcPolicy
+            }
+        });
+
+        const cfnRole = role.node.defaultChild as iam.CfnRole;
+        cfnRole.cfnOptions.metadata = {
             cfn_nag: {
                 rules_to_suppress: [{
-                    id: 'W12',
-                    reason: 'Actions do not support resource level permissions'
+                    id: 'W11',
+                    reason: 'EC2 actions in VPC policy do not support resource level permissions'
                 }]
             }
         };

@@ -25,7 +25,7 @@ export interface DataStreamProps {
 }
 
 export class DataStream extends cdk.Construct {
-    public readonly Stream: kinesis.IStream;
+    public readonly Stream: kinesis.Stream;
 
     constructor(scope: cdk.Construct, id: string, props: DataStreamProps) {
         super(scope, id);
@@ -44,25 +44,27 @@ export class DataStream extends cdk.Construct {
     }
 
     private createCustomResource(enableEnhancedMonitoring: string) {
-        const monitoringPolicy = new iam.Policy(this, 'MonitoringPolicy', {
+        const monitoringPolicy = new iam.PolicyDocument({
             statements: [new iam.PolicyStatement({
                 resources: ['*'],
                 actions: ['kinesis:EnableEnhancedMonitoring', 'kinesis:DisableEnhancedMonitoring']
             })]
         });
 
-        const cfnPolicy = monitoringPolicy.node.defaultChild as iam.CfnPolicy;
-        cfnPolicy.cfnOptions.metadata = {
+        const customResouceRole = new ExecutionRole(this, 'Role', {
+            inlinePolicyName: 'MonitoringPolicy',
+            inlinePolicyDocument: monitoringPolicy
+        });
+
+        const cfnRole = customResouceRole.Role.node.defaultChild as iam.CfnRole;
+        cfnRole.cfnOptions.metadata = {
             cfn_nag: {
                 rules_to_suppress: [{
-                    id: 'W12',
+                    id: 'W11',
                     reason: 'Kinesis enhanced monitoring actions do not support resource level permissions'
                 }]
             }
         };
-
-        const customResouceRole = new ExecutionRole(this, 'Role');
-        monitoringPolicy.attachToRole(customResouceRole.Role);
 
         const customResourceFunction = new lambda.Function(this, 'CustomResource', {
             runtime: lambda.Runtime.PYTHON_3_8,

@@ -68,6 +68,7 @@ export class ApplicationMonitoring extends cdk.Construct {
             title,
             left: [metric],
             leftYAxis: { showUnits: false },
+            rightYAxis: { showUnits: false },
             leftAnnotations: annonations
         });
     }
