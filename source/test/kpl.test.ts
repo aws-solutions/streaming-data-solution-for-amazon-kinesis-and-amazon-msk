@@ -32,7 +32,7 @@ beforeEach(() => {
 });
 
 test('creates a KPL instance', () => {
-    new KinesisProducer(stack, 'TestProducer', {
+    const kpl = new KinesisProducer(stack, 'TestProducer', {
         stream: testStream,
         vpcId: testVpcId,
         subnetId: testSubnetId,
@@ -42,6 +42,7 @@ test('creates a KPL instance', () => {
     });
 
     expect(SynthUtils.toCloudFormation(stack)).toMatchSnapshot();
+    expect(kpl.InstanceId).not.toBeUndefined();
 });
 
 test('adds cfn_nag suppressions', () => {

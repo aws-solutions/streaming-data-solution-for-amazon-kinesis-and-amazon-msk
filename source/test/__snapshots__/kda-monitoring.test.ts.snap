@@ -13,7 +13,14 @@ Object {
               Object {
                 "Ref": "AWS::Region",
               },
-              "\\",\\"metrics\\":[[\\"AWS/KinesisAnalytics\\",\\"downtime\\",\\"Application\\",\\"test-application\\",{\\"period\\":60}]],\\"annotations\\":{\\"horizontal\\":[{\\"label\\":\\"Downtime threshold\\",\\"value\\":0,\\"yAxis\\":\\"left\\"}]},\\"yAxis\\":{\\"left\\":{\\"showUnits\\":false},\\"right\\":{\\"showUnits\\":false}}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":6,\\"y\\":1,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Uptime\\",\\"region\\":\\"",
+              "\\",\\"annotations\\":{\\"alarms\\":[\\"",
+              Object {
+                "Fn::GetAtt": Array [
+                  "DashboardDowntimeAlarm0610A7CD",
+                  "Arn",
+                ],
+              },
+              "\\"]},\\"yAxis\\":{}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":6,\\"y\\":1,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Uptime\\",\\"region\\":\\"",
               Object {
                 "Ref": "AWS::Region",
               },
@@ -25,7 +32,14 @@ Object {
               Object {
                 "Ref": "AWS::Region",
               },
-              "\\",\\"metrics\\":[[\\"AWS/KinesisAnalytics\\",\\"numberOfFailedCheckpoints\\",\\"Application\\",\\"test-application\\",{\\"period\\":60}]],\\"annotations\\":{\\"horizontal\\":[{\\"label\\":\\"Number of Failed Checkpoints threshold\\",\\"value\\":0,\\"yAxis\\":\\"left\\"}]},\\"yAxis\\":{\\"left\\":{\\"showUnits\\":false},\\"right\\":{\\"showUnits\\":false}}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":0,\\"y\\":7,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Last Checkpoint Duration\\",\\"region\\":\\"",
+              "\\",\\"annotations\\":{\\"alarms\\":[\\"",
+              Object {
+                "Fn::GetAtt": Array [
+                  "DashboardCheckpointAlarm3205A33F",
+                  "Arn",
+                ],
+              },
+              "\\"]},\\"yAxis\\":{}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":0,\\"y\\":7,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Last Checkpoint Duration\\",\\"region\\":\\"",
               Object {
                 "Ref": "AWS::Region",
               },
@@ -37,11 +51,25 @@ Object {
               Object {
                 "Ref": "AWS::Region",
               },
-              "\\",\\"metrics\\":[[\\"AWS/KinesisAnalytics\\",\\"cpuUtilization\\",\\"Application\\",\\"test-application\\",{\\"period\\":60,\\"stat\\":\\"Maximum\\"}]],\\"annotations\\":{\\"horizontal\\":[{\\"label\\":\\"CPU Utilization threshold\\",\\"value\\":80,\\"yAxis\\":\\"left\\"}]},\\"yAxis\\":{\\"left\\":{\\"showUnits\\":false},\\"right\\":{\\"showUnits\\":false}}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":6,\\"y\\":14,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Heap Memory Utilization\\",\\"region\\":\\"",
+              "\\",\\"annotations\\":{\\"alarms\\":[\\"",
+              Object {
+                "Fn::GetAtt": Array [
+                  "DashboardCpuUtilizationAlarm557F9515",
+                  "Arn",
+                ],
+              },
+              "\\"]},\\"yAxis\\":{}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":6,\\"y\\":14,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Heap Memory Utilization\\",\\"region\\":\\"",
               Object {
                 "Ref": "AWS::Region",
               },
-              "\\",\\"metrics\\":[[\\"AWS/KinesisAnalytics\\",\\"heapMemoryUtilization\\",\\"Application\\",\\"test-application\\",{\\"period\\":60,\\"stat\\":\\"Maximum\\"}]],\\"annotations\\":{\\"horizontal\\":[{\\"label\\":\\"Heap Memory Utilization threshold\\",\\"value\\":90,\\"yAxis\\":\\"left\\"}]},\\"yAxis\\":{\\"left\\":{\\"showUnits\\":false},\\"right\\":{\\"showUnits\\":false}}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":12,\\"y\\":14,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Thread Count\\",\\"region\\":\\"",
+              "\\",\\"annotations\\":{\\"alarms\\":[\\"",
+              Object {
+                "Fn::GetAtt": Array [
+                  "DashboardHeapMemoryAlarmAA149A1B",
+                  "Arn",
+                ],
+              },
+              "\\"]},\\"yAxis\\":{}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":12,\\"y\\":14,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Thread Count\\",\\"region\\":\\"",
               Object {
                 "Ref": "AWS::Region",
               },
@@ -49,7 +77,14 @@ Object {
               Object {
                 "Ref": "AWS::Region",
               },
-              "\\",\\"metrics\\":[[{\\"label\\":\\"Old Generation GC Time Percent\\",\\"expression\\":\\"(m1 * 100)/60000\\"}],[\\"AWS/KinesisAnalytics\\",\\"oldGenerationGCTime\\",\\"Application\\",\\"test-application\\",{\\"period\\":60,\\"stat\\":\\"Maximum\\",\\"visible\\":false,\\"id\\":\\"m1\\"}]],\\"annotations\\":{\\"horizontal\\":[{\\"label\\":\\"GC Percent threshold\\",\\"value\\":60,\\"yAxis\\":\\"left\\"}]},\\"yAxis\\":{\\"left\\":{\\"showUnits\\":false},\\"right\\":{\\"showUnits\\":false}}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":0,\\"y\\":20,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Old Generation GC Count Rate\\",\\"region\\":\\"",
+              "\\",\\"annotations\\":{\\"alarms\\":[\\"",
+              Object {
+                "Fn::GetAtt": Array [
+                  "DashboardGCPercentAlarmE5EE740C",
+                  "Arn",
+                ],
+              },
+              "\\"]},\\"yAxis\\":{}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":0,\\"y\\":20,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Old Generation GC Count Rate\\",\\"region\\":\\"",
               Object {
                 "Ref": "AWS::Region",
               },
@@ -61,7 +96,14 @@ Object {
               Object {
                 "Ref": "AWS::Region",
               },
-              "\\",\\"metrics\\":[[\\"AWS/KinesisAnalytics\\",\\"numRecordsOutPerSecond\\",\\"Application\\",\\"test-application\\",{\\"period\\":60}]],\\"yAxis\\":{\\"left\\":{\\"showUnits\\":false},\\"right\\":{\\"showUnits\\":false}}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":12,\\"y\\":27,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Input Watermark\\",\\"region\\":\\"",
+              "\\",\\"annotations\\":{\\"alarms\\":[\\"",
+              Object {
+                "Fn::GetAtt": Array [
+                  "DashboardRecordsOutAlarmCCE6886B",
+                  "Arn",
+                ],
+              },
+              "\\"]},\\"yAxis\\":{}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":12,\\"y\\":27,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Input Watermark\\",\\"region\\":\\"",
               Object {
                 "Ref": "AWS::Region",
               },
@@ -81,7 +123,14 @@ Object {
               Object {
                 "Ref": "AWS::Region",
               },
-              "\\",\\"metrics\\":[[\\"AWS/KinesisAnalytics\\",\\"millisBehindLatest\\",\\"Application\\",\\"test-application\\",\\"Flow\\",\\"Input\\",\\"Id\\",\\"test_stream\\",{\\"period\\":60,\\"stat\\":\\"Maximum\\"}]],\\"annotations\\":{\\"horizontal\\":[{\\"label\\":\\"MillisBehindLatest threshold\\",\\"value\\":60000,\\"yAxis\\":\\"left\\"}]},\\"yAxis\\":{\\"left\\":{\\"showUnits\\":false},\\"right\\":{\\"showUnits\\":false}}}},{\\"type\\":\\"text\\",\\"width\\":24,\\"height\\":1,\\"x\\":0,\\"y\\":46,\\"properties\\":{\\"markdown\\":\\"\\\\n# Logs Insights\\\\n\\"}},{\\"type\\":\\"log\\",\\"width\\":24,\\"height\\":6,\\"x\\":0,\\"y\\":47,\\"properties\\":{\\"view\\":\\"table\\",\\"title\\":\\"Distribution of Tasks\\",\\"region\\":\\"",
+              "\\",\\"annotations\\":{\\"alarms\\":[\\"",
+              Object {
+                "Fn::GetAtt": Array [
+                  "DashboardMillisBehindAlarm6B85D4DB",
+                  "Arn",
+                ],
+              },
+              "\\"]},\\"yAxis\\":{}}},{\\"type\\":\\"text\\",\\"width\\":24,\\"height\\":1,\\"x\\":0,\\"y\\":46,\\"properties\\":{\\"markdown\\":\\"\\\\n# Logs Insights\\\\n\\"}},{\\"type\\":\\"log\\",\\"width\\":24,\\"height\\":6,\\"x\\":0,\\"y\\":47,\\"properties\\":{\\"view\\":\\"table\\",\\"title\\":\\"Distribution of Tasks\\",\\"region\\":\\"",
               Object {
                 "Ref": "AWS::Region",
               },
@@ -163,6 +212,25 @@ Object {
       },
       "Type": "AWS::CloudWatch::Alarm",
     },
+    "DashboardCpuUtilizationAlarm557F9515": Object {
+      "Properties": Object {
+        "ComparisonOperator": "GreaterThanThreshold",
+        "Dimensions": Array [
+          Object {
+            "Name": "Application",
+            "Value": "test-application",
+          },
+        ],
+        "EvaluationPeriods": 1,
+        "MetricName": "cpuUtilization",
+        "Namespace": "AWS/KinesisAnalytics",
+        "Period": 60,
+        "Statistic": "Maximum",
+        "Threshold": 80,
+        "TreatMissingData": "breaching",
+      },
+      "Type": "AWS::CloudWatch::Alarm",
+    },
     "DashboardDowntimeAlarm0610A7CD": Object {
       "Properties": Object {
         "ComparisonOperator": "GreaterThanThreshold",
@@ -178,6 +246,59 @@ Object {
         "Period": 60,
         "Statistic": "Average",
         "Threshold": 0,
+        "TreatMissingData": "breaching",
+      },
+      "Type": "AWS::CloudWatch::Alarm",
+    },
+    "DashboardGCPercentAlarmE5EE740C": Object {
+      "Properties": Object {
+        "ComparisonOperator": "GreaterThanThreshold",
+        "EvaluationPeriods": 1,
+        "Metrics": Array [
+          Object {
+            "Expression": "(m1 * 100)/60000",
+            "Id": "expr_1",
+            "Label": "Old Generation GC Time Percent",
+          },
+          Object {
+            "Id": "m1",
+            "MetricStat": Object {
+              "Metric": Object {
+                "Dimensions": Array [
+                  Object {
+                    "Name": "Application",
+                    "Value": "test-application",
+                  },
+                ],
+                "MetricName": "oldGenerationGCTime",
+                "Namespace": "AWS/KinesisAnalytics",
+              },
+              "Period": 60,
+              "Stat": "Maximum",
+            },
+            "ReturnData": false,
+          },
+        ],
+        "Threshold": 60,
+        "TreatMissingData": "breaching",
+      },
+      "Type": "AWS::CloudWatch::Alarm",
+    },
+    "DashboardHeapMemoryAlarmAA149A1B": Object {
+      "Properties": Object {
+        "ComparisonOperator": "GreaterThanThreshold",
+        "Dimensions": Array [
+          Object {
+            "Name": "Application",
+            "Value": "test-application",
+          },
+        ],
+        "EvaluationPeriods": 1,
+        "MetricName": "heapMemoryUtilization",
+        "Namespace": "AWS/KinesisAnalytics",
+        "Period": 60,
+        "Statistic": "Maximum",
+        "Threshold": 90,
         "TreatMissingData": "breaching",
       },
       "Type": "AWS::CloudWatch::Alarm",

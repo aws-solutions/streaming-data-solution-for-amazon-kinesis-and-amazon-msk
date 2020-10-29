@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`creates the solution helper custom resources 1`] = `
+exports[`creates solution helper with optional properties 1`] = `
 Object {
   "Conditions": Object {
     "HelperAnonymousDatatoAWS6303A68E": Object {
@@ -24,16 +24,16 @@ Object {
     },
   },
   "Parameters": Object {
-    "AssetParameters98838f73fb540895891e17605586c07a9e65871175493db45d41d60f9a35ed3fArtifactHash1B98E78B": Object {
-      "Description": "Artifact hash for asset \\"98838f73fb540895891e17605586c07a9e65871175493db45d41d60f9a35ed3f\\"",
+    "AssetParameters16e7a7d898422753c70886374331ba4db7dd29796f3c41fbeb9d6eaa8be0a752ArtifactHash7EF4BB10": Object {
+      "Description": "Artifact hash for asset \\"16e7a7d898422753c70886374331ba4db7dd29796f3c41fbeb9d6eaa8be0a752\\"",
       "Type": "String",
     },
-    "AssetParameters98838f73fb540895891e17605586c07a9e65871175493db45d41d60f9a35ed3fS3Bucket2CD89632": Object {
-      "Description": "S3 bucket for asset \\"98838f73fb540895891e17605586c07a9e65871175493db45d41d60f9a35ed3f\\"",
+    "AssetParameters16e7a7d898422753c70886374331ba4db7dd29796f3c41fbeb9d6eaa8be0a752S3Bucket1298FDC0": Object {
+      "Description": "S3 bucket for asset \\"16e7a7d898422753c70886374331ba4db7dd29796f3c41fbeb9d6eaa8be0a752\\"",
       "Type": "String",
     },
-    "AssetParameters98838f73fb540895891e17605586c07a9e65871175493db45d41d60f9a35ed3fS3VersionKeyB762B170": Object {
-      "Description": "S3 key for asset version \\"98838f73fb540895891e17605586c07a9e65871175493db45d41d60f9a35ed3f\\"",
+    "AssetParameters16e7a7d898422753c70886374331ba4db7dd29796f3c41fbeb9d6eaa8be0a752S3VersionKey1E8B6095": Object {
+      "Description": "S3 key for asset version \\"16e7a7d898422753c70886374331ba4db7dd29796f3c41fbeb9d6eaa8be0a752\\"",
       "Type": "String",
     },
   },
@@ -112,6 +112,9 @@ Object {
       "Condition": "HelperAnonymousDatatoAWS6303A68E",
       "DeletionPolicy": "Delete",
       "Properties": Object {
+        "BufferingInterval": 300,
+        "BufferingSize": 5,
+        "CompressionFormat": "GZIP",
         "EnhancedMonitoring": "false",
         "Pattern": "test-pattern",
         "Region": Object {
@@ -146,7 +149,7 @@ Object {
       "Properties": Object {
         "Code": Object {
           "S3Bucket": Object {
-            "Ref": "AssetParameters98838f73fb540895891e17605586c07a9e65871175493db45d41d60f9a35ed3fS3Bucket2CD89632",
+            "Ref": "AssetParameters16e7a7d898422753c70886374331ba4db7dd29796f3c41fbeb9d6eaa8be0a752S3Bucket1298FDC0",
           },
           "S3Key": Object {
             "Fn::Join": Array [
@@ -159,7 +162,7 @@ Object {
                       "Fn::Split": Array [
                         "||",
                         Object {
-                          "Ref": "AssetParameters98838f73fb540895891e17605586c07a9e65871175493db45d41d60f9a35ed3fS3VersionKeyB762B170",
+                          "Ref": "AssetParameters16e7a7d898422753c70886374331ba4db7dd29796f3c41fbeb9d6eaa8be0a752S3VersionKey1E8B6095",
                         },
                       ],
                     },
@@ -172,7 +175,203 @@ Object {
                       "Fn::Split": Array [
                         "||",
                         Object {
-                          "Ref": "AssetParameters98838f73fb540895891e17605586c07a9e65871175493db45d41d60f9a35ed3fS3VersionKeyB762B170",
+                          "Ref": "AssetParameters16e7a7d898422753c70886374331ba4db7dd29796f3c41fbeb9d6eaa8be0a752S3VersionKey1E8B6095",
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            ],
+          },
+        },
+        "Description": "This function generates UUID for each deployment and sends anonymous data to the AWS Solutions team",
+        "Handler": "lambda_function.handler",
+        "Role": Object {
+          "Fn::GetAtt": Array [
+            "HelperRole30063D70",
+            "Arn",
+          ],
+        },
+        "Runtime": "python3.8",
+        "Timeout": 30,
+      },
+      "Type": "AWS::Lambda::Function",
+    },
+  },
+}
+`;
+
+exports[`creates solution helper without any optional properties 1`] = `
+Object {
+  "Conditions": Object {
+    "HelperAnonymousDatatoAWS6303A68E": Object {
+      "Fn::Equals": Array [
+        Object {
+          "Fn::FindInMap": Array [
+            "HelperAnonymousData1341617A",
+            "SendAnonymousData",
+            "Data",
+          ],
+        },
+        "Yes",
+      ],
+    },
+  },
+  "Mappings": Object {
+    "HelperAnonymousData1341617A": Object {
+      "SendAnonymousData": Object {
+        "Data": "Yes",
+      },
+    },
+  },
+  "Parameters": Object {
+    "AssetParameters16e7a7d898422753c70886374331ba4db7dd29796f3c41fbeb9d6eaa8be0a752ArtifactHash7EF4BB10": Object {
+      "Description": "Artifact hash for asset \\"16e7a7d898422753c70886374331ba4db7dd29796f3c41fbeb9d6eaa8be0a752\\"",
+      "Type": "String",
+    },
+    "AssetParameters16e7a7d898422753c70886374331ba4db7dd29796f3c41fbeb9d6eaa8be0a752S3Bucket1298FDC0": Object {
+      "Description": "S3 bucket for asset \\"16e7a7d898422753c70886374331ba4db7dd29796f3c41fbeb9d6eaa8be0a752\\"",
+      "Type": "String",
+    },
+    "AssetParameters16e7a7d898422753c70886374331ba4db7dd29796f3c41fbeb9d6eaa8be0a752S3VersionKey1E8B6095": Object {
+      "Description": "S3 key for asset version \\"16e7a7d898422753c70886374331ba4db7dd29796f3c41fbeb9d6eaa8be0a752\\"",
+      "Type": "String",
+    },
+  },
+  "Resources": Object {
+    "HelperCreateUniqueID28DA313C": Object {
+      "Condition": "HelperAnonymousDatatoAWS6303A68E",
+      "DeletionPolicy": "Delete",
+      "Properties": Object {
+        "Resource": "UUID",
+        "ServiceToken": Object {
+          "Fn::GetAtt": Array [
+            "HelperSolutionHelperB4625520",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "Custom::CreateUUID",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "HelperRole30063D70": Object {
+      "Properties": Object {
+        "AssumeRolePolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": Object {
+                "Service": "lambda.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "Policies": Array [
+          Object {
+            "PolicyDocument": Object {
+              "Statement": Array [
+                Object {
+                  "Action": Array [
+                    "logs:CreateLogGroup",
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents",
+                  ],
+                  "Effect": "Allow",
+                  "Resource": Object {
+                    "Fn::Join": Array [
+                      "",
+                      Array [
+                        "arn:",
+                        Object {
+                          "Ref": "AWS::Partition",
+                        },
+                        ":logs:",
+                        Object {
+                          "Ref": "AWS::Region",
+                        },
+                        ":",
+                        Object {
+                          "Ref": "AWS::AccountId",
+                        },
+                        ":log-group:/aws/lambda/*",
+                      ],
+                    ],
+                  },
+                },
+              ],
+              "Version": "2012-10-17",
+            },
+            "PolicyName": "CloudWatchLogsPolicy",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "HelperSendAnonymousData42DD297E": Object {
+      "Condition": "HelperAnonymousDatatoAWS6303A68E",
+      "DeletionPolicy": "Delete",
+      "Properties": Object {
+        "Pattern": "test-pattern",
+        "Region": Object {
+          "Ref": "AWS::Region",
+        },
+        "Resource": "AnonymousMetric",
+        "ServiceToken": Object {
+          "Fn::GetAtt": Array [
+            "HelperSolutionHelperB4625520",
+            "Arn",
+          ],
+        },
+        "SolutionId": "SO9999",
+        "UUID": Object {
+          "Fn::GetAtt": Array [
+            "HelperCreateUniqueID28DA313C",
+            "UUID",
+          ],
+        },
+        "Version": "%%VERSION%%",
+      },
+      "Type": "Custom::AnonymousData",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "HelperSolutionHelperB4625520": Object {
+      "Condition": "HelperAnonymousDatatoAWS6303A68E",
+      "DependsOn": Array [
+        "HelperRole30063D70",
+      ],
+      "Properties": Object {
+        "Code": Object {
+          "S3Bucket": Object {
+            "Ref": "AssetParameters16e7a7d898422753c70886374331ba4db7dd29796f3c41fbeb9d6eaa8be0a752S3Bucket1298FDC0",
+          },
+          "S3Key": Object {
+            "Fn::Join": Array [
+              "",
+              Array [
+                Object {
+                  "Fn::Select": Array [
+                    0,
+                    Object {
+                      "Fn::Split": Array [
+                        "||",
+                        Object {
+                          "Ref": "AssetParameters16e7a7d898422753c70886374331ba4db7dd29796f3c41fbeb9d6eaa8be0a752S3VersionKey1E8B6095",
+                        },
+                      ],
+                    },
+                  ],
+                },
+                Object {
+                  "Fn::Select": Array [
+                    1,
+                    Object {
+                      "Fn::Split": Array [
+                        "||",
+                        Object {
+                          "Ref": "AssetParameters16e7a7d898422753c70886374331ba4db7dd29796f3c41fbeb9d6eaa8be0a752S3VersionKey1E8B6095",
                         },
                       ],
                     },

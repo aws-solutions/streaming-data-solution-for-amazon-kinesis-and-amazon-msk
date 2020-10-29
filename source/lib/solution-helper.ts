@@ -20,9 +20,13 @@ export interface SolutionHelperProps {
     readonly solutionId: string;
     readonly pattern: string;
 
-    readonly shardCount: number;
-    readonly retentionHours: number;
-    readonly enhancedMonitoring: string;
+    readonly shardCount?: number;
+    readonly retentionHours?: number;
+    readonly enhancedMonitoring?: string;
+
+    readonly bufferingSize?: number;
+    readonly bufferingInterval?: number;
+    readonly compressionFormat?: string;
 }
 
 export class SolutionHelper extends cdk.Construct {
@@ -42,7 +46,6 @@ export class SolutionHelper extends cdk.Construct {
         });
 
         const helperRole = new ExecutionRole(this, 'Role');
-
         const helperFunction = new lambda.Function(this, 'SolutionHelper', {
             runtime: lambda.Runtime.PYTHON_3_8,
             handler: 'lambda_function.handler',
@@ -73,7 +76,11 @@ export class SolutionHelper extends cdk.Construct {
 
                 'ShardCount': props.shardCount,
                 'RetentionHours': props.retentionHours,
-                'EnhancedMonitoring': props.enhancedMonitoring
+                'EnhancedMonitoring': props.enhancedMonitoring,
+
+                'BufferingSize': props.bufferingSize,
+                'BufferingInterval': props.bufferingInterval,
+                'CompressionFormat': props.compressionFormat
             },
             resourceType: 'Custom::AnonymousData'
         });

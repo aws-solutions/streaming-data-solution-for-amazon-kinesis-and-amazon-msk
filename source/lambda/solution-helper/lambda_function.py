@@ -55,7 +55,7 @@ def custom_resource(event, _):
             }
 
             logger.info(f'Sending payload: {payload}')
-            response = requests.post('https://metrics.awssolutionsbuilder.com/generic', data=payload, headers=headers)
+            response = requests.post('https://metrics.awssolutionsbuilder.com/generic', json=payload, headers=headers)
             logger.info(f'Response from metrics endpoint: {response.status_code} {response.reason}')
         except requests.exceptions.RequestException:
             logger.exception('Could not send usage data')

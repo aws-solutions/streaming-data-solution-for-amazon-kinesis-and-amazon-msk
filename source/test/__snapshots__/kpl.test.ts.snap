@@ -66,20 +66,47 @@ unzip /tmp/producer.zip -d /tmp && rm -f /tmp/producer.zip",
               "Action": Array [
                 "s3:GetObjectVersion",
                 "s3:GetObject",
+                "s3:ListBucket",
               ],
               "Effect": "Allow",
-              "Resource": Object {
-                "Fn::Join": Array [
-                  "",
-                  Array [
-                    "arn:",
-                    Object {
-                      "Ref": "AWS::Partition",
-                    },
-                    ":s3:::test-bucket/test-key.zip",
+              "Resource": Array [
+                Object {
+                  "Fn::Join": Array [
+                    "",
+                    Array [
+                      "arn:",
+                      Object {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":s3:::test-bucket/test-key.zip",
+                    ],
                   ],
-                ],
-              },
+                },
+                Object {
+                  "Fn::Join": Array [
+                    "",
+                    Array [
+                      "arn:",
+                      Object {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":s3:::aws-bigdata-blog/*",
+                    ],
+                  ],
+                },
+                Object {
+                  "Fn::Join": Array [
+                    "",
+                    Array [
+                      "arn:",
+                      Object {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":s3:::aws-bigdata-blog",
+                    ],
+                  ],
+                },
+              ],
             },
           ],
           "Version": "2012-10-17",

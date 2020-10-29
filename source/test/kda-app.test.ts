@@ -13,8 +13,6 @@
 
 import * as cdk from '@aws-cdk/core';
 import * as logs from '@aws-cdk/aws-logs';
-import * as kinesis from '@aws-cdk/aws-kinesis';
-import * as s3 from '@aws-cdk/aws-s3';
 import { expect as expectCDK, haveResource, ResourcePart, SynthUtils } from '@aws-cdk/assert';
 
 import { FlinkApplication } from '../lib/kda-flink-application';
@@ -27,9 +25,12 @@ describe('successful scenarios', () => {
         stack = new cdk.Stack(app, 'TestStack');
 
         new FlinkApplication(stack, 'TestApplication', {
-            inputStream: new kinesis.Stream(stack, 'TestStream'),
-            outputBucket: new s3.Bucket(stack, 'TestBucket'),
-
+            environmentProperties: {
+                propertyGroupId: 'some-group-id',
+                propertyMap: {
+                    'some-property': 'foo'
+                }
+            },
             logsRetentionDays: logs.RetentionDays.ONE_WEEK,
             logLevel: 'INFO',
             metricsLevel: 'APPLICATION',
@@ -89,20 +90,20 @@ describe('successful scenarios', () => {
 
 describe('validation tests', () => {
     let stack: cdk.Stack;
-    let fakeStream: kinesis.IStream;
-    let fakeBucket: s3.IBucket;
 
     beforeEach(() => {
         const app = new cdk.App();
         stack = new cdk.Stack(app, 'TestStack');
-        fakeStream = new kinesis.Stream(stack, 'TestStream');
-        fakeBucket = new s3.Bucket(stack, 'TestBucket');
     });
 
     test('invalid log level', () => {
         expect(() => new FlinkApplication(stack, 'TestApplication', {
-            inputStream: fakeStream,
-            outputBucket: fakeBucket,
+            environmentProperties: {
+                propertyGroupId: 'some-group-id',
+                propertyMap: {
+                    'some-property': 'foo'
+                }
+            },
 
             logsRetentionDays: logs.RetentionDays.ONE_WEEK,
             logLevel: 'FOO',
@@ -118,8 +119,12 @@ describe('validation tests', () => {
 
     test('invalid metric level', () => {
         expect(() => new FlinkApplication(stack, 'TestApplication', {
-            inputStream: fakeStream,
-            outputBucket: fakeBucket,
+            environmentProperties: {
+                propertyGroupId: 'some-group-id',
+                propertyMap: {
+                    'some-property': 'foo'
+                }
+            },
 
             logsRetentionDays: logs.RetentionDays.ONE_WEEK,
             logLevel: 'INFO',

@@ -16,17 +16,34 @@ import { SynthUtils } from '@aws-cdk/assert';
 
 import { SolutionHelper } from '../lib/solution-helper';
 
-test('creates the solution helper custom resources', () => {
-    const app = new cdk.App();
-    const stack = new cdk.Stack(app, 'TestStack');
+let stack: cdk.Stack;
 
+beforeEach(() => {
+    const app = new cdk.App();
+    stack = new cdk.Stack(app, 'TestStack');
+});
+
+test('creates solution helper without any optional properties', () => {
+    new SolutionHelper(stack, 'Helper', {
+        solutionId: 'SO9999',
+        pattern: 'test-pattern'
+    });
+
+    expect(SynthUtils.toCloudFormation(stack)).toMatchSnapshot();
+});
+
+test('creates solution helper with optional properties', () => {
     new SolutionHelper(stack, 'Helper', {
         solutionId: 'SO9999',
         pattern: 'test-pattern',
 
         shardCount: 2,
         retentionHours: 24,
-        enhancedMonitoring: 'false'
+        enhancedMonitoring: 'false',
+
+        bufferingSize: 5,
+        bufferingInterval: 300,
+        compressionFormat: 'GZIP'
     });
 
     expect(SynthUtils.toCloudFormation(stack)).toMatchSnapshot();

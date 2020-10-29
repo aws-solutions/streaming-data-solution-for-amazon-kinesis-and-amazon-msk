@@ -122,8 +122,14 @@ export class KplKdsKda extends cdk.Stack {
         });
 
         const kda = new FlinkApplication(this, 'Kda', {
-            inputStream: kds.Stream,
-            outputBucket: outputBucket.Bucket,
+            environmentProperties: {
+                propertyGroupId: 'FlinkApplicationProperties',
+                propertyMap: {
+                    'InputStreamName': kds.Stream.streamName,
+                    'OutputBucketName': outputBucket.Bucket.bucketName,
+                    'Region': cdk.Aws.REGION
+                }
+            },
 
             logsRetentionDays: cwlogs.RetentionDays.ONE_YEAR,
             logLevel: logLevel.valueAsString,
@@ -138,6 +144,9 @@ export class KplKdsKda extends cdk.Stack {
             subnetIds: subnets.valueAsList,
             securityGroupIds: securityGroups.valueAsList
         });
+
+        kds.Stream.grantRead(kda.ApplicationRole);
+        outputBucket.Bucket.grantReadWrite(kda.ApplicationRole);
 
         //---------------------------------------------------------------------
         // Solution metrics

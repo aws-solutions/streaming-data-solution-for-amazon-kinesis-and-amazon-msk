@@ -28,7 +28,7 @@ export enum BrokerInstanceType {
 }
 
 export interface KafkaClusterProps {
-    readonly kafkaVersion: '1.1.1' | '2.2.1' | '2.3.1' | '2.4.1';
+    readonly kafkaVersion: '1.1.1' | '2.2.1' | '2.3.1' | '2.4.1' | '2.4.1.1' | '2.5.1';
     readonly numberOfBrokerNodes: number;
     readonly brokerInstanceType: BrokerInstanceType;
 

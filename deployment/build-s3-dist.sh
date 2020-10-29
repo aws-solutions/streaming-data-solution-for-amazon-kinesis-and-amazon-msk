@@ -26,7 +26,7 @@
 set -e
 
 # Important: CDK global version number
-cdk_version=1.62.0
+cdk_version=1.67.0
 
 # Check to see if input has been provided:
 if [ -z "$1" ] || [ -z "$2" ] || [ -z "$3" ]; then
@@ -62,15 +62,14 @@ echo "--------------------------------------------------------------------------
 echo "[Init] Install dependencies for the cdk-solution-helper"
 echo "------------------------------------------------------------------------------"
 cd $template_dir/cdk-solution-helper
-npm install
+npm ci --only=prod
 
 echo "------------------------------------------------------------------------------"
-echo "[Init] Install dependencies for Lambda functions and Kinesis applications"
+echo "[Init] Install dependencies for Lambda functions"
 echo "------------------------------------------------------------------------------"
 cd $source_dir/lambda
 for folder in */ ; do
     cd "$folder"
-
     function_name=${PWD##*/}
     echo "Installing dependencies for $function_name"
 
@@ -90,21 +89,56 @@ for folder in */ ; do
     cd ..
 done
 
+echo "------------------------------------------------------------------------------"
+echo "[Init] Download and compile Apache Flink"
+echo "------------------------------------------------------------------------------"
+cd $source_dir/kinesis
+flink_version=1.8.2
+flink_checksum="7451cafb920f954e851fad2bcb551c9dc24af0615a70c78f932455b260832a434893548de5058609c22d251d2e4c2a3bc6c1c2d2f93c7811b481651d2877d34b flink-$flink_version-src.tgz"
+
+wget https://archive.apache.org/dist/flink/flink-$flink_version/flink-$flink_version-src.tgz
+echo $flink_checksum | sha512sum -c
+
+tar -xf flink-$flink_version-src.tgz
+cd flink-$flink_version
+mvn clean install --quiet -Pinclude-kinesis -DskipTests -Dfast --projects flink-connectors/flink-connector-kinesis,flink-connectors/flink-connector-kafka
+
+echo "------------------------------------------------------------------------------"
+echo "[Init] Generate jar files for demo Java applications"
+echo "------------------------------------------------------------------------------"
 cd $source_dir/kinesis
 for folder in */ ; do
     cd "$folder"
+    application_name=${PWD##*/}
 
-    folder_name=${PWD##*/}
-    zip_path="$build_dist_dir/$folder_name.zip"
-
-    if [ -e "build.sh" ]; then
-        echo "Running build script for $folder_name (output at $zip_path)"
-        chmod +x ./build.sh
-        ./build.sh $zip_path
+    if [ $application_name == flink-$flink_version ]; then
+        cd ..
+        continue
     fi
+
+    echo "Compiling application $application_name"
+    mvn clean package --quiet -Dflink.version=$flink_version
+    zip -jq9 $build_dist_dir/$application_name.zip target/aws-$application_name.jar
 
     cd ..
 done
+
+echo "------------------------------------------------------------------------------"
+echo "[Init] Generate jar file for Amazon Kinesis Replay"
+echo "------------------------------------------------------------------------------"
+cd $source_dir/kinesis
+
+application_name=amazon-kinesis-replay
+application_version=0.1.0
+wget https://github.com/aws-samples/$application_name/archive/release-$application_version.zip
+unzip -q release-$application_version.zip
+
+cd $application_name-release-$application_version
+mvn clean package --quiet
+zip -jq9 $build_dist_dir/$application_name.zip target/$application_name-$application_version.jar
+
+cd $source_dir/kinesis
+rm -rf $application_name-release-$application_version release-$application_version.zip
 
 echo "------------------------------------------------------------------------------"
 echo "[Synth] CDK Project"
@@ -130,7 +164,7 @@ done
 node $template_dir/cdk-solution-helper/index
 
 echo "------------------------------------------------------------------------------"
-echo "Updating placeholders"
+echo "[Packing] Updating placeholders"
 echo "------------------------------------------------------------------------------"
 for file in $template_dist_dir/*.template
 do

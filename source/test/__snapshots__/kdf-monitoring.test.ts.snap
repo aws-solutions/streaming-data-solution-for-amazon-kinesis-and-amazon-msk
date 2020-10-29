@@ -1,0 +1,794 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`direct put monitoring with limit alarms creates a dashboard for KDF only 1`] = `
+Object {
+  "Resources": Object {
+    "TestAlarms1Dashboard5C0CF01C": Object {
+      "Properties": Object {
+        "DashboardBody": Object {
+          "Fn::Join": Array [
+            "",
+            Array [
+              "{\\"widgets\\":[{\\"type\\":\\"text\\",\\"width\\":24,\\"height\\":1,\\"x\\":0,\\"y\\":0,\\"properties\\":{\\"markdown\\":\\"\\\\n# Kinesis Data Firehose Metrics\\\\n\\"}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":0,\\"y\\":1,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Incoming bytes per second\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"metrics\\":[[{\\"label\\":\\"IncomingBytes (per second average)\\",\\"expression\\":\\"METRICS(\\\\\\"m1\\\\\\") / 300\\"}],[\\"AWS/Firehose\\",\\"IncomingBytes\\",\\"DeliveryStreamName\\",\\"test-delivery-stream\\",{\\"label\\":\\"\\",\\"stat\\":\\"Sum\\",\\"visible\\":false,\\"id\\":\\"m1\\"}],[\\"AWS/Firehose\\",\\"BytesPerSecondLimit\\",\\"DeliveryStreamName\\",\\"test-delivery-stream\\",{\\"color\\":\\"#d62728\\",\\"stat\\":\\"Minimum\\"}]],\\"yAxis\\":{\\"left\\":{\\"showUnits\\":false,\\"label\\":\\"Bytes\\",\\"min\\":0}}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":6,\\"y\\":1,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Incoming put requests per second\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"metrics\\":[[{\\"label\\":\\"IncomingPutRequests (per second average)\\",\\"expression\\":\\"METRICS(\\\\\\"m1\\\\\\") / 300\\"}],[\\"AWS/Firehose\\",\\"IncomingPutRequests\\",\\"DeliveryStreamName\\",\\"test-delivery-stream\\",{\\"label\\":\\"\\",\\"stat\\":\\"Sum\\",\\"visible\\":false,\\"id\\":\\"m1\\"}],[\\"AWS/Firehose\\",\\"PutRequestsPerSecondLimit\\",\\"DeliveryStreamName\\",\\"test-delivery-stream\\",{\\"color\\":\\"#d62728\\",\\"stat\\":\\"Minimum\\"}]],\\"yAxis\\":{\\"left\\":{\\"showUnits\\":false,\\"label\\":\\"Count\\",\\"min\\":0}}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":12,\\"y\\":1,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Incoming records per second\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"metrics\\":[[{\\"label\\":\\"IncomingRecords (per second average)\\",\\"expression\\":\\"METRICS(\\\\\\"m1\\\\\\") / 300\\"}],[\\"AWS/Firehose\\",\\"IncomingRecords\\",\\"DeliveryStreamName\\",\\"test-delivery-stream\\",{\\"label\\":\\"\\",\\"stat\\":\\"Sum\\",\\"visible\\":false,\\"id\\":\\"m1\\"}],[\\"AWS/Firehose\\",\\"RecordsPerSecondLimit\\",\\"DeliveryStreamName\\",\\"test-delivery-stream\\",{\\"color\\":\\"#d62728\\",\\"stat\\":\\"Minimum\\"}]],\\"yAxis\\":{\\"left\\":{\\"showUnits\\":false,\\"label\\":\\"Count\\",\\"min\\":0}}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":18,\\"y\\":1,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Throttled records (Count)\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"metrics\\":[[\\"AWS/Firehose\\",\\"ThrottledRecords\\",\\"DeliveryStreamName\\",\\"test-delivery-stream\\",{\\"stat\\":\\"Sum\\"}]],\\"yAxis\\":{}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":0,\\"y\\":7,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Incoming bytes (percentage of limit)\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"annotations\\":{\\"alarms\\":[\\"",
+              Object {
+                "Fn::GetAtt": Array [
+                  "TestAlarms1IncomingBytesAlarm23018E4E",
+                  "Arn",
+                ],
+              },
+              "\\"]},\\"yAxis\\":{}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":6,\\"y\\":7,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Incoming put requests (percentage of limit)\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"annotations\\":{\\"alarms\\":[\\"",
+              Object {
+                "Fn::GetAtt": Array [
+                  "TestAlarms1IncomingPutRequestsAlarm3DCA88E1",
+                  "Arn",
+                ],
+              },
+              "\\"]},\\"yAxis\\":{}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":12,\\"y\\":7,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Incoming records (percentage of limit)\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"annotations\\":{\\"alarms\\":[\\"",
+              Object {
+                "Fn::GetAtt": Array [
+                  "TestAlarms1IncomingRecordsAlarmD32774E5",
+                  "Arn",
+                ],
+              },
+              "\\"]},\\"yAxis\\":{}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":0,\\"y\\":13,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Delivery to Amazon S3 success\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"metrics\\":[[{\\"label\\":\\"DeliveryToS3.Success\\",\\"expression\\":\\"METRICS(\\\\\\"m1\\\\\\") * 100\\"}],[\\"AWS/Firehose\\",\\"DeliveryToS3.Success\\",\\"DeliveryStreamName\\",\\"test-delivery-stream\\",{\\"label\\":\\"\\",\\"visible\\":false,\\"id\\":\\"m1\\"}]],\\"yAxis\\":{\\"left\\":{\\"showUnits\\":false,\\"label\\":\\"Percentage\\",\\"min\\":0,\\"max\\":100}}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":6,\\"y\\":13,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Delivery to Amazon S3 data freshness (Maximum)\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"annotations\\":{\\"alarms\\":[\\"",
+              Object {
+                "Fn::GetAtt": Array [
+                  "TestAlarms1DataFreshnessAlarm64CD0C86",
+                  "Arn",
+                ],
+              },
+              "\\"]},\\"yAxis\\":{}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":12,\\"y\\":13,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Records delivered to Amazon S3 (Sum)\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"metrics\\":[[\\"AWS/Firehose\\",\\"DeliveryToS3.Records\\",\\"DeliveryStreamName\\",\\"test-delivery-stream\\",{\\"stat\\":\\"Sum\\"}]],\\"yAxis\\":{}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":18,\\"y\\":13,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Bytes delivered to Amazon S3 (Sum)\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"metrics\\":[[\\"AWS/Firehose\\",\\"DeliveryToS3.Bytes\\",\\"DeliveryStreamName\\",\\"test-delivery-stream\\",{\\"stat\\":\\"Sum\\"}]],\\"yAxis\\":{}}}]}",
+            ],
+          ],
+        },
+      },
+      "Type": "AWS::CloudWatch::Dashboard",
+    },
+    "TestAlarms1DataFreshnessAlarm64CD0C86": Object {
+      "Properties": Object {
+        "ComparisonOperator": "GreaterThanThreshold",
+        "Dimensions": Array [
+          Object {
+            "Name": "DeliveryStreamName",
+            "Value": "test-delivery-stream",
+          },
+        ],
+        "EvaluationPeriods": 1,
+        "MetricName": "DeliveryToS3.DataFreshness",
+        "Namespace": "AWS/Firehose",
+        "Period": 300,
+        "Statistic": "Maximum",
+        "Threshold": 900,
+        "TreatMissingData": "breaching",
+      },
+      "Type": "AWS::CloudWatch::Alarm",
+    },
+    "TestAlarms1IncomingBytesAlarm23018E4E": Object {
+      "Properties": Object {
+        "ComparisonOperator": "GreaterThanThreshold",
+        "EvaluationPeriods": 1,
+        "Metrics": Array [
+          Object {
+            "Expression": "100 * (m1 / m2)",
+            "Id": "expr_1",
+            "Label": "IncomingBytes (percentage)",
+          },
+          Object {
+            "Id": "m1",
+            "Label": "",
+            "MetricStat": Object {
+              "Metric": Object {
+                "Dimensions": Array [
+                  Object {
+                    "Name": "DeliveryStreamName",
+                    "Value": "test-delivery-stream",
+                  },
+                ],
+                "MetricName": "IncomingBytes",
+                "Namespace": "AWS/Firehose",
+              },
+              "Period": 300,
+              "Stat": "Sum",
+            },
+            "ReturnData": false,
+          },
+          Object {
+            "Id": "m2",
+            "Label": "",
+            "MetricStat": Object {
+              "Metric": Object {
+                "Dimensions": Array [
+                  Object {
+                    "Name": "DeliveryStreamName",
+                    "Value": "test-delivery-stream",
+                  },
+                ],
+                "MetricName": "BytesPerSecondLimit",
+                "Namespace": "AWS/Firehose",
+              },
+              "Period": 300,
+              "Stat": "Minimum",
+            },
+            "ReturnData": false,
+          },
+        ],
+        "Threshold": 75,
+        "TreatMissingData": "breaching",
+      },
+      "Type": "AWS::CloudWatch::Alarm",
+    },
+    "TestAlarms1IncomingPutRequestsAlarm3DCA88E1": Object {
+      "Properties": Object {
+        "ComparisonOperator": "GreaterThanThreshold",
+        "EvaluationPeriods": 1,
+        "Metrics": Array [
+          Object {
+            "Expression": "100 * (m1 / m2)",
+            "Id": "expr_1",
+            "Label": "IncomingPutRequests (percentage)",
+          },
+          Object {
+            "Id": "m1",
+            "Label": "",
+            "MetricStat": Object {
+              "Metric": Object {
+                "Dimensions": Array [
+                  Object {
+                    "Name": "DeliveryStreamName",
+                    "Value": "test-delivery-stream",
+                  },
+                ],
+                "MetricName": "IncomingPutRequests",
+                "Namespace": "AWS/Firehose",
+              },
+              "Period": 300,
+              "Stat": "Sum",
+            },
+            "ReturnData": false,
+          },
+          Object {
+            "Id": "m2",
+            "Label": "",
+            "MetricStat": Object {
+              "Metric": Object {
+                "Dimensions": Array [
+                  Object {
+                    "Name": "DeliveryStreamName",
+                    "Value": "test-delivery-stream",
+                  },
+                ],
+                "MetricName": "PutRequestsPerSecondLimit",
+                "Namespace": "AWS/Firehose",
+              },
+              "Period": 300,
+              "Stat": "Minimum",
+            },
+            "ReturnData": false,
+          },
+        ],
+        "Threshold": 75,
+        "TreatMissingData": "breaching",
+      },
+      "Type": "AWS::CloudWatch::Alarm",
+    },
+    "TestAlarms1IncomingRecordsAlarmD32774E5": Object {
+      "Properties": Object {
+        "ComparisonOperator": "GreaterThanThreshold",
+        "EvaluationPeriods": 1,
+        "Metrics": Array [
+          Object {
+            "Expression": "100 * (m1 / m2)",
+            "Id": "expr_1",
+            "Label": "IncomingRecords (percentage)",
+          },
+          Object {
+            "Id": "m1",
+            "Label": "",
+            "MetricStat": Object {
+              "Metric": Object {
+                "Dimensions": Array [
+                  Object {
+                    "Name": "DeliveryStreamName",
+                    "Value": "test-delivery-stream",
+                  },
+                ],
+                "MetricName": "IncomingRecords",
+                "Namespace": "AWS/Firehose",
+              },
+              "Period": 300,
+              "Stat": "Sum",
+            },
+            "ReturnData": false,
+          },
+          Object {
+            "Id": "m2",
+            "Label": "",
+            "MetricStat": Object {
+              "Metric": Object {
+                "Dimensions": Array [
+                  Object {
+                    "Name": "DeliveryStreamName",
+                    "Value": "test-delivery-stream",
+                  },
+                ],
+                "MetricName": "RecordsPerSecondLimit",
+                "Namespace": "AWS/Firehose",
+              },
+              "Period": 300,
+              "Stat": "Minimum",
+            },
+            "ReturnData": false,
+          },
+        ],
+        "Threshold": 75,
+        "TreatMissingData": "breaching",
+      },
+      "Type": "AWS::CloudWatch::Alarm",
+    },
+  },
+}
+`;
+
+exports[`kds as source monitoring without limit alarms creates a dashboard for KDF and KDS 1`] = `
+Object {
+  "Resources": Object {
+    "TestAlarms1Dashboard5C0CF01C": Object {
+      "Properties": Object {
+        "DashboardBody": Object {
+          "Fn::Join": Array [
+            "",
+            Array [
+              "{\\"widgets\\":[{\\"type\\":\\"text\\",\\"width\\":24,\\"height\\":1,\\"x\\":0,\\"y\\":0,\\"properties\\":{\\"markdown\\":\\"\\\\n# Kinesis Data Firehose Metrics\\\\n\\"}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":0,\\"y\\":1,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Incoming bytes per second\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"metrics\\":[[{\\"label\\":\\"IncomingBytes (per second average)\\",\\"expression\\":\\"METRICS(\\\\\\"m1\\\\\\") / 300\\"}],[\\"AWS/Firehose\\",\\"IncomingBytes\\",\\"DeliveryStreamName\\",\\"test-delivery-stream\\",{\\"label\\":\\"\\",\\"stat\\":\\"Sum\\",\\"visible\\":false,\\"id\\":\\"m1\\"}],[\\"AWS/Firehose\\",\\"BytesPerSecondLimit\\",\\"DeliveryStreamName\\",\\"test-delivery-stream\\",{\\"color\\":\\"#d62728\\",\\"stat\\":\\"Minimum\\"}]],\\"yAxis\\":{\\"left\\":{\\"showUnits\\":false,\\"label\\":\\"Bytes\\",\\"min\\":0}}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":6,\\"y\\":1,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Incoming put requests per second\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"metrics\\":[[{\\"label\\":\\"IncomingPutRequests (per second average)\\",\\"expression\\":\\"METRICS(\\\\\\"m1\\\\\\") / 300\\"}],[\\"AWS/Firehose\\",\\"IncomingPutRequests\\",\\"DeliveryStreamName\\",\\"test-delivery-stream\\",{\\"label\\":\\"\\",\\"stat\\":\\"Sum\\",\\"visible\\":false,\\"id\\":\\"m1\\"}],[\\"AWS/Firehose\\",\\"PutRequestsPerSecondLimit\\",\\"DeliveryStreamName\\",\\"test-delivery-stream\\",{\\"color\\":\\"#d62728\\",\\"stat\\":\\"Minimum\\"}]],\\"yAxis\\":{\\"left\\":{\\"showUnits\\":false,\\"label\\":\\"Count\\",\\"min\\":0}}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":12,\\"y\\":1,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Incoming records per second\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"metrics\\":[[{\\"label\\":\\"IncomingRecords (per second average)\\",\\"expression\\":\\"METRICS(\\\\\\"m1\\\\\\") / 300\\"}],[\\"AWS/Firehose\\",\\"IncomingRecords\\",\\"DeliveryStreamName\\",\\"test-delivery-stream\\",{\\"label\\":\\"\\",\\"stat\\":\\"Sum\\",\\"visible\\":false,\\"id\\":\\"m1\\"}],[\\"AWS/Firehose\\",\\"RecordsPerSecondLimit\\",\\"DeliveryStreamName\\",\\"test-delivery-stream\\",{\\"color\\":\\"#d62728\\",\\"stat\\":\\"Minimum\\"}]],\\"yAxis\\":{\\"left\\":{\\"showUnits\\":false,\\"label\\":\\"Count\\",\\"min\\":0}}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":18,\\"y\\":1,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Throttled records (Count)\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"metrics\\":[[\\"AWS/Firehose\\",\\"ThrottledRecords\\",\\"DeliveryStreamName\\",\\"test-delivery-stream\\",{\\"stat\\":\\"Sum\\"}]],\\"yAxis\\":{}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":0,\\"y\\":7,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Incoming bytes (percentage of limit)\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"annotations\\":{\\"alarms\\":[\\"",
+              Object {
+                "Fn::GetAtt": Array [
+                  "TestAlarms1IncomingBytesAlarm23018E4E",
+                  "Arn",
+                ],
+              },
+              "\\"]},\\"yAxis\\":{}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":6,\\"y\\":7,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Incoming put requests (percentage of limit)\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"annotations\\":{\\"alarms\\":[\\"",
+              Object {
+                "Fn::GetAtt": Array [
+                  "TestAlarms1IncomingPutRequestsAlarm3DCA88E1",
+                  "Arn",
+                ],
+              },
+              "\\"]},\\"yAxis\\":{}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":12,\\"y\\":7,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Incoming records (percentage of limit)\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"annotations\\":{\\"alarms\\":[\\"",
+              Object {
+                "Fn::GetAtt": Array [
+                  "TestAlarms1IncomingRecordsAlarmD32774E5",
+                  "Arn",
+                ],
+              },
+              "\\"]},\\"yAxis\\":{}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":0,\\"y\\":13,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Delivery to Amazon S3 success\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"metrics\\":[[{\\"label\\":\\"DeliveryToS3.Success\\",\\"expression\\":\\"METRICS(\\\\\\"m1\\\\\\") * 100\\"}],[\\"AWS/Firehose\\",\\"DeliveryToS3.Success\\",\\"DeliveryStreamName\\",\\"test-delivery-stream\\",{\\"label\\":\\"\\",\\"visible\\":false,\\"id\\":\\"m1\\"}]],\\"yAxis\\":{\\"left\\":{\\"showUnits\\":false,\\"label\\":\\"Percentage\\",\\"min\\":0,\\"max\\":100}}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":6,\\"y\\":13,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Delivery to Amazon S3 data freshness (Maximum)\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"annotations\\":{\\"alarms\\":[\\"",
+              Object {
+                "Fn::GetAtt": Array [
+                  "TestAlarms1DataFreshnessAlarm64CD0C86",
+                  "Arn",
+                ],
+              },
+              "\\"]},\\"yAxis\\":{}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":12,\\"y\\":13,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Records delivered to Amazon S3 (Sum)\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"metrics\\":[[\\"AWS/Firehose\\",\\"DeliveryToS3.Records\\",\\"DeliveryStreamName\\",\\"test-delivery-stream\\",{\\"stat\\":\\"Sum\\"}]],\\"yAxis\\":{}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":18,\\"y\\":13,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Bytes delivered to Amazon S3 (Sum)\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"metrics\\":[[\\"AWS/Firehose\\",\\"DeliveryToS3.Bytes\\",\\"DeliveryStreamName\\",\\"test-delivery-stream\\",{\\"stat\\":\\"Sum\\"}]],\\"yAxis\\":{}}}]}",
+            ],
+          ],
+        },
+      },
+      "Type": "AWS::CloudWatch::Dashboard",
+    },
+    "TestAlarms1DataFreshnessAlarm64CD0C86": Object {
+      "Properties": Object {
+        "ComparisonOperator": "GreaterThanThreshold",
+        "Dimensions": Array [
+          Object {
+            "Name": "DeliveryStreamName",
+            "Value": "test-delivery-stream",
+          },
+        ],
+        "EvaluationPeriods": 1,
+        "MetricName": "DeliveryToS3.DataFreshness",
+        "Namespace": "AWS/Firehose",
+        "Period": 300,
+        "Statistic": "Maximum",
+        "Threshold": 900,
+        "TreatMissingData": "breaching",
+      },
+      "Type": "AWS::CloudWatch::Alarm",
+    },
+    "TestAlarms1IncomingBytesAlarm23018E4E": Object {
+      "Properties": Object {
+        "ComparisonOperator": "GreaterThanThreshold",
+        "EvaluationPeriods": 1,
+        "Metrics": Array [
+          Object {
+            "Expression": "100 * (m1 / m2)",
+            "Id": "expr_1",
+            "Label": "IncomingBytes (percentage)",
+          },
+          Object {
+            "Id": "m1",
+            "Label": "",
+            "MetricStat": Object {
+              "Metric": Object {
+                "Dimensions": Array [
+                  Object {
+                    "Name": "DeliveryStreamName",
+                    "Value": "test-delivery-stream",
+                  },
+                ],
+                "MetricName": "IncomingBytes",
+                "Namespace": "AWS/Firehose",
+              },
+              "Period": 300,
+              "Stat": "Sum",
+            },
+            "ReturnData": false,
+          },
+          Object {
+            "Id": "m2",
+            "Label": "",
+            "MetricStat": Object {
+              "Metric": Object {
+                "Dimensions": Array [
+                  Object {
+                    "Name": "DeliveryStreamName",
+                    "Value": "test-delivery-stream",
+                  },
+                ],
+                "MetricName": "BytesPerSecondLimit",
+                "Namespace": "AWS/Firehose",
+              },
+              "Period": 300,
+              "Stat": "Minimum",
+            },
+            "ReturnData": false,
+          },
+        ],
+        "Threshold": 75,
+        "TreatMissingData": "breaching",
+      },
+      "Type": "AWS::CloudWatch::Alarm",
+    },
+    "TestAlarms1IncomingPutRequestsAlarm3DCA88E1": Object {
+      "Properties": Object {
+        "ComparisonOperator": "GreaterThanThreshold",
+        "EvaluationPeriods": 1,
+        "Metrics": Array [
+          Object {
+            "Expression": "100 * (m1 / m2)",
+            "Id": "expr_1",
+            "Label": "IncomingPutRequests (percentage)",
+          },
+          Object {
+            "Id": "m1",
+            "Label": "",
+            "MetricStat": Object {
+              "Metric": Object {
+                "Dimensions": Array [
+                  Object {
+                    "Name": "DeliveryStreamName",
+                    "Value": "test-delivery-stream",
+                  },
+                ],
+                "MetricName": "IncomingPutRequests",
+                "Namespace": "AWS/Firehose",
+              },
+              "Period": 300,
+              "Stat": "Sum",
+            },
+            "ReturnData": false,
+          },
+          Object {
+            "Id": "m2",
+            "Label": "",
+            "MetricStat": Object {
+              "Metric": Object {
+                "Dimensions": Array [
+                  Object {
+                    "Name": "DeliveryStreamName",
+                    "Value": "test-delivery-stream",
+                  },
+                ],
+                "MetricName": "PutRequestsPerSecondLimit",
+                "Namespace": "AWS/Firehose",
+              },
+              "Period": 300,
+              "Stat": "Minimum",
+            },
+            "ReturnData": false,
+          },
+        ],
+        "Threshold": 75,
+        "TreatMissingData": "breaching",
+      },
+      "Type": "AWS::CloudWatch::Alarm",
+    },
+    "TestAlarms1IncomingRecordsAlarmD32774E5": Object {
+      "Properties": Object {
+        "ComparisonOperator": "GreaterThanThreshold",
+        "EvaluationPeriods": 1,
+        "Metrics": Array [
+          Object {
+            "Expression": "100 * (m1 / m2)",
+            "Id": "expr_1",
+            "Label": "IncomingRecords (percentage)",
+          },
+          Object {
+            "Id": "m1",
+            "Label": "",
+            "MetricStat": Object {
+              "Metric": Object {
+                "Dimensions": Array [
+                  Object {
+                    "Name": "DeliveryStreamName",
+                    "Value": "test-delivery-stream",
+                  },
+                ],
+                "MetricName": "IncomingRecords",
+                "Namespace": "AWS/Firehose",
+              },
+              "Period": 300,
+              "Stat": "Sum",
+            },
+            "ReturnData": false,
+          },
+          Object {
+            "Id": "m2",
+            "Label": "",
+            "MetricStat": Object {
+              "Metric": Object {
+                "Dimensions": Array [
+                  Object {
+                    "Name": "DeliveryStreamName",
+                    "Value": "test-delivery-stream",
+                  },
+                ],
+                "MetricName": "RecordsPerSecondLimit",
+                "Namespace": "AWS/Firehose",
+              },
+              "Period": 300,
+              "Stat": "Minimum",
+            },
+            "ReturnData": false,
+          },
+        ],
+        "Threshold": 75,
+        "TreatMissingData": "breaching",
+      },
+      "Type": "AWS::CloudWatch::Alarm",
+    },
+    "TestAlarms2Dashboard42915699": Object {
+      "Properties": Object {
+        "DashboardBody": Object {
+          "Fn::Join": Array [
+            "",
+            Array [
+              "{\\"widgets\\":[{\\"type\\":\\"text\\",\\"width\\":24,\\"height\\":1,\\"x\\":0,\\"y\\":0,\\"properties\\":{\\"markdown\\":\\"\\\\n# Kinesis Data Stream Metrics\\\\n\\"}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":0,\\"y\\":1,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Get records iterator age (Milliseconds)\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"annotations\\":{\\"alarms\\":[\\"",
+              Object {
+                "Fn::GetAtt": Array [
+                  "TestAlarms2IteratorAgeAlarm0147B6CD",
+                  "Arn",
+                ],
+              },
+              "\\"]},\\"yAxis\\":{}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":6,\\"y\\":1,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Read throughput exceeded (Percent)\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"annotations\\":{\\"alarms\\":[\\"",
+              Object {
+                "Fn::GetAtt": Array [
+                  "TestAlarms2ReadProvisionedAlarm7259474E",
+                  "Arn",
+                ],
+              },
+              "\\"]},\\"yAxis\\":{}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":12,\\"y\\":1,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Write throughput exceeded (Percent)\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"annotations\\":{\\"alarms\\":[\\"",
+              Object {
+                "Fn::GetAtt": Array [
+                  "TestAlarms2WriteProvisionedAlarmB9E955C9",
+                  "Arn",
+                ],
+              },
+              "\\"]},\\"yAxis\\":{}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":18,\\"y\\":1,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Put record success (Percent)\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"annotations\\":{\\"alarms\\":[\\"",
+              Object {
+                "Fn::GetAtt": Array [
+                  "TestAlarms2PutRecordAlarmDCD19290",
+                  "Arn",
+                ],
+              },
+              "\\"]},\\"yAxis\\":{}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":0,\\"y\\":7,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Put records success (Percent)\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"annotations\\":{\\"alarms\\":[\\"",
+              Object {
+                "Fn::GetAtt": Array [
+                  "TestAlarms2PutRecordsAlarm8C41B160",
+                  "Arn",
+                ],
+              },
+              "\\"]},\\"yAxis\\":{}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":6,\\"y\\":7,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Get records success (Percent)\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"annotations\\":{\\"alarms\\":[\\"",
+              Object {
+                "Fn::GetAtt": Array [
+                  "TestAlarms2GetRecordsAlarm362BC702",
+                  "Arn",
+                ],
+              },
+              "\\"]},\\"yAxis\\":{}}},{\\"type\\":\\"text\\",\\"width\\":24,\\"height\\":1,\\"x\\":0,\\"y\\":13,\\"properties\\":{\\"markdown\\":\\"\\\\n# Kinesis Data Firehose Metrics\\\\n\\"}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":0,\\"y\\":14,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Records read from Kinesis Data Streams (Sum)\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"metrics\\":[[\\"AWS/Firehose\\",\\"DataReadFromKinesisStream.Records\\",\\"DeliveryStreamName\\",\\"test-delivery-stream\\",{\\"stat\\":\\"Sum\\"}]],\\"yAxis\\":{}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":6,\\"y\\":14,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Bytes read from Kinesis Data Streams (Sum)\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"metrics\\":[[\\"AWS/Firehose\\",\\"DataReadFromKinesisStream.Bytes\\",\\"DeliveryStreamName\\",\\"test-delivery-stream\\",{\\"stat\\":\\"Sum\\"}]],\\"yAxis\\":{}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":12,\\"y\\":14,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"GetRecords operations throttled (Average)\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"metrics\\":[[\\"AWS/Firehose\\",\\"ThrottledGetRecords\\",\\"DeliveryStreamName\\",\\"test-delivery-stream\\"]],\\"yAxis\\":{}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":0,\\"y\\":20,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Delivery to Amazon S3 success\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"metrics\\":[[{\\"label\\":\\"DeliveryToS3.Success\\",\\"expression\\":\\"METRICS(\\\\\\"m1\\\\\\") * 100\\"}],[\\"AWS/Firehose\\",\\"DeliveryToS3.Success\\",\\"DeliveryStreamName\\",\\"test-delivery-stream\\",{\\"label\\":\\"\\",\\"visible\\":false,\\"id\\":\\"m1\\"}]],\\"yAxis\\":{\\"left\\":{\\"showUnits\\":false,\\"label\\":\\"Percentage\\",\\"min\\":0,\\"max\\":100}}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":6,\\"y\\":20,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Delivery to Amazon S3 data freshness (Maximum)\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"annotations\\":{\\"alarms\\":[\\"",
+              Object {
+                "Fn::GetAtt": Array [
+                  "TestAlarms2DataFreshnessAlarm471DB442",
+                  "Arn",
+                ],
+              },
+              "\\"]},\\"yAxis\\":{}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":12,\\"y\\":20,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Records delivered to Amazon S3 (Sum)\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"metrics\\":[[\\"AWS/Firehose\\",\\"DeliveryToS3.Records\\",\\"DeliveryStreamName\\",\\"test-delivery-stream\\",{\\"stat\\":\\"Sum\\"}]],\\"yAxis\\":{}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":18,\\"y\\":20,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Bytes delivered to Amazon S3 (Sum)\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"metrics\\":[[\\"AWS/Firehose\\",\\"DeliveryToS3.Bytes\\",\\"DeliveryStreamName\\",\\"test-delivery-stream\\",{\\"stat\\":\\"Sum\\"}]],\\"yAxis\\":{}}}]}",
+            ],
+          ],
+        },
+      },
+      "Type": "AWS::CloudWatch::Dashboard",
+    },
+    "TestAlarms2DataFreshnessAlarm471DB442": Object {
+      "Properties": Object {
+        "ComparisonOperator": "GreaterThanThreshold",
+        "Dimensions": Array [
+          Object {
+            "Name": "DeliveryStreamName",
+            "Value": "test-delivery-stream",
+          },
+        ],
+        "EvaluationPeriods": 1,
+        "MetricName": "DeliveryToS3.DataFreshness",
+        "Namespace": "AWS/Firehose",
+        "Period": 300,
+        "Statistic": "Maximum",
+        "Threshold": 900,
+        "TreatMissingData": "breaching",
+      },
+      "Type": "AWS::CloudWatch::Alarm",
+    },
+    "TestAlarms2GetRecordsAlarm362BC702": Object {
+      "Properties": Object {
+        "ComparisonOperator": "LessThanOrEqualToThreshold",
+        "Dimensions": Array [
+          Object {
+            "Name": "StreamName",
+            "Value": "test-data-stream",
+          },
+        ],
+        "EvaluationPeriods": 1,
+        "MetricName": "GetRecords.Success",
+        "Namespace": "AWS/Kinesis",
+        "Period": 60,
+        "Statistic": "Average",
+        "Threshold": 0.98,
+        "TreatMissingData": "breaching",
+      },
+      "Type": "AWS::CloudWatch::Alarm",
+    },
+    "TestAlarms2IteratorAgeAlarm0147B6CD": Object {
+      "Properties": Object {
+        "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+        "Dimensions": Array [
+          Object {
+            "Name": "StreamName",
+            "Value": "test-data-stream",
+          },
+        ],
+        "EvaluationPeriods": 1,
+        "MetricName": "GetRecords.IteratorAgeMilliseconds",
+        "Namespace": "AWS/Kinesis",
+        "Period": 60,
+        "Statistic": "Maximum",
+        "Threshold": 60000,
+        "TreatMissingData": "breaching",
+      },
+      "Type": "AWS::CloudWatch::Alarm",
+    },
+    "TestAlarms2PutRecordAlarmDCD19290": Object {
+      "Properties": Object {
+        "ComparisonOperator": "LessThanOrEqualToThreshold",
+        "Dimensions": Array [
+          Object {
+            "Name": "StreamName",
+            "Value": "test-data-stream",
+          },
+        ],
+        "EvaluationPeriods": 1,
+        "MetricName": "PutRecord.Success",
+        "Namespace": "AWS/Kinesis",
+        "Period": 60,
+        "Statistic": "Average",
+        "Threshold": 0.95,
+        "TreatMissingData": "notBreaching",
+      },
+      "Type": "AWS::CloudWatch::Alarm",
+    },
+    "TestAlarms2PutRecordsAlarm8C41B160": Object {
+      "Properties": Object {
+        "ComparisonOperator": "LessThanOrEqualToThreshold",
+        "Dimensions": Array [
+          Object {
+            "Name": "StreamName",
+            "Value": "test-data-stream",
+          },
+        ],
+        "EvaluationPeriods": 1,
+        "MetricName": "PutRecords.Success",
+        "Namespace": "AWS/Kinesis",
+        "Period": 60,
+        "Statistic": "Average",
+        "Threshold": 0.95,
+        "TreatMissingData": "notBreaching",
+      },
+      "Type": "AWS::CloudWatch::Alarm",
+    },
+    "TestAlarms2ReadProvisionedAlarm7259474E": Object {
+      "Properties": Object {
+        "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+        "Dimensions": Array [
+          Object {
+            "Name": "StreamName",
+            "Value": "test-data-stream",
+          },
+        ],
+        "EvaluationPeriods": 1,
+        "MetricName": "ReadProvisionedThroughputExceeded",
+        "Namespace": "AWS/Kinesis",
+        "Period": 60,
+        "Statistic": "Average",
+        "Threshold": 0.01,
+        "TreatMissingData": "breaching",
+      },
+      "Type": "AWS::CloudWatch::Alarm",
+    },
+    "TestAlarms2WriteProvisionedAlarmB9E955C9": Object {
+      "Properties": Object {
+        "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+        "Dimensions": Array [
+          Object {
+            "Name": "StreamName",
+            "Value": "test-data-stream",
+          },
+        ],
+        "EvaluationPeriods": 1,
+        "MetricName": "WriteProvisionedThroughputExceeded",
+        "Namespace": "AWS/Kinesis",
+        "Period": 60,
+        "Statistic": "Average",
+        "Threshold": 0.01,
+        "TreatMissingData": "breaching",
+      },
+      "Type": "AWS::CloudWatch::Alarm",
+    },
+  },
+}
+`;

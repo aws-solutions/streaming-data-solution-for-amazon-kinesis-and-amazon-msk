@@ -14,16 +14,13 @@
 import * as cdk from '@aws-cdk/core';
 import * as analytics from '@aws-cdk/aws-kinesisanalytics';
 import * as iam from '@aws-cdk/aws-iam';
-import * as kinesis from '@aws-cdk/aws-kinesis';
 import * as logs from '@aws-cdk/aws-logs';
 import * as lambda from '@aws-cdk/aws-lambda';
-import * as s3 from '@aws-cdk/aws-s3';
 
 import { ExecutionRole } from './lambda-role-cloudwatch';
 
 export interface FlinkApplicationProps {
-    readonly inputStream: kinesis.IStream;
-    readonly outputBucket: s3.IBucket;
+    readonly environmentProperties: analytics.CfnApplicationV2.PropertyGroupProperty;
 
     readonly logsRetentionDays: logs.RetentionDays;
     readonly logLevel: string;
@@ -42,6 +39,7 @@ export interface FlinkApplicationProps {
 export class FlinkApplication extends cdk.Construct {
     private readonly Application: analytics.CfnApplicationV2;
     private readonly LogGroup: logs.LogGroup;
+    private readonly Role: iam.IRole;
 
     public get ApplicationName() {
         return this.Application.ref;
@@ -49,6 +47,10 @@ export class FlinkApplication extends cdk.Construct {
 
     public get LogGroupName() {
         return this.LogGroup.logGroupName;
+    }
+
+    public get ApplicationRole() {
+        return this.Role;
     }
 
     public static get AllowedLogLevels(): string[] {
@@ -80,9 +82,7 @@ export class FlinkApplication extends cdk.Construct {
             removalPolicy: cdk.RemovalPolicy.RETAIN
         });
 
-        const role = this.createRole(props.codeBucketArn, props.codeFileKey);
-        props.inputStream.grantRead(role);
-        props.outputBucket.grantReadWrite(role);
+        this.Role = this.createRole(props.codeBucketArn, props.codeFileKey);
 
         const autoScalingCondition = new cdk.CfnCondition(this, 'EnableAutoScaling', {
             expression: cdk.Fn.conditionEquals(props.enableAutoScaling, 'true')
@@ -94,7 +94,7 @@ export class FlinkApplication extends cdk.Construct {
 
         this.Application = new analytics.CfnApplicationV2(this, 'Application', {
             runtimeEnvironment: 'FLINK-1_8',
-            serviceExecutionRole: role.roleArn,
+            serviceExecutionRole: this.Role.roleArn,
             applicationConfiguration: {
                 applicationCodeConfiguration: {
                     codeContent: {
@@ -106,14 +106,7 @@ export class FlinkApplication extends cdk.Construct {
                     codeContentType: 'ZIPFILE'
                 },
                 environmentProperties: {
-                    propertyGroups: [{
-                        propertyGroupId: 'FlinkApplicationProperties',
-                        propertyMap: {
-                            'InputStreamName': props.inputStream.streamName,
-                            'OutputBucketName': props.outputBucket.bucketName,
-                            'Region': cdk.Aws.REGION
-                        }
-                    }]
+                    propertyGroups: [props.environmentProperties]
                 },
                 flinkApplicationConfiguration: {
                     monitoringConfiguration: {

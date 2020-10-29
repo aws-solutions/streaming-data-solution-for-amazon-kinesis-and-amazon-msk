@@ -57,11 +57,13 @@ class LambdaTest(unittest.TestCase):
         actual_headers = mock_post.call_args.kwargs['headers']
         self.assertEqual(expected_headers, actual_headers)
 
-        actual_payload = mock_post.call_args.kwargs['data']
+        actual_payload = mock_post.call_args.kwargs['json']
         self.assertIn('Solution', actual_payload)
         self.assertIn('UUID', actual_payload)
         self.assertIn('TimeStamp', actual_payload)
+
         self.assertIn('Data', actual_payload)
+        self.assertEqual(actual_payload['Data'], {'Foo': 'Bar', 'RequestType': 'Create'})
 
     @mock.patch('requests.post')
     def test_send_metrics_connection_error(self, mock_post):

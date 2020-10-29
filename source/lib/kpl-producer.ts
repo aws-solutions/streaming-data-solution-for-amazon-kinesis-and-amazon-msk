@@ -102,10 +102,16 @@ export class KinesisProducer extends cdk.Construct {
             'kinesis:SubscribeToShard'
         );
 
+        // The demo applications read data from the aws-bigdata-blog bucket, so
+        // we need to include it in the policy resources as well.
         const s3Policy = new iam.Policy(this, 'CodePolicy', {
             statements: [new iam.PolicyStatement({
-                resources: [`arn:${cdk.Aws.PARTITION}:s3:::${s3Path}`],
-                actions: ['s3:GetObjectVersion', 's3:GetObject']
+                resources: [
+                    `arn:${cdk.Aws.PARTITION}:s3:::${s3Path}`,
+                    `arn:${cdk.Aws.PARTITION}:s3:::aws-bigdata-blog/*`,
+                    `arn:${cdk.Aws.PARTITION}:s3:::aws-bigdata-blog`
+                ],
+                actions: ['s3:GetObjectVersion', 's3:GetObject', 's3:ListBucket']
             })]
         });
         s3Policy.attachToRole(role);

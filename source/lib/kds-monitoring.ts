@@ -13,42 +13,19 @@
 
 import * as cdk from '@aws-cdk/core';
 import * as cw from '@aws-cdk/aws-cloudwatch';
+import { MonitoringBase } from './monitoring-base';
 
-export interface StreamMonitoringProps {
+export interface DataStreamMonitoringProps {
     readonly streamName: string;
     readonly lambdaFunctionName?: string;
 }
 
-export class StreamMonitoring extends cdk.Construct {
-    private readonly Dashboard: cw.Dashboard;
-
-    // These values are recommended, but can be ajusted depending on the workload.
-    private readonly ITERATOR_AGE_THRESHOLD: number = 60000;
-    private readonly READ_WRITE_PROVISIONED_THRESHOLD: number = 0.01;
-    private readonly PUT_RECORDS_THRESHOLD: number = 0.95;
-    private readonly GET_RECORDS_THRESHOLD: number = 0.98;
-
-    private readonly MONITORING_PERIOD: cdk.Duration = cdk.Duration.minutes(1);
-
-    constructor(scope: cdk.Construct, id: string, props: StreamMonitoringProps) {
+export class DataStreamMonitoring extends MonitoringBase {
+    constructor(scope: cdk.Construct, id: string, props: DataStreamMonitoringProps) {
         super(scope, id);
 
-        this.Dashboard = new cw.Dashboard(this, 'Dashboard');
-
-        this.addStreamMetrics(props.streamName);
+        this.addDataStreamMetrics(props.streamName);
         this.addLambdaMetrics(props.lambdaFunctionName);
-    }
-
-    private createMarkdownWidget(text: string): cw.TextWidget {
-        return new cw.TextWidget({ markdown: text, width: 24, height: 1 });
-    }
-
-    private createGraphWidget(title: string, metric: cw.IMetric | cw.IMetric[], annonations?: cw.HorizontalAnnotation[]): cw.GraphWidget {
-        return new cw.GraphWidget({
-            title,
-            left: Array.isArray(metric) ? metric : [metric],
-            leftAnnotations: annonations
-        });
     }
 
     private createAvailabilityWidget(title: string, leftMetric: cw.IMetric, rightMetric: cw.IMetric): cw.GraphWidget {
@@ -58,142 +35,6 @@ export class StreamMonitoring extends cdk.Construct {
             right: [rightMetric],
             rightYAxis: { max: 100 }
         });
-    }
-
-    private addStreamMetrics(streamName: string) {
-        const defaultMetricProps = {
-            namespace: 'AWS/Kinesis',
-            period: this.MONITORING_PERIOD,
-            statistic: 'Average',
-            dimensions: { 'StreamName': streamName }
-        };
-
-        this.Dashboard.addWidgets(this.createMarkdownWidget('\n# Kinesis Stream Metrics\n'));
-
-        //---------------------------------------------------------------------
-        const iteratorAgeMetric = new cw.Metric({
-            ...defaultMetricProps,
-            statistic: 'Maximum',
-            metricName: 'GetRecords.IteratorAgeMilliseconds'
-        });
-
-        const iteratorAgeAnnonations = [{
-            label: 'Iterator age threshold',
-            value: this.ITERATOR_AGE_THRESHOLD
-        }];
-
-        new cw.Alarm(this, 'IteratorAgeAlarm', {
-            threshold: this.ITERATOR_AGE_THRESHOLD,
-            evaluationPeriods: 1,
-            treatMissingData: cw.TreatMissingData.BREACHING,
-            comparisonOperator: cw.ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
-            metric: iteratorAgeMetric
-        });
-
-        //---------------------------------------------------------------------
-        const readProvisionedMetric = new cw.Metric({
-            ...defaultMetricProps,
-            metricName: 'ReadProvisionedThroughputExceeded'
-        });
-
-        const readProvisionedAnnonations = [{
-            label: 'Read throughput threshold',
-            value: this.READ_WRITE_PROVISIONED_THRESHOLD
-        }];
-
-        new cw.Alarm(this, 'ReadProvisionedAlarm', {
-            threshold: this.READ_WRITE_PROVISIONED_THRESHOLD,
-            evaluationPeriods: 1,
-            treatMissingData: cw.TreatMissingData.BREACHING,
-            comparisonOperator: cw.ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
-            metric: readProvisionedMetric
-        });
-
-        //---------------------------------------------------------------------
-        const writeProvisionedMetric = new cw.Metric({
-            ...defaultMetricProps,
-            metricName: 'WriteProvisionedThroughputExceeded'
-        });
-
-        const writeProvisionedAnnonations = [{
-            label: 'Write throughput threshold',
-            value: this.READ_WRITE_PROVISIONED_THRESHOLD
-        }];
-
-        new cw.Alarm(this, 'WriteProvisionedAlarm', {
-            threshold: this.READ_WRITE_PROVISIONED_THRESHOLD,
-            evaluationPeriods: 1,
-            treatMissingData: cw.TreatMissingData.BREACHING,
-            comparisonOperator: cw.ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
-            metric: writeProvisionedMetric
-        });
-
-        //---------------------------------------------------------------------
-        const putRecordMetric = new cw.Metric({
-            ...defaultMetricProps,
-            metricName: 'PutRecord.Success'
-        });
-
-        const putRecordAnnonations = [{
-            label: 'Put record threshold',
-            value: this.PUT_RECORDS_THRESHOLD
-        }];
-
-        new cw.Alarm(this, 'PutRecordAlarm', {
-            threshold: this.PUT_RECORDS_THRESHOLD,
-            evaluationPeriods: 1,
-            treatMissingData: cw.TreatMissingData.NOT_BREACHING,
-            comparisonOperator: cw.ComparisonOperator.LESS_THAN_OR_EQUAL_TO_THRESHOLD,
-            metric: putRecordMetric
-        });
-
-        //---------------------------------------------------------------------
-        const putRecordsMetric = new cw.Metric({
-            ...defaultMetricProps,
-            metricName: 'PutRecords.Success'
-        });
-
-        const putRecordsAnnonations = [{
-            label: 'Put records threshold',
-            value: this.PUT_RECORDS_THRESHOLD
-        }];
-
-        new cw.Alarm(this, 'PutRecordsAlarm', {
-            threshold: this.PUT_RECORDS_THRESHOLD,
-            evaluationPeriods: 1,
-            treatMissingData: cw.TreatMissingData.NOT_BREACHING,
-            comparisonOperator: cw.ComparisonOperator.LESS_THAN_OR_EQUAL_TO_THRESHOLD,
-            metric: putRecordsMetric
-        });
-
-        //---------------------------------------------------------------------
-        const getRecordsMetric = new cw.Metric({
-            ...defaultMetricProps,
-            metricName: 'GetRecords.Success'
-        });
-
-        const getRecordsAnnonations = [{
-            label: 'Get records threshold',
-            value: this.GET_RECORDS_THRESHOLD
-        }];
-
-        new cw.Alarm(this, 'GetRecordsAlarm', {
-            threshold: this.GET_RECORDS_THRESHOLD,
-            evaluationPeriods: 1,
-            treatMissingData: cw.TreatMissingData.BREACHING,
-            comparisonOperator: cw.ComparisonOperator.LESS_THAN_OR_EQUAL_TO_THRESHOLD,
-            metric: getRecordsMetric
-        });
-
-        //---------------------------------------------------------------------
-        this.Dashboard.addWidgets(
-            this.createGraphWidget('Get records iterator age (Milliseconds)', iteratorAgeMetric, iteratorAgeAnnonations),
-            this.createGraphWidget('Read throughput exceeded (Percent)', readProvisionedMetric, readProvisionedAnnonations),
-            this.createGraphWidget('Write throughput exceeded (Percent)', writeProvisionedMetric, writeProvisionedAnnonations),
-            this.createGraphWidget('Put record success (Percent)', putRecordMetric, putRecordAnnonations),
-            this.createGraphWidget('Put records success (Percent)', putRecordsMetric, putRecordsAnnonations),
-            this.createGraphWidget('Get records success (Percent)', getRecordsMetric, getRecordsAnnonations)
-        );
     }
 
     private addLambdaMetrics(functionName?: string) {
@@ -268,12 +109,12 @@ export class StreamMonitoring extends cdk.Construct {
 
         //---------------------------------------------------------------------
         this.Dashboard.addWidgets(
-            this.createGraphWidget('Invocations', invocationsMetric),
-            this.createGraphWidget('Duration', durationMetrics),
+            this.createWidgetWithUnits('Invocations', invocationsMetric),
+            this.createWidgetWithUnits('Duration', durationMetrics),
             this.createAvailabilityWidget('Error count and success rate (%)', errorsMetric, availabilityExpression),
-            this.createGraphWidget('Throttles', throttlesMetric),
-            this.createGraphWidget('IteratorAge', iteratorAgeMetric),
-            this.createGraphWidget('Concurrent executions', executionsMetric),
+            this.createWidgetWithUnits('Throttles', throttlesMetric),
+            this.createWidgetWithUnits('IteratorAge', iteratorAgeMetric),
+            this.createWidgetWithUnits('Concurrent executions', executionsMetric),
         );
     }
 }

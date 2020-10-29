@@ -26,7 +26,7 @@ beforeEach(() => {
 });
 
 test.each([2, 4, 6])('creates a MSK cluster', (validNodeCount) => {
-    new KafkaCluster(stack, 'TestCluster', {
+    const cluster = new KafkaCluster(stack, 'TestCluster', {
         kafkaVersion: '2.2.1',
         numberOfBrokerNodes: validNodeCount,
         brokerInstanceType: BrokerInstanceType.m5_large,
@@ -38,6 +38,7 @@ test.each([2, 4, 6])('creates a MSK cluster', (validNodeCount) => {
     });
 
     expect(SynthUtils.toCloudFormation(stack)).toMatchSnapshot();
+    expect(cluster.ClusterArn).not.toBeUndefined();
 });
 
 test.each([0, 1, 4])('subnet count must be between allowed values', (invalidSubnetCount) => {

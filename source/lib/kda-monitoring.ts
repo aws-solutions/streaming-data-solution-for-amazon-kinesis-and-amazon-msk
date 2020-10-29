@@ -13,6 +13,7 @@
 
 import * as cdk from '@aws-cdk/core';
 import * as cw from '@aws-cdk/aws-cloudwatch';
+import { MonitoringBase } from './monitoring-base';
 
 export interface ApplicationMonitoringProps {
     readonly applicationName: string;
@@ -20,9 +21,7 @@ export interface ApplicationMonitoringProps {
     readonly inputStreamName: string;
 }
 
-export class ApplicationMonitoring extends cdk.Construct {
-    private readonly Dashboard: cw.Dashboard;
-
+export class ApplicationMonitoring extends MonitoringBase {
     // These values are recommended, but can be ajusted depending on the workload.
     private readonly FAILED_CHECKPOINTS_THRESHOLD: number = 0;
     private readonly DOWNTIME_THRESHOLD: number = 0;
@@ -31,8 +30,6 @@ export class ApplicationMonitoring extends cdk.Construct {
     private readonly GARBAGE_COLLECTION_THRESHOLD: number = 60;
     private readonly PROCESSING_DELAY_THRESHOLD: number = 60000;
     private readonly LOG_QUERY_LIMIT: number = 20;
-
-    private readonly MONITORING_PERIOD: cdk.Duration = cdk.Duration.minutes(1);
 
     private DEFAULT_METRIC_PROPS = {
         namespace: 'AWS/KinesisAnalytics',
@@ -50,27 +47,12 @@ export class ApplicationMonitoring extends cdk.Construct {
         super(scope, id);
 
         this.DEFAULT_METRIC_PROPS.dimensions['Application'] = props.applicationName;
-        this.Dashboard = new cw.Dashboard(this, 'Dashboard');
 
         this.addApplicationHealth();
         this.addResourceUtilization();
         this.addApplicationProgress();
         this.addSourceMetrics(props.inputStreamName);
         this.addLogging(props.applicationName, props.logGroupName);
-    }
-
-    private createMarkdownWidget(text: string): cw.TextWidget {
-        return new cw.TextWidget({ markdown: text, width: 24, height: 1 });
-    }
-
-    private createGraphWidget(title: string, metric: cw.IMetric, annonations?: cw.HorizontalAnnotation[]): cw.GraphWidget {
-        return new cw.GraphWidget({
-            title,
-            left: [metric],
-            leftYAxis: { showUnits: false },
-            rightYAxis: { showUnits: false },
-            leftAnnotations: annonations
-        });
     }
 
     private createLogWidget(logGroupName: string, title: string, queryString: string): cw.LogQueryWidget {
@@ -82,25 +64,27 @@ export class ApplicationMonitoring extends cdk.Construct {
         });
     }
 
+    private createWidgetWithoutUnits(title: string, metric: cw.IMetric): cw.GraphWidget {
+        return new cw.GraphWidget({
+            title,
+            left: [metric],
+            leftYAxis: { showUnits: false },
+            rightYAxis: { showUnits: false }
+        });
+    }
+
     private addApplicationHealth() {
         this.Dashboard.addWidgets(this.createMarkdownWidget('\n# Application Health\n'));
 
         //---------------------------------------------------------------------
-        const downtimeMetric = new cw.Metric({
-            ...this.DEFAULT_METRIC_PROPS,
-            metricName: 'downtime',
-            statistic: 'Average'
-        });
-
-        const downtimeAnnonations = [{
-            label: 'Downtime threshold',
-            value: this.DOWNTIME_THRESHOLD
-        }];
-
-        new cw.Alarm(this, 'DowntimeAlarm', {
+        const downtimeAlarm = new cw.Alarm(this, 'DowntimeAlarm', {
             ...this.DEFAULT_ALARM_PROPS,
-            metric: downtimeMetric,
-            threshold: this.DOWNTIME_THRESHOLD
+            threshold: this.DOWNTIME_THRESHOLD,
+            metric: new cw.Metric({
+                ...this.DEFAULT_METRIC_PROPS,
+                metricName: 'downtime',
+                statistic: 'Average'
+            })
         });
 
         //---------------------------------------------------------------------
@@ -118,21 +102,14 @@ export class ApplicationMonitoring extends cdk.Construct {
         });
 
         //---------------------------------------------------------------------
-        const failedCheckpointsMetric = new cw.Metric({
-            ...this.DEFAULT_METRIC_PROPS,
-            metricName: 'numberOfFailedCheckpoints',
-            statistic: 'Average'
-        });
-
-        const failedCheckpointsAnnonations = [{
-            label: 'Number of Failed Checkpoints threshold',
-            value: this.FAILED_CHECKPOINTS_THRESHOLD
-        }];
-
-        new cw.Alarm(this, 'CheckpointAlarm', {
+        const checkpointAlarm = new cw.Alarm(this, 'CheckpointAlarm', {
             ...this.DEFAULT_ALARM_PROPS,
-            metric: failedCheckpointsMetric,
-            threshold: this.FAILED_CHECKPOINTS_THRESHOLD
+            threshold: this.FAILED_CHECKPOINTS_THRESHOLD,
+            metric: new cw.Metric({
+                ...this.DEFAULT_METRIC_PROPS,
+                metricName: 'numberOfFailedCheckpoints',
+                statistic: 'Average'
+            })
         });
 
         //---------------------------------------------------------------------
@@ -150,12 +127,12 @@ export class ApplicationMonitoring extends cdk.Construct {
         });
 
         this.Dashboard.addWidgets(
-            this.createGraphWidget('Downtime', downtimeMetric, downtimeAnnonations),
-            this.createGraphWidget('Uptime', uptimeMetric),
-            this.createGraphWidget('Flink Job Restarts', jobRestartsMetric),
-            this.createGraphWidget('Number of Failed Checkpoints', failedCheckpointsMetric, failedCheckpointsAnnonations),
-            this.createGraphWidget('Last Checkpoint Duration', checkpointDurationMetric),
-            this.createGraphWidget('Last Checkpoint Size', checkpointSizeMetric)
+            this.createAlarmWidget('Downtime', downtimeAlarm),
+            this.createWidgetWithoutUnits('Uptime', uptimeMetric),
+            this.createWidgetWithoutUnits('Flink Job Restarts', jobRestartsMetric),
+            this.createAlarmWidget('Number of Failed Checkpoints', checkpointAlarm),
+            this.createWidgetWithoutUnits('Last Checkpoint Duration', checkpointDurationMetric),
+            this.createWidgetWithoutUnits('Last Checkpoint Size', checkpointSizeMetric)
         );
     }
 
@@ -163,28 +140,26 @@ export class ApplicationMonitoring extends cdk.Construct {
         this.Dashboard.addWidgets(this.createMarkdownWidget('\n# Resource Utilization\n'));
 
         //---------------------------------------------------------------------
-        const cpuUtilizationMetric = new cw.Metric({
-            ...this.DEFAULT_METRIC_PROPS,
-            metricName: 'cpuUtilization',
-            statistic: 'Maximum'
-        });
-
-        const cpuUtilizationAnnonations = [{
-            label: 'CPU Utilization threshold',
-            value: this.CPU_UTILIZATION_THRESHOLD
-        }];
+        const cpuUtilizationAlarm = new cw.Alarm(this, 'CpuUtilizationAlarm', {
+            ...this.DEFAULT_ALARM_PROPS,
+            threshold: this.CPU_UTILIZATION_THRESHOLD,
+            metric: new cw.Metric({
+                ...this.DEFAULT_METRIC_PROPS,
+                metricName: 'cpuUtilization',
+                statistic: 'Maximum'
+            })
+        })
 
         //---------------------------------------------------------------------
-        const heapMemoryMetric = new cw.Metric({
-            ...this.DEFAULT_METRIC_PROPS,
-            metricName: 'heapMemoryUtilization',
-            statistic: 'Maximum'
+        const heapMemoryAlarm = new cw.Alarm(this, 'HeapMemoryAlarm', {
+            ...this.DEFAULT_ALARM_PROPS,
+            threshold: this.HEAP_MEMORY_THRESHOLD,
+            metric: new cw.Metric({
+                ...this.DEFAULT_METRIC_PROPS,
+                metricName: 'heapMemoryUtilization',
+                statistic: 'Maximum'
+            })
         });
-
-        const heapMemoryAnnonations = [{
-            label: 'Heap Memory Utilization threshold',
-            value: this.HEAP_MEMORY_THRESHOLD
-        }];
 
         //---------------------------------------------------------------------
         const gcCountRateExpression = new cw.MathExpression({
@@ -202,23 +177,22 @@ export class ApplicationMonitoring extends cdk.Construct {
         });
 
         //---------------------------------------------------------------------
-        const gcPercentExpression = new cw.MathExpression({
-            expression: '(m1 * 100)/60000',
-            label: 'Old Generation GC Time Percent',
-            period: this.MONITORING_PERIOD,
-            usingMetrics: {
-                'm1': new cw.Metric({
-                    ...this.DEFAULT_METRIC_PROPS,
-                    metricName: 'oldGenerationGCTime',
-                    statistic: 'Maximum'
-                })
-            }
+        const gcPercentAlarm = new cw.Alarm(this, 'GCPercentAlarm', {
+            ...this.DEFAULT_ALARM_PROPS,
+            threshold: this.GARBAGE_COLLECTION_THRESHOLD,
+            metric: new cw.MathExpression({
+                expression: '(m1 * 100)/60000',
+                label: 'Old Generation GC Time Percent',
+                period: this.MONITORING_PERIOD,
+                usingMetrics: {
+                    'm1': new cw.Metric({
+                        ...this.DEFAULT_METRIC_PROPS,
+                        metricName: 'oldGenerationGCTime',
+                        statistic: 'Maximum'
+                    })
+                }
+            })
         });
-
-        const gcPercentAnnonations = [{
-            label: 'GC Percent threshold',
-            value: this.GARBAGE_COLLECTION_THRESHOLD
-        }];
 
         //---------------------------------------------------------------------
         const threadCountMetric = new cw.Metric({
@@ -229,11 +203,11 @@ export class ApplicationMonitoring extends cdk.Construct {
 
         //---------------------------------------------------------------------
         this.Dashboard.addWidgets(
-            this.createGraphWidget('CPU Utilization', cpuUtilizationMetric, cpuUtilizationAnnonations),
-            this.createGraphWidget('Heap Memory Utilization', heapMemoryMetric, heapMemoryAnnonations),
-            this.createGraphWidget('Thread Count', threadCountMetric),
-            this.createGraphWidget('Old Generation GC Percent (Over 1 Min)', gcPercentExpression, gcPercentAnnonations),
-            this.createGraphWidget('Old Generation GC Count Rate', gcCountRateExpression)
+            this.createAlarmWidget('CPU Utilization', cpuUtilizationAlarm),
+            this.createAlarmWidget('Heap Memory Utilization', heapMemoryAlarm),
+            this.createWidgetWithoutUnits('Thread Count', threadCountMetric),
+            this.createAlarmWidget('Old Generation GC Percent (Over 1 Min)', gcPercentAlarm),
+            this.createWidgetWithoutUnits('Old Generation GC Count Rate', gcCountRateExpression)
         );
     }
 
@@ -248,15 +222,13 @@ export class ApplicationMonitoring extends cdk.Construct {
         });
 
         //---------------------------------------------------------------------
-        const outgoingRecordsMetric = new cw.Metric({
-            ...this.DEFAULT_METRIC_PROPS,
-            metricName: 'numRecordsOutPerSecond',
-            statistic: 'Average'
-        });
-
-        new cw.Alarm(this, 'RecordsOutAlarm', {
+        const recordsOutAlarm = new cw.Alarm(this, 'RecordsOutAlarm', {
             ...this.DEFAULT_ALARM_PROPS,
-            metric: outgoingRecordsMetric,
+            metric: new cw.Metric({
+                ...this.DEFAULT_METRIC_PROPS,
+                metricName: 'numRecordsOutPerSecond',
+                statistic: 'Average'
+            }),
             comparisonOperator: cw.ComparisonOperator.LESS_THAN_OR_EQUAL_TO_THRESHOLD,
             threshold: 0
         });
@@ -295,36 +267,29 @@ export class ApplicationMonitoring extends cdk.Construct {
 
         //---------------------------------------------------------------------
         this.Dashboard.addWidgets(
-            this.createGraphWidget('Incoming Records (Per Second)', incomingRecordsMetric),
-            this.createGraphWidget('Outgoing Records (Per Second)', outgoingRecordsMetric),
-            this.createGraphWidget('Input Watermark', inputWatermarkMetric),
-            this.createGraphWidget('Output Watermark', outputWatermarkMetric),
-            this.createGraphWidget('Event Time Latency', eventTimeExpression),
-            this.createGraphWidget('Late Records Dropped', lateRecordsMetric)
+            this.createWidgetWithoutUnits('Incoming Records (Per Second)', incomingRecordsMetric),
+            this.createAlarmWidget('Outgoing Records (Per Second)', recordsOutAlarm),
+            this.createWidgetWithoutUnits('Input Watermark', inputWatermarkMetric),
+            this.createWidgetWithoutUnits('Output Watermark', outputWatermarkMetric),
+            this.createWidgetWithoutUnits('Event Time Latency', eventTimeExpression),
+            this.createWidgetWithoutUnits('Late Records Dropped', lateRecordsMetric)
         );
     }
 
     private addSourceMetrics(inputStreamName: string) {
-        const kinesisDimensions = {
-            ...this.DEFAULT_METRIC_PROPS.dimensions,
-            'Id': cdk.Fn.join('_', cdk.Fn.split('-', inputStreamName)),
-            'Flow': 'Input'
-        };
-
         //---------------------------------------------------------------------
         const kinesisMetric = new cw.Metric({
             ...this.DEFAULT_METRIC_PROPS,
             metricName: 'millisBehindLatest',
             statistic: 'Maximum',
-            dimensions: kinesisDimensions
+            dimensions: {
+                ...this.DEFAULT_METRIC_PROPS.dimensions,
+                'Id': cdk.Fn.join('_', cdk.Fn.split('-', inputStreamName)),
+                'Flow': 'Input'
+            }
         });
 
-        const kinesisAnnotations = [{
-            label: 'MillisBehindLatest threshold',
-            value: this.PROCESSING_DELAY_THRESHOLD
-        }];
-
-        new cw.Alarm(this, 'MillisBehindAlarm', {
+        const millisBehindAlarm = new cw.Alarm(this, 'MillisBehindAlarm', {
             ...this.DEFAULT_ALARM_PROPS,
             metric: kinesisMetric,
             threshold: this.PROCESSING_DELAY_THRESHOLD
@@ -332,9 +297,7 @@ export class ApplicationMonitoring extends cdk.Construct {
 
         //---------------------------------------------------------------------
         this.Dashboard.addWidgets(this.createMarkdownWidget('\n# Kinesis Source Metrics\n'));
-        this.Dashboard.addWidgets(
-            this.createGraphWidget('Kinesis MillisBehindLatest', kinesisMetric, kinesisAnnotations)
-        );
+        this.Dashboard.addWidgets(this.createAlarmWidget('Kinesis MillisBehindLatest', millisBehindAlarm));
     }
 
     private addLogging(applicationName: string, logGroupName: string) {

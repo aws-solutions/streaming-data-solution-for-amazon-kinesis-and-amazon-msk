@@ -12,13 +12,15 @@
  *********************************************************************************************************************/
 
 import * as cdk from '@aws-cdk/core';
+import * as lambda from '@aws-cdk/aws-lambda';
+
 import { ApiGatewayToKinesisStreams } from '@aws-solutions-constructs/aws-apigateway-kinesisstreams';
+import { KinesisStreamsToLambda } from '@aws-solutions-constructs/aws-kinesisstreams-lambda';
 
 import { DataStream } from '../lib/kds-data-stream';
-import { LambdaConsumer } from '../lib/kds-lambda-consumer';
 import { SolutionHelper } from '../lib/solution-helper';
 import { SolutionStackProps } from './solution-props';
-import { StreamMonitoring } from '../lib/kds-monitoring';
+import { DataStreamMonitoring } from '../lib/kds-monitoring';
 
 export class ApiGwKdsLambda extends cdk.Stack {
     constructor(scope: cdk.Construct, id: string, props: SolutionStackProps) {
@@ -109,20 +111,31 @@ export class ApiGwKdsLambda extends cdk.Stack {
             maxValue: 10000
         });
 
-        const lambda = new LambdaConsumer(this, 'KdsLambda', {
-            stream: kds.Stream,
-            batchSize: batchSize.valueAsNumber,
-            parallelizationFactor: parallelization.valueAsNumber,
-            retryAttempts: retryAttempts.valueAsNumber,
-            timeout: cdk.Duration.minutes(5)
+        const kdsToLambda = new KinesisStreamsToLambda(this, 'KdsLambda', {
+            existingStreamObj: kds.Stream,
+            createCloudWatchAlarms: false,
+            deploySqsDlqQueue: true,
+            lambdaFunctionProps: {
+                runtime: lambda.Runtime.NODEJS_12_X,
+                handler: 'index.handler',
+                code: lambda.Code.fromAsset('lambda/kds-lambda-consumer'),
+                timeout: cdk.Duration.minutes(5)
+            },
+            kinesisEventSourceProps: {
+                startingPosition: lambda.StartingPosition.LATEST,
+                batchSize: batchSize.valueAsNumber,
+                retryAttempts: parallelization.valueAsNumber,
+                parallelizationFactor: retryAttempts.valueAsNumber,
+                bisectBatchOnError: true
+            }
         });
 
         //---------------------------------------------------------------------
         // Monitoring (dashboard and alarms) configuration
 
-        new StreamMonitoring(this, 'Monitoring', {
+        new DataStreamMonitoring(this, 'Monitoring', {
             streamName: kds.Stream.streamName,
-            lambdaFunctionName: lambda.Function.functionName
+            lambdaFunctionName: kdsToLambda.lambdaFunction.functionName
         });
 
         //---------------------------------------------------------------------
@@ -207,7 +220,7 @@ export class ApiGwKdsLambda extends cdk.Stack {
 
         new cdk.CfnOutput(this, 'LambdaConsumerArn', {
             description: 'ARN of the Lambda function',
-            value: lambda.Function.functionArn
+            value: kdsToLambda.lambdaFunction.functionArn
         });
     }
 }
