@@ -24,10 +24,9 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 
-import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.nio.ByteBuffer;
-import java.sql.Timestamp;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -102,11 +101,11 @@ public class SampleProducer {
                     LOG.error(String.format("Record failed to put - %s : %s", last.getErrorCode(), last.getErrorMessage()));
                 }
                 LOG.error("Exception during put", t);
-            };
+            }
 
             @Override public void onSuccess(UserRecordResult result) {
                 completed.getAndIncrement();
-            };
+            }
         };
 
         final ExecutorService callbackThreadPool = Executors.newCachedThreadPool();
@@ -199,13 +198,7 @@ public class SampleProducer {
 
         LOG.debug(record);
 
-        byte[] sendData = null;
-        try {
-            sendData = record.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            LOG.error("Error converting string to byte array " + e);
-        }
-
+        byte[] sendData = record.getBytes(StandardCharsets.UTF_8);
         return ByteBuffer.wrap(sendData);
     }
 }

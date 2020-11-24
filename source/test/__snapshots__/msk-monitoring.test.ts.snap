@@ -1,0 +1,197 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`creates custom resource for CloudWatch dashboard 1`] = `
+Object {
+  "Parameters": Object {
+    "AssetParameters0f75916c5e10d7845ae2c00c3df5dd85007ca0abc92c99eea3e0e0d1680e07dcArtifactHash91C5E04F": Object {
+      "Description": "Artifact hash for asset \\"0f75916c5e10d7845ae2c00c3df5dd85007ca0abc92c99eea3e0e0d1680e07dc\\"",
+      "Type": "String",
+    },
+    "AssetParameters0f75916c5e10d7845ae2c00c3df5dd85007ca0abc92c99eea3e0e0d1680e07dcS3BucketD0525F0E": Object {
+      "Description": "S3 bucket for asset \\"0f75916c5e10d7845ae2c00c3df5dd85007ca0abc92c99eea3e0e0d1680e07dc\\"",
+      "Type": "String",
+    },
+    "AssetParameters0f75916c5e10d7845ae2c00c3df5dd85007ca0abc92c99eea3e0e0d1680e07dcS3VersionKeyE94B0391": Object {
+      "Description": "S3 key for asset version \\"0f75916c5e10d7845ae2c00c3df5dd85007ca0abc92c99eea3e0e0d1680e07dc\\"",
+      "Type": "String",
+    },
+  },
+  "Resources": Object {
+    "MonitoringDashboardCR0C25BCB3": Object {
+      "DeletionPolicy": "Delete",
+      "Properties": Object {
+        "ClusterArn": "my-cluster-arn",
+        "DashboardName": "my-dashboard",
+        "Region": Object {
+          "Ref": "AWS::Region",
+        },
+        "ServiceToken": Object {
+          "Fn::GetAtt": Array [
+            "MonitoringFunction76E68B38",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "Custom::CloudWatchDashboard",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "MonitoringFunction76E68B38": Object {
+      "DependsOn": Array [
+        "MonitoringRole4BF58EFD",
+      ],
+      "Properties": Object {
+        "Code": Object {
+          "S3Bucket": Object {
+            "Ref": "AssetParameters0f75916c5e10d7845ae2c00c3df5dd85007ca0abc92c99eea3e0e0d1680e07dcS3BucketD0525F0E",
+          },
+          "S3Key": Object {
+            "Fn::Join": Array [
+              "",
+              Array [
+                Object {
+                  "Fn::Select": Array [
+                    0,
+                    Object {
+                      "Fn::Split": Array [
+                        "||",
+                        Object {
+                          "Ref": "AssetParameters0f75916c5e10d7845ae2c00c3df5dd85007ca0abc92c99eea3e0e0d1680e07dcS3VersionKeyE94B0391",
+                        },
+                      ],
+                    },
+                  ],
+                },
+                Object {
+                  "Fn::Select": Array [
+                    1,
+                    Object {
+                      "Fn::Split": Array [
+                        "||",
+                        Object {
+                          "Ref": "AssetParameters0f75916c5e10d7845ae2c00c3df5dd85007ca0abc92c99eea3e0e0d1680e07dcS3VersionKeyE94B0391",
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            ],
+          },
+        },
+        "Description": "This function creates a dashboard that monitors the health of a MSK cluster",
+        "Handler": "lambda_function.handler",
+        "Role": Object {
+          "Fn::GetAtt": Array [
+            "MonitoringRole4BF58EFD",
+            "Arn",
+          ],
+        },
+        "Runtime": "python3.8",
+        "Timeout": 30,
+      },
+      "Type": "AWS::Lambda::Function",
+    },
+    "MonitoringRole4BF58EFD": Object {
+      "Metadata": Object {
+        "cfn_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "W11",
+              "reason": "DescribeCluster does not support resource level permissions",
+            },
+          ],
+        },
+      },
+      "Properties": Object {
+        "AssumeRolePolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": Object {
+                "Service": "lambda.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "Policies": Array [
+          Object {
+            "PolicyDocument": Object {
+              "Statement": Array [
+                Object {
+                  "Action": Array [
+                    "logs:CreateLogGroup",
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents",
+                  ],
+                  "Effect": "Allow",
+                  "Resource": Object {
+                    "Fn::Join": Array [
+                      "",
+                      Array [
+                        "arn:",
+                        Object {
+                          "Ref": "AWS::Partition",
+                        },
+                        ":logs:",
+                        Object {
+                          "Ref": "AWS::Region",
+                        },
+                        ":",
+                        Object {
+                          "Ref": "AWS::AccountId",
+                        },
+                        ":log-group:/aws/lambda/*",
+                      ],
+                    ],
+                  },
+                },
+              ],
+              "Version": "2012-10-17",
+            },
+            "PolicyName": "CloudWatchLogsPolicy",
+          },
+          Object {
+            "PolicyDocument": Object {
+              "Statement": Array [
+                Object {
+                  "Action": Array [
+                    "cloudwatch:PutDashboard",
+                    "cloudwatch:DeleteDashboards",
+                  ],
+                  "Effect": "Allow",
+                  "Resource": Object {
+                    "Fn::Join": Array [
+                      "",
+                      Array [
+                        "arn:",
+                        Object {
+                          "Ref": "AWS::Partition",
+                        },
+                        ":cloudwatch::",
+                        Object {
+                          "Ref": "AWS::AccountId",
+                        },
+                        ":dashboard/my-dashboard",
+                      ],
+                    ],
+                  },
+                },
+                Object {
+                  "Action": "kafka:DescribeCluster",
+                  "Effect": "Allow",
+                  "Resource": "*",
+                },
+              ],
+              "Version": "2012-10-17",
+            },
+            "PolicyName": "DashboardPolicy",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+  },
+}
+`;

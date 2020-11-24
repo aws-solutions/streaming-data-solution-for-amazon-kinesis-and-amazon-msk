@@ -30,7 +30,7 @@ export interface KinesisProducerProps {
 export class KinesisProducer extends cdk.Construct {
     private readonly Instance: ec2.CfnInstance;
 
-    public get InstanceId() {
+    public get InstanceId(): string {
         return this.Instance.ref;
     }
 

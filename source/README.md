@@ -1,5 +1,5 @@
 # CDK project
-The AWS Streaming Data Solution for Amazon Kinesis uses the AWS CDK to create the necessary AWS resources, and the top-level stacks are defined in the `patterns` folder.
+This solution uses the AWS CDK to create the necessary AWS resources, and the top-level stacks are defined in the `patterns` folder.
 
 ## Using individual constructs
 Each construct can be found in the `lib` folder, and they can be used separately of the solution. For instance, let's walk through an example where there's already an existing AWS Lambda function that processes records from an Amazon Kinesis data stream, but there are no alarms or monitoring configured.

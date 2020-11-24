@@ -1,0 +1,22 @@
+{
+  "name": "msk-lambda-kdf",
+  "version": "1.0.0",
+  "description": "lambda consumer that publishes MSK events to KDF",
+  "main": "index.js",
+  "scripts": {
+    "pretest": "npm ci",
+    "test": "nyc --reporter=text mocha test/*.spec.js"
+  },
+  "private": true,
+  "license": "Apache-2.0",
+  "author": {
+    "name": "aws-solutions-builder"
+  },
+  "devDependencies": {
+    "chai": "4.2.0",
+    "mocha": "8.2.1",
+    "nyc": "15.1.0",
+    "sinon": "9.2.1",
+    "aws-sdk-mock": "5.1.0"
+  }
+}

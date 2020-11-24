@@ -43,7 +43,11 @@ test('creates solution helper with optional properties', () => {
 
         bufferingSize: 5,
         bufferingInterval: 300,
-        compressionFormat: 'GZIP'
+        compressionFormat: 'GZIP',
+
+        brokerInstanceType: 'kafka.m5.large',
+        numberOfBrokerNodes: 2,
+        monitoringLevel: 'DEFAULT'
     });
 
     expect(SynthUtils.toCloudFormation(stack)).toMatchSnapshot();

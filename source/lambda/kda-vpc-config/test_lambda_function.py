@@ -19,9 +19,9 @@ from unittest.mock import patch
 
 class LambdaTest(unittest.TestCase):
     @classmethod
-    def setUpClass(self):
-        self._kinesisAnalytics = botocore.session.get_session().create_client('kinesisanalyticsv2')
-        stubber = Stubber(self._kinesisAnalytics)
+    def setUpClass(cls):
+        cls._kinesisAnalytics = botocore.session.get_session().create_client('kinesisanalyticsv2')
+        stubber = Stubber(cls._kinesisAnalytics)
 
         stubber.add_response('describe_application', stub_application_without_vpc)
 

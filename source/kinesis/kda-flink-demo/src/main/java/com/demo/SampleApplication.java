@@ -17,7 +17,6 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.kinesisanalytics.runtime.KinesisAnalyticsRuntime;
 import com.demo.utils.ParameterToolUtils;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.Properties;
 

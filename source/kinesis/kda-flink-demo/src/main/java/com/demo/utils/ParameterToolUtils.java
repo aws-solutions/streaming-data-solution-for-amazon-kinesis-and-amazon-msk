@@ -19,6 +19,10 @@ import java.util.Properties;
 import org.apache.flink.api.java.utils.ParameterTool;
 
 public class ParameterToolUtils {
+    private ParameterToolUtils() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static ParameterTool fromApplicationProperties(Properties properties) {
         Map<String, String> map = new HashMap<>(properties.size());
 

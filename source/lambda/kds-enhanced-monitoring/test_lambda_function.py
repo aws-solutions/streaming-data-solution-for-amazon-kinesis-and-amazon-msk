@@ -30,9 +30,9 @@ all_metrics = [
 
 class LambdaTest(unittest.TestCase):
     @classmethod
-    def setUpClass(self):
-        self._kinesis = botocore.session.get_session().create_client('kinesis')
-        stubber = Stubber(self._kinesis)
+    def setUpClass(cls):
+        cls._kinesis = botocore.session.get_session().create_client('kinesis')
+        stubber = Stubber(cls._kinesis)
 
         stubber.add_response('enable_enhanced_monitoring', {
             'StreamName': 'test-stream',

@@ -19,23 +19,18 @@ import { KinesisProducer } from '../lib/kpl-producer';
 
 let stack: cdk.Stack;
 let testStream: kinesis.Stream;
-let testVpcId: string;
-let testSubnetId: string;
 
 beforeEach(() => {
     const app = new cdk.App();
     stack = new cdk.Stack(app, 'TestStack');
-
     testStream = new kinesis.Stream(stack, 'TestStream');
-    testVpcId = 'vpc-123';
-    testSubnetId = 'subnet-abc';
 });
 
 test('creates a KPL instance', () => {
     const kpl = new KinesisProducer(stack, 'TestProducer', {
         stream: testStream,
-        vpcId: testVpcId,
-        subnetId: testSubnetId,
+        vpcId: 'vpc-123',
+        subnetId: 'subnet-abc',
         imageId: 'ami-1234',
         codeBucketName: 'test-bucket',
         codeFileKey: 'test-key.zip'
@@ -48,8 +43,8 @@ test('creates a KPL instance', () => {
 test('adds cfn_nag suppressions', () => {
     new KinesisProducer(stack, 'TestProducer', {
         stream: testStream,
-        vpcId: testVpcId,
-        subnetId: testSubnetId,
+        vpcId: 'vpc-123',
+        subnetId: 'subnet-abc',
         imageId: 'ami-1234',
         codeBucketName: 'test-bucket',
         codeFileKey: 'test-key.zip'

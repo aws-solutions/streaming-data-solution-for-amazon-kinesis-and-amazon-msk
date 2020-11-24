@@ -214,12 +214,12 @@ export class ApiGwKdsLambda extends cdk.Stack {
         });
 
         new cdk.CfnOutput(this, 'DataStreamName', {
-            description: 'Name of the Kinesis stream',
+            description: 'Name of the Amazon Kinesis Data stream',
             value: kds.Stream.streamName
         });
 
         new cdk.CfnOutput(this, 'LambdaConsumerArn', {
-            description: 'ARN of the Lambda function',
+            description: 'ARN of the AWS Lambda function',
             value: kdsToLambda.lambdaFunction.functionArn
         });
     }

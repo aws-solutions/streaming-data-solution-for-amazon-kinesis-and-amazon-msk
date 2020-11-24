@@ -14,7 +14,7 @@
 import boto3, logging
 from crhelper import CfnResource
 
-client = boto3.client('kinesisanalyticsv2')
+client_kinesis_analytics = boto3.client('kinesisanalyticsv2')
 helper = CfnResource(json_logging=True)
 logger = logging.getLogger(__name__)
 
@@ -22,7 +22,7 @@ def _filter_empty_items(str_list):
     return list(filter(None, str_list))
 
 def _get_application_details(application_name):
-    response = client.describe_application(ApplicationName=application_name)
+    response = client_kinesis_analytics.describe_application(ApplicationName=application_name)
     application_detail = response['ApplicationDetail']
     description = application_detail['ApplicationConfigurationDescription']
 
@@ -34,20 +34,20 @@ def _get_application_details(application_name):
 
     return (application_detail['ApplicationVersionId'], vpc_config_id)
 
-def _add_config(application_name, version_id, subnets, securityGroups):
-    response = client.add_application_vpc_configuration(
+def _add_config(application_name, version_id, subnets, security_groups):
+    response = client_kinesis_analytics.add_application_vpc_configuration(
         ApplicationName=application_name,
         CurrentApplicationVersionId=version_id,
         VpcConfiguration={
             'SubnetIds': subnets,
-            'SecurityGroupIds': securityGroups
+            'SecurityGroupIds': security_groups
         }
     )
 
     return response['VpcConfigurationDescription']['VpcConfigurationId']
 
 def _remove_config(application_name, version_id, vpc_config_id):
-    response = client.delete_application_vpc_configuration(
+    response = client_kinesis_analytics.delete_application_vpc_configuration(
         ApplicationName=application_name,
         CurrentApplicationVersionId=version_id,
         VpcConfigurationId=vpc_config_id
@@ -71,13 +71,13 @@ def _add_vpc_configuration(application_name, subnet_ids, security_group_ids):
     We filter out the empty items since the VPC API does not accept null or blank values.
     """
     subnets = _filter_empty_items(subnet_ids)
-    securityGroups = _filter_empty_items(security_group_ids)
+    security_groups = _filter_empty_items(security_group_ids)
 
-    if not subnets or not securityGroups:
+    if not subnets or not security_groups:
         logger.info('Either SubnetIds or SecurityGroupIds is empty, not adding configuration')
         return
 
-    return _add_config(application_name, version_id, subnets, securityGroups)
+    return _add_config(application_name, version_id, subnets, security_groups)
 
 def _delete_vpc_configuration(application_name):
     (version_id, vpc_config_id) = _get_application_details(application_name)

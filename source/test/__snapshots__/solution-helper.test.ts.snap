@@ -112,10 +112,13 @@ Object {
       "Condition": "HelperAnonymousDatatoAWS6303A68E",
       "DeletionPolicy": "Delete",
       "Properties": Object {
+        "BrokerInstanceType": "kafka.m5.large",
         "BufferingInterval": 300,
         "BufferingSize": 5,
         "CompressionFormat": "GZIP",
         "EnhancedMonitoring": "false",
+        "MonitoringLevel": "DEFAULT",
+        "NumberOfBrokerNodes": 2,
         "Pattern": "test-pattern",
         "Region": Object {
           "Ref": "AWS::Region",

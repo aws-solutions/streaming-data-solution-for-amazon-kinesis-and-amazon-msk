@@ -14,19 +14,19 @@
 import boto3
 from crhelper import CfnResource
 
-client = boto3.client('kinesis')
+client_kinesis = boto3.client('kinesis')
 helper = CfnResource(json_logging=True)
 
 def _enhance_monitoring(stream_name, enable):
     shard_level_metrics = ['ALL']
 
     if enable == 'true':
-        response = client.enable_enhanced_monitoring(
+        response = client_kinesis.enable_enhanced_monitoring(
             StreamName=stream_name,
             ShardLevelMetrics=shard_level_metrics
         )
     else:
-        response = client.disable_enhanced_monitoring(
+        response = client_kinesis.disable_enhanced_monitoring(
             StreamName=stream_name,
             ShardLevelMetrics=shard_level_metrics
         )

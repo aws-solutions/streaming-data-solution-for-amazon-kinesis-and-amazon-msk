@@ -47,7 +47,7 @@ public class StreamingJob {
     private static final Logger LOG = LoggerFactory.getLogger(StreamingJob.class);
     private static final String DEFAULT_REGION_NAME = new DefaultAwsRegionProviderChain().getRegion();
 
-    private static SourceFunction<Event> createSource(StreamExecutionEnvironment env, ParameterTool parameters) {
+    private static SourceFunction<Event> createSource(ParameterTool parameters) {
         Properties inputProperties = new Properties();
         inputProperties.setProperty(AWSConfigConstants.AWS_REGION, parameters.get("Region", DEFAULT_REGION_NAME));
         inputProperties.setProperty(AWSConfigConstants.AWS_CREDENTIALS_PROVIDER, "AUTO");
@@ -75,7 +75,7 @@ public class StreamingJob {
         Map<String,String> apiKeyHeader = ImmutableMap.of("x-api-key", parameters.getRequired("ApiKey"));
 
         DataStream<Event> events = env
-            .addSource(createSource(env, parameters))
+            .addSource(createSource(parameters))
             .rebalance();
 
         /*

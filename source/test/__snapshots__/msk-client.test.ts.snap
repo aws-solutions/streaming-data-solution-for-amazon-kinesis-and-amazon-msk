@@ -1,0 +1,148 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`creates a Kafka client instance 1`] = `
+Object {
+  "Resources": Object {
+    "TestClientD3610C34": Object {
+      "Properties": Object {
+        "IamInstanceProfile": Object {
+          "Ref": "TestClientInstanceProfileF9C60143",
+        },
+        "ImageId": "ami-1234",
+        "InstanceType": "t3.small",
+        "SecurityGroupIds": Array [
+          "cluster-sg",
+        ],
+        "SubnetId": "subnet-abc",
+        "Tags": Array [
+          Object {
+            "Key": "Name",
+            "Value": "KafkaClient",
+          },
+        ],
+        "UserData": Object {
+          "Fn::Base64": "#!/bin/bash
+yum update -y
+yum install java-1.8.0 -y
+mkdir -p /home/kafka && cd /home/kafka
+wget https://archive.apache.org/dist/kafka/2.6.0/kafka_2.12-2.6.0.tgz
+tar -xzf kafka_2.12-2.6.0.tgz --strip 1 && rm kafka_2.12-2.6.0.tgz
+find /usr/lib/jvm/ -name \\"cacerts\\" | xargs -I '{}' cp '{}' /tmp/kafka.client.truststore.jks
+touch bin/client.properties
+echo \\"security.protocol=SSL\\" >> bin/client.properties
+echo \\"ssl.truststore.location=/tmp/kafka.client.truststore.jks\\" >> bin/client.properties",
+        },
+      },
+      "Type": "AWS::EC2::Instance",
+    },
+    "TestClientInstanceProfileF9C60143": Object {
+      "Properties": Object {
+        "Roles": Array [
+          Object {
+            "Ref": "TestClientRole00F4BDF5",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::InstanceProfile",
+    },
+    "TestClientMskPolicyDC57001A": Object {
+      "Metadata": Object {
+        "cfn_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "W12",
+              "reason": "MSK actions do not support resource level permissions",
+            },
+          ],
+        },
+      },
+      "Properties": Object {
+        "PolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": Array [
+                "kafka:DescribeCluster",
+                "kafka:GetBootstrapBrokers",
+              ],
+              "Effect": "Allow",
+              "Resource": "*",
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "TestClientMskPolicyDC57001A",
+        "Roles": Array [
+          Object {
+            "Ref": "TestClientRole00F4BDF5",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "TestClientRole00F4BDF5": Object {
+      "Properties": Object {
+        "AssumeRolePolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": Object {
+                "Service": Object {
+                  "Fn::Join": Array [
+                    "",
+                    Array [
+                      "ec2.",
+                      Object {
+                        "Ref": "AWS::URLSuffix",
+                      },
+                    ],
+                  ],
+                },
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "TestClientSessionManagerPolicy40AA67DF": Object {
+      "Metadata": Object {
+        "cfn_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "W12",
+              "reason": "Session Manager actions do not support resource level permissions",
+            },
+          ],
+        },
+      },
+      "Properties": Object {
+        "PolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": Array [
+                "ssm:UpdateInstanceInformation",
+                "ssmmessages:CreateControlChannel",
+                "ssmmessages:CreateDataChannel",
+                "ssmmessages:OpenControlChannel",
+                "ssmmessages:OpenDataChannel",
+              ],
+              "Effect": "Allow",
+              "Resource": "*",
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "TestClientSessionManagerPolicy40AA67DF",
+        "Roles": Array [
+          Object {
+            "Ref": "TestClientRole00F4BDF5",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+  },
+}
+`;

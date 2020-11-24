@@ -20,13 +20,20 @@ export interface SolutionHelperProps {
     readonly solutionId: string;
     readonly pattern: string;
 
+    // KDS metrics
     readonly shardCount?: number;
     readonly retentionHours?: number;
     readonly enhancedMonitoring?: string;
 
+    // KDF metrics
     readonly bufferingSize?: number;
     readonly bufferingInterval?: number;
     readonly compressionFormat?: string;
+
+    // MSK metrics
+    readonly numberOfBrokerNodes?: number;
+    readonly brokerInstanceType?: string;
+    readonly monitoringLevel?: string;
 }
 
 export class SolutionHelper extends cdk.Construct {
@@ -80,7 +87,11 @@ export class SolutionHelper extends cdk.Construct {
 
                 'BufferingSize': props.bufferingSize,
                 'BufferingInterval': props.bufferingInterval,
-                'CompressionFormat': props.compressionFormat
+                'CompressionFormat': props.compressionFormat,
+
+                'NumberOfBrokerNodes': props.numberOfBrokerNodes,
+                'BrokerInstanceType': props.brokerInstanceType,
+                'MonitoringLevel': props.monitoringLevel
             },
             resourceType: 'Custom::AnonymousData'
         });

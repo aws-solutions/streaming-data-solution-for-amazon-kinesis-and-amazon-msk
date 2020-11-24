@@ -188,17 +188,17 @@ export class KdsKdfS3 extends cdk.Stack {
         // Stack outputs
 
         new cdk.CfnOutput(this, 'DataStreamName', {
-            description: 'Name of the Kinesis stream',
+            description: 'Name of the Amazon Kinesis Data stream',
             value: kds.Stream.streamName
         });
 
         new cdk.CfnOutput(this, 'DeliveryStreamName', {
-            description: 'Name of the Firehose delivery stream',
+            description: 'Name of the Amazon Kinesis Data Firehose delivery stream',
             value: deliveryStream.ref
         });
 
         new cdk.CfnOutput(this, 'OutputBucketName', {
-            description: 'Name of the S3 destination bucket',
+            description: 'Name of the Amazon S3 destination bucket',
             value: outputBucket.Bucket.bucketName
         });
     }

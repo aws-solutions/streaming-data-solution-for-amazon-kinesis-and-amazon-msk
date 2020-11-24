@@ -41,15 +41,15 @@ export class FlinkApplication extends cdk.Construct {
     private readonly LogGroup: logs.LogGroup;
     private readonly Role: iam.IRole;
 
-    public get ApplicationName() {
+    public get ApplicationName(): string {
         return this.Application.ref;
     }
 
-    public get LogGroupName() {
+    public get LogGroupName(): string {
         return this.LogGroup.logGroupName;
     }
 
-    public get ApplicationRole() {
+    public get ApplicationRole(): iam.IRole {
         return this.Role;
     }
 

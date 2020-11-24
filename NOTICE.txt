@@ -1,4 +1,4 @@
-AWS Streaming Data Solution for Amazon Kinesis
+AWS Streaming Data Solution for Amazon Kinesis and AWS Streaming Data Solution for Amazon MSK
 
 Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
@@ -8,12 +8,14 @@ THIRD PARTY COMPONENTS
 This software includes third party software subject to the following copyrights:
 
 aws-sdk under the Apache License Version 2.0
+aws-sdk-mock under the Apache License Version 2.0
 crhelper under the Apache License Version 2.0
 Coverage.py under the Apache License Version 2.0
 chai under the Massachusetts Institute of Technology (MIT) license
 mocha under the Massachusetts Institute of Technology (MIT) license
 nyc under the ISC license
 requests under the Apache License Version 2.0
+sinon under the BSD-3-Clause license
 
 Amazon Kinesis Client Library For Java under the Apache License Version 2.0
 Amazon Kinesis Producer Library under the Apache License Version 2.0

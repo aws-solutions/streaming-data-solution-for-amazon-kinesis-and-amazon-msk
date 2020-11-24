@@ -15,7 +15,7 @@ npm ci && npm run test -- -u
 cd "$lambda_dir/kds-lambda-consumer"
 npm test
 
-for custom_resource in "$lambda_dir/kda-vpc-config" "$lambda_dir/kds-enhanced-monitoring" "$lambda_dir/solution-helper"; do
+for custom_resource in "$lambda_dir/kda-vpc-config" "$lambda_dir/kds-enhanced-monitoring" "$lambda_dir/solution-helper" "$lambda_dir/msk-dashboard"; do
     cd $custom_resource
     venv_folder="./v-env/"
 

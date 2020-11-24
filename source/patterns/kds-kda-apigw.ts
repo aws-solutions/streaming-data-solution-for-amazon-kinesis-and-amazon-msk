@@ -54,7 +54,7 @@ export class KdsKdaApiGw extends cdk.Stack {
         const enhancedMonitoring = new cdk.CfnParameter(this, 'EnableEnhancedMonitoring', {
             type: 'String',
             default: 'false',
-            allowedValues: ['true', 'false']
+            allowedValues: this.BinaryOptions
         });
 
         const kds = new DataStream(this, 'Kds', {
@@ -251,17 +251,17 @@ export class KdsKdaApiGw extends cdk.Stack {
         // Stack outputs
 
         new cdk.CfnOutput(this, 'ProducerInstance', {
-            description: 'ID of the KPL EC2 instance',
+            description: 'ID of the KPL Amazon EC2 instance',
             value: kpl.InstanceId
         });
 
         new cdk.CfnOutput(this, 'DataStreamName', {
-            description: 'Name of the Kinesis stream',
+            description: 'Name of the Amazon Kinesis Data stream',
             value: kds.Stream.streamName
         });
 
         new cdk.CfnOutput(this, 'ApplicationName', {
-            description: 'Name of the Kinesis Analytics application',
+            description: 'Name of the Kinesis Data Analytics application',
             value: kda.ApplicationName
         });
     }
