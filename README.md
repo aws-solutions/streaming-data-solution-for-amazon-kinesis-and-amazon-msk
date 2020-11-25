@@ -3,7 +3,7 @@ Streaming data use cases follow a similar pattern where data flows from data pro
 
 The challenge with these use cases is the set up time and effort that developers require to create the resources and establish the best practices needed by the streaming data services (such as access control, logging capabilities, and data integrations).
 
-The AWS Streaming Data Solution for Amazon Kinesis and AWS Streaming Data Solution for Amazon MSK automatically configure the AWS services necessary to easily capture, store, process, and deliver streaming data. They provide common streaming data patterns for you to choose from that can serve as a starting point for solving your use case or to improve existing applications. You can try out new service combinations to implement common streaming data use cases, or use the solutions as the basis for your production environment.
+The [AWS Streaming Data Solution for Amazon Kinesis](https://aws.amazon.com/solutions/implementations/aws-streaming-data-solution-for-amazon-kinesis) and [AWS Streaming Data Solution for Amazon MSK](https://aws.amazon.com/solutions/implementations/aws-streaming-data-solution-for-amazon-msk) automatically configure the AWS services necessary to easily capture, store, process, and deliver streaming data. They provide common streaming data patterns for you to choose from that can serve as a starting point for solving your use case or to improve existing applications. You can try out new service combinations to implement common streaming data use cases, or use the solutions as the basis for your production environment.
 
 ## Table of contents
 - [Architecture for AWS Streaming Data Solution for Amazon Kinesis](source/docs/README-Kinesis.md)
