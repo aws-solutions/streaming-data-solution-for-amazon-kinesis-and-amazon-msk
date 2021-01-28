@@ -1,4 +1,4 @@
-## Architecture for Architecture for AWS Streaming Data Solution for Amazon MSK
+## Architecture for AWS Streaming Data Solution for Amazon MSK
 The solution implements three patterns with more coming soon. All of them use Amazon MSK for streaming storage, and you can combine and extend the different components (which are built using the AWS CDK) to meet your needs.
 
 ### Networking configuration
