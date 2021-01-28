@@ -1,5 +1,5 @@
 /*********************************************************************************************************************
- *  Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.                                           *
+ *  Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.                                      *
  *                                                                                                                    *
  *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
  *  with the License. A copy of the License is located at                                                             *
@@ -90,6 +90,7 @@ public class Sig4SignedHttpRequestAsyncFunction<T> extends RichAsyncFunction<Sig
     }
 
     @Override
+    @SuppressWarnings("squid:HiddenFieldCheck")
     public void open(Configuration parameters) throws Exception {
         asyncHttpClient = NettyNioAsyncHttpClient.builder().build();
 
@@ -185,9 +186,10 @@ public class Sig4SignedHttpRequestAsyncFunction<T> extends RichAsyncFunction<Sig
         }
 
         public HttpRequest<T> withRawQueryParameter(String paramName, String paramValue) {
-            return new HttpRequest<T>(triggeringEvent, builder.putRawQueryParameter(paramName, paramValue));
+            return new HttpRequest<>(triggeringEvent, builder.putRawQueryParameter(paramName, paramValue));
         }
 
+        @SuppressWarnings("squid:HiddenFieldCheck")
         public HttpRequest<T> withBody(String body) {
             byte[] bytes = body.getBytes(Charsets.UTF_8);
 
@@ -200,7 +202,7 @@ public class Sig4SignedHttpRequestAsyncFunction<T> extends RichAsyncFunction<Sig
                 })
                 .putHeader("Content-Length", Integer.toString(bytes.length));
 
-            return new HttpRequest<T>(triggeringEvent, builder);
+            return new HttpRequest<>(triggeringEvent, builder);
         }
 
         public SdkHttpFullRequest.Builder builder() {

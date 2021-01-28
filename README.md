@@ -12,6 +12,7 @@ The [AWS Streaming Data Solution for Amazon Kinesis](https://aws.amazon.com/solu
 - [Project structure](#project-structure)
 - [Deployment](#deployment)
 - [Creating a custom build](#creating-a-custom-build)
+- [Known issues](#known-issues)
 - [Additional Resources](#additional-resources)
 
 ## AWS CDK Constructs
@@ -49,7 +50,7 @@ To customize the solution, follow the steps below:
 * [AWS Command Line Interface](https://aws.amazon.com/cli/)
 * Node.js 12.x or later
 * Python 3.8 or later
-* Java 1.8 (only required if using Apache Flink)
+* Java 11 (only required if using Apache Flink)
 * Apache Maven 3.1 (only required if using Apache Flink)
 
 > **Note**: The commands listed below will build all patterns. To only include one, you can modify the CDK entrypoint file on `source/bin/streaming-data-solution.ts`
@@ -100,6 +101,10 @@ aws s3 sync ./regional-s3-assets s3://$ARTIFACT_BUCKET-us-east-1/$SOLUTION_NAME/
 * Get the link of the template uploaded to your Amazon S3 bucket (created as $ARTIFACT_BUCKET in the previous step)
 * Deploy the solution to your account by launching a new AWS CloudFormation stack
 
+## Known issues
+* For the options that use Amazon Kinesis Data Analytics, we recommend stopping the application before you delete the stack.
+If the application is running during the stack deletion, its status will change to `Updating`, and you might see some errors when CloudFormation tries to delete resources such as `AWS::KinesisAnalyticsV2::ApplicationCloudWatchLoggingOption` and `Custom::VpcConfiguration` (a custom resource that configures the application to connect to a virtual private cloud).
+
 ## Additional Resources
 
 ### Services
@@ -121,7 +126,7 @@ aws s3 sync ./regional-s3-assets s3://$ARTIFACT_BUCKET-us-east-1/$SOLUTION_NAME/
 
 ***
 
-Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

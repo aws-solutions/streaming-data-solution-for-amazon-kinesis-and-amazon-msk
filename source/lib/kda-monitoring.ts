@@ -1,5 +1,5 @@
 /*********************************************************************************************************************
- *  Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.                                           *
+ *  Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.                                      *
  *                                                                                                                    *
  *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
  *  with the License. A copy of the License is located at                                                             *
@@ -18,7 +18,8 @@ import { MonitoringBase } from './monitoring-base';
 export interface ApplicationMonitoringProps {
     readonly applicationName: string;
     readonly logGroupName: string;
-    readonly inputStreamName: string;
+    readonly inputStreamName?: string;
+    readonly kafkaTopicName?: string;
 }
 
 export class ApplicationMonitoring extends MonitoringBase {
@@ -51,7 +52,7 @@ export class ApplicationMonitoring extends MonitoringBase {
         this.addApplicationHealth();
         this.addResourceUtilization();
         this.addApplicationProgress();
-        this.addSourceMetrics(props.inputStreamName);
+        this.addSourceMetrics(props.inputStreamName, props.kafkaTopicName);
         this.addLogging(props.applicationName, props.logGroupName);
     }
 
@@ -276,28 +277,44 @@ export class ApplicationMonitoring extends MonitoringBase {
         );
     }
 
-    private addSourceMetrics(inputStreamName: string) {
-        //---------------------------------------------------------------------
-        const kinesisMetric = new cw.Metric({
-            ...this.DEFAULT_METRIC_PROPS,
-            metricName: 'millisBehindLatest',
-            statistic: 'Maximum',
-            dimensions: {
-                ...this.DEFAULT_METRIC_PROPS.dimensions,
-                'Id': cdk.Fn.join('_', cdk.Fn.split('-', inputStreamName)),
-                'Flow': 'Input'
-            }
-        });
+    private addSourceMetrics(inputStreamName?: string, kafkaTopicName?: string) {
+        if (inputStreamName !== undefined) {
+            //---------------------------------------------------------------------
+            const kinesisMetric = new cw.Metric({
+                ...this.DEFAULT_METRIC_PROPS,
+                metricName: 'millisBehindLatest',
+                statistic: 'Maximum',
+                dimensions: {
+                    ...this.DEFAULT_METRIC_PROPS.dimensions,
+                    'Id': cdk.Fn.join('_', cdk.Fn.split('-', inputStreamName)),
+                    'Flow': 'Input'
+                }
+            });
 
-        const millisBehindAlarm = new cw.Alarm(this, 'MillisBehindAlarm', {
-            ...this.DEFAULT_ALARM_PROPS,
-            metric: kinesisMetric,
-            threshold: this.PROCESSING_DELAY_THRESHOLD
-        });
+            const millisBehindAlarm = new cw.Alarm(this, 'MillisBehindAlarm', {
+                ...this.DEFAULT_ALARM_PROPS,
+                metric: kinesisMetric,
+                threshold: this.PROCESSING_DELAY_THRESHOLD
+            });
 
-        //---------------------------------------------------------------------
-        this.Dashboard.addWidgets(this.createMarkdownWidget('\n# Kinesis Source Metrics\n'));
-        this.Dashboard.addWidgets(this.createAlarmWidget('Kinesis MillisBehindLatest', millisBehindAlarm));
+            //---------------------------------------------------------------------
+            this.Dashboard.addWidgets(this.createMarkdownWidget('\n# Kinesis Source Metrics\n'));
+            this.Dashboard.addWidgets(this.createAlarmWidget('Kinesis MillisBehindLatest', millisBehindAlarm));
+        } else if (kafkaTopicName !== undefined) {
+            //---------------------------------------------------------------------
+            const kafkaMetric = new cw.Metric({
+                ...this.DEFAULT_METRIC_PROPS,
+                metricName: 'records_lag_max',
+                statistic: 'Maximum',
+                dimensions: {
+                    ...this.DEFAULT_METRIC_PROPS.dimensions
+                }
+            });
+
+            //---------------------------------------------------------------------
+            this.Dashboard.addWidgets(this.createMarkdownWidget('\n# Kafka Source Metrics\n'));
+            this.Dashboard.addWidgets(this.createWidgetWithoutUnits('Kafka RecordsLagMax', kafkaMetric));
+        }
     }
 
     private addLogging(applicationName: string, logGroupName: string) {

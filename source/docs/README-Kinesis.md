@@ -15,7 +15,7 @@ The second pattern includes an EC2 instance that generates data using the Kinesi
 
 ![cw-dashboard](kda-cw-dashboard.png)
 
-The solution provides a [demo producer application](/source/kinesis/kpl-demo), which is configured to write 100 records per second to the data stream. There's also a [demo Java application for Kinesis Data Analytics](/source/kinesis/kda-flink-demo), in order to demonstrate how to use Apache Flink sources, sinks, and operators. The schema used is the same one provided in [Getting Started with Amazon Kinesis Data Analytics](https://docs.aws.amazon.com/kinesisanalytics/latest/java/getting-started.html):
+The solution provides a [demo producer application](/source/kinesis/kpl-demo), which is configured to write 100 records per second to the data stream. There's also a [demo Java application for Kinesis Data Analytics](/source/kinesis/kda-flink-demo), in order to demonstrate how to use Apache Flink sources, sinks, and operators. The schema used is the same one provided in [Getting Started with Amazon Kinesis Data Analytics for Apache Flink (DataStream API)](https://docs.aws.amazon.com/kinesisanalytics/latest/java/getting-started.html):
 
 ```json
 {

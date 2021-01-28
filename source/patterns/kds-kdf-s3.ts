@@ -1,5 +1,5 @@
 /*********************************************************************************************************************
- *  Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.                                           *
+ *  Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.                                      *
  *                                                                                                                    *
  *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
  *  with the License. A copy of the License is located at                                                             *
@@ -39,7 +39,7 @@ export class KdsKdfS3 extends cdk.Stack {
             type: 'Number',
             default: 24,
             minValue: 24,
-            maxValue: 168
+            maxValue: 8760
         });
 
         const enhancedMonitoring = new cdk.CfnParameter(this, 'EnableEnhancedMonitoring', {

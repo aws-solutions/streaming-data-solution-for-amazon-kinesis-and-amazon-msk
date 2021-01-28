@@ -3,5 +3,8 @@ module.exports = {
   testMatch: ['**/*.test.ts'],
   transform: {
     '^.+\\.tsx?$': 'ts-jest'
-  }
+  },
+  coverageReporters: [
+    ["lcov", {"projectRoot": "../"}]
+  ]
 };

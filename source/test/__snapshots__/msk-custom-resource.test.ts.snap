@@ -1,0 +1,173 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`creates custom resource for cluster metadata 1`] = `
+Object {
+  "Parameters": Object {
+    "AssetParametersc02c389ab00b8e2d85da2f901a80ab31facea529c0124dd7acee93942e1a1152ArtifactHash1A322459": Object {
+      "Description": "Artifact hash for asset \\"c02c389ab00b8e2d85da2f901a80ab31facea529c0124dd7acee93942e1a1152\\"",
+      "Type": "String",
+    },
+    "AssetParametersc02c389ab00b8e2d85da2f901a80ab31facea529c0124dd7acee93942e1a1152S3Bucket334A1313": Object {
+      "Description": "S3 bucket for asset \\"c02c389ab00b8e2d85da2f901a80ab31facea529c0124dd7acee93942e1a1152\\"",
+      "Type": "String",
+    },
+    "AssetParametersc02c389ab00b8e2d85da2f901a80ab31facea529c0124dd7acee93942e1a1152S3VersionKeyBB3661D5": Object {
+      "Description": "S3 key for asset version \\"c02c389ab00b8e2d85da2f901a80ab31facea529c0124dd7acee93942e1a1152\\"",
+      "Type": "String",
+    },
+  },
+  "Resources": Object {
+    "MskCustomResource12A90CA2": Object {
+      "DependsOn": Array [
+        "MskRoleCB221854",
+      ],
+      "Properties": Object {
+        "Code": Object {
+          "S3Bucket": Object {
+            "Ref": "AssetParametersc02c389ab00b8e2d85da2f901a80ab31facea529c0124dd7acee93942e1a1152S3Bucket334A1313",
+          },
+          "S3Key": Object {
+            "Fn::Join": Array [
+              "",
+              Array [
+                Object {
+                  "Fn::Select": Array [
+                    0,
+                    Object {
+                      "Fn::Split": Array [
+                        "||",
+                        Object {
+                          "Ref": "AssetParametersc02c389ab00b8e2d85da2f901a80ab31facea529c0124dd7acee93942e1a1152S3VersionKeyBB3661D5",
+                        },
+                      ],
+                    },
+                  ],
+                },
+                Object {
+                  "Fn::Select": Array [
+                    1,
+                    Object {
+                      "Fn::Split": Array [
+                        "||",
+                        Object {
+                          "Ref": "AssetParametersc02c389ab00b8e2d85da2f901a80ab31facea529c0124dd7acee93942e1a1152S3VersionKeyBB3661D5",
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            ],
+          },
+        },
+        "Description": "This function retrieves metadata (such as list of brokers and networking) from a MSK cluster",
+        "Handler": "lambda_function.handler",
+        "Role": Object {
+          "Fn::GetAtt": Array [
+            "MskRoleCB221854",
+            "Arn",
+          ],
+        },
+        "Runtime": "python3.8",
+        "Timeout": 60,
+      },
+      "Type": "AWS::Lambda::Function",
+    },
+    "MskMetadataHelper10BDCE6D": Object {
+      "DeletionPolicy": "Delete",
+      "Properties": Object {
+        "ClusterArn": "my-cluster-arn",
+        "ServiceToken": Object {
+          "Fn::GetAtt": Array [
+            "MskCustomResource12A90CA2",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "Custom::MskMetadata",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "MskRoleCB221854": Object {
+      "Metadata": Object {
+        "cfn_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "W11",
+              "reason": "MSK actions do not support resource level permissions",
+            },
+          ],
+        },
+      },
+      "Properties": Object {
+        "AssumeRolePolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": Object {
+                "Service": "lambda.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "Policies": Array [
+          Object {
+            "PolicyDocument": Object {
+              "Statement": Array [
+                Object {
+                  "Action": Array [
+                    "logs:CreateLogGroup",
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents",
+                  ],
+                  "Effect": "Allow",
+                  "Resource": Object {
+                    "Fn::Join": Array [
+                      "",
+                      Array [
+                        "arn:",
+                        Object {
+                          "Ref": "AWS::Partition",
+                        },
+                        ":logs:",
+                        Object {
+                          "Ref": "AWS::Region",
+                        },
+                        ":",
+                        Object {
+                          "Ref": "AWS::AccountId",
+                        },
+                        ":log-group:/aws/lambda/*",
+                      ],
+                    ],
+                  },
+                },
+              ],
+              "Version": "2012-10-17",
+            },
+            "PolicyName": "CloudWatchLogsPolicy",
+          },
+          Object {
+            "PolicyDocument": Object {
+              "Statement": Array [
+                Object {
+                  "Action": Array [
+                    "kafka:DescribeCluster",
+                    "kafka:GetBootstrapBrokers",
+                  ],
+                  "Effect": "Allow",
+                  "Resource": "*",
+                },
+              ],
+              "Version": "2012-10-17",
+            },
+            "PolicyName": "MetadataPolicy",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+  },
+}
+`;

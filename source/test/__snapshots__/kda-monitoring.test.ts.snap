@@ -1,6 +1,325 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`creates a dashboard for a Flink application 1`] = `
+exports[`kafka topic as source creates a dashboard for a Flink application 1`] = `
+Object {
+  "Resources": Object {
+    "Dashboard7A714131": Object {
+      "Properties": Object {
+        "DashboardBody": Object {
+          "Fn::Join": Array [
+            "",
+            Array [
+              "{\\"widgets\\":[{\\"type\\":\\"text\\",\\"width\\":24,\\"height\\":1,\\"x\\":0,\\"y\\":0,\\"properties\\":{\\"markdown\\":\\"\\\\n# Application Health\\\\n\\"}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":0,\\"y\\":1,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Downtime\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"annotations\\":{\\"alarms\\":[\\"",
+              Object {
+                "Fn::GetAtt": Array [
+                  "DashboardDowntimeAlarm0610A7CD",
+                  "Arn",
+                ],
+              },
+              "\\"]},\\"yAxis\\":{}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":6,\\"y\\":1,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Uptime\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"metrics\\":[[\\"AWS/KinesisAnalytics\\",\\"uptime\\",\\"Application\\",\\"test-application\\",{\\"period\\":60,\\"stat\\":\\"Minimum\\"}]],\\"yAxis\\":{\\"left\\":{\\"showUnits\\":false},\\"right\\":{\\"showUnits\\":false}}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":12,\\"y\\":1,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Flink Job Restarts\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"metrics\\":[[\\"AWS/KinesisAnalytics\\",\\"fullRestarts\\",\\"Application\\",\\"test-application\\",{\\"period\\":60,\\"stat\\":\\"Maximum\\"}]],\\"yAxis\\":{\\"left\\":{\\"showUnits\\":false},\\"right\\":{\\"showUnits\\":false}}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":18,\\"y\\":1,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Number of Failed Checkpoints\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"annotations\\":{\\"alarms\\":[\\"",
+              Object {
+                "Fn::GetAtt": Array [
+                  "DashboardCheckpointAlarm3205A33F",
+                  "Arn",
+                ],
+              },
+              "\\"]},\\"yAxis\\":{}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":0,\\"y\\":7,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Last Checkpoint Duration\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"metrics\\":[[\\"AWS/KinesisAnalytics\\",\\"lastCheckpointDuration\\",\\"Application\\",\\"test-application\\",{\\"period\\":60,\\"stat\\":\\"Maximum\\"}]],\\"yAxis\\":{\\"left\\":{\\"showUnits\\":false},\\"right\\":{\\"showUnits\\":false}}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":6,\\"y\\":7,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Last Checkpoint Size\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"metrics\\":[[\\"AWS/KinesisAnalytics\\",\\"lastCheckpointSize\\",\\"Application\\",\\"test-application\\",{\\"period\\":60}]],\\"yAxis\\":{\\"left\\":{\\"showUnits\\":false},\\"right\\":{\\"showUnits\\":false}}}},{\\"type\\":\\"text\\",\\"width\\":24,\\"height\\":1,\\"x\\":0,\\"y\\":13,\\"properties\\":{\\"markdown\\":\\"\\\\n# Resource Utilization\\\\n\\"}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":0,\\"y\\":14,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"CPU Utilization\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"annotations\\":{\\"alarms\\":[\\"",
+              Object {
+                "Fn::GetAtt": Array [
+                  "DashboardCpuUtilizationAlarm557F9515",
+                  "Arn",
+                ],
+              },
+              "\\"]},\\"yAxis\\":{}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":6,\\"y\\":14,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Heap Memory Utilization\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"annotations\\":{\\"alarms\\":[\\"",
+              Object {
+                "Fn::GetAtt": Array [
+                  "DashboardHeapMemoryAlarmAA149A1B",
+                  "Arn",
+                ],
+              },
+              "\\"]},\\"yAxis\\":{}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":12,\\"y\\":14,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Thread Count\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"metrics\\":[[\\"AWS/KinesisAnalytics\\",\\"threadsCount\\",\\"Application\\",\\"test-application\\",{\\"period\\":60,\\"stat\\":\\"Maximum\\"}]],\\"yAxis\\":{\\"left\\":{\\"showUnits\\":false},\\"right\\":{\\"showUnits\\":false}}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":18,\\"y\\":14,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Old Generation GC Percent (Over 1 Min)\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"annotations\\":{\\"alarms\\":[\\"",
+              Object {
+                "Fn::GetAtt": Array [
+                  "DashboardGCPercentAlarmE5EE740C",
+                  "Arn",
+                ],
+              },
+              "\\"]},\\"yAxis\\":{}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":0,\\"y\\":20,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Old Generation GC Count Rate\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"metrics\\":[[{\\"label\\":\\"Old Generation GC Count Rate\\",\\"expression\\":\\"RATE(METRICS()) * 60\\"}],[\\"AWS/KinesisAnalytics\\",\\"oldGenerationGCCount\\",\\"Application\\",\\"test-application\\",{\\"label\\":\\"\\",\\"period\\":60,\\"stat\\":\\"Maximum\\",\\"visible\\":false,\\"id\\":\\"m1\\"}]],\\"yAxis\\":{\\"left\\":{\\"showUnits\\":false},\\"right\\":{\\"showUnits\\":false}}}},{\\"type\\":\\"text\\",\\"width\\":24,\\"height\\":1,\\"x\\":0,\\"y\\":26,\\"properties\\":{\\"markdown\\":\\"\\\\n# Flink Application Progress\\\\n\\"}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":0,\\"y\\":27,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Incoming Records (Per Second)\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"metrics\\":[[\\"AWS/KinesisAnalytics\\",\\"numRecordsInPerSecond\\",\\"Application\\",\\"test-application\\",{\\"period\\":60}]],\\"yAxis\\":{\\"left\\":{\\"showUnits\\":false},\\"right\\":{\\"showUnits\\":false}}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":6,\\"y\\":27,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Outgoing Records (Per Second)\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"annotations\\":{\\"alarms\\":[\\"",
+              Object {
+                "Fn::GetAtt": Array [
+                  "DashboardRecordsOutAlarmCCE6886B",
+                  "Arn",
+                ],
+              },
+              "\\"]},\\"yAxis\\":{}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":12,\\"y\\":27,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Input Watermark\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"metrics\\":[[\\"AWS/KinesisAnalytics\\",\\"currentInputWatermark\\",\\"Application\\",\\"test-application\\",{\\"period\\":60,\\"stat\\":\\"Minimum\\"}]],\\"yAxis\\":{\\"left\\":{\\"showUnits\\":false},\\"right\\":{\\"showUnits\\":false}}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":18,\\"y\\":27,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Output Watermark\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"metrics\\":[[\\"AWS/KinesisAnalytics\\",\\"currentOutputWatermark\\",\\"Application\\",\\"test-application\\",{\\"period\\":60,\\"stat\\":\\"Minimum\\"}]],\\"yAxis\\":{\\"left\\":{\\"showUnits\\":false},\\"right\\":{\\"showUnits\\":false}}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":0,\\"y\\":33,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Event Time Latency\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"metrics\\":[[{\\"label\\":\\"Event Time Latency\\",\\"expression\\":\\"m1 - m2\\"}],[\\"AWS/KinesisAnalytics\\",\\"currentOutputWatermark\\",\\"Application\\",\\"test-application\\",{\\"label\\":\\"\\",\\"period\\":60,\\"stat\\":\\"Minimum\\",\\"visible\\":false,\\"id\\":\\"m1\\"}],[\\"AWS/KinesisAnalytics\\",\\"currentInputWatermark\\",\\"Application\\",\\"test-application\\",{\\"label\\":\\"\\",\\"period\\":60,\\"stat\\":\\"Minimum\\",\\"visible\\":false,\\"id\\":\\"m2\\"}]],\\"yAxis\\":{\\"left\\":{\\"showUnits\\":false},\\"right\\":{\\"showUnits\\":false}}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":6,\\"y\\":33,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Late Records Dropped\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"metrics\\":[[\\"AWS/KinesisAnalytics\\",\\"numLateRecordsDropped\\",\\"Application\\",\\"test-application\\",{\\"period\\":60,\\"stat\\":\\"Maximum\\"}]],\\"yAxis\\":{\\"left\\":{\\"showUnits\\":false},\\"right\\":{\\"showUnits\\":false}}}},{\\"type\\":\\"text\\",\\"width\\":24,\\"height\\":1,\\"x\\":0,\\"y\\":39,\\"properties\\":{\\"markdown\\":\\"\\\\n# Kafka Source Metrics\\\\n\\"}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":0,\\"y\\":40,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Kafka RecordsLagMax\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"metrics\\":[[\\"AWS/KinesisAnalytics\\",\\"records_lag_max\\",\\"Application\\",\\"test-application\\",{\\"period\\":60,\\"stat\\":\\"Maximum\\"}]],\\"yAxis\\":{\\"left\\":{\\"showUnits\\":false},\\"right\\":{\\"showUnits\\":false}}}},{\\"type\\":\\"text\\",\\"width\\":24,\\"height\\":1,\\"x\\":0,\\"y\\":46,\\"properties\\":{\\"markdown\\":\\"\\\\n# Logs Insights\\\\n\\"}},{\\"type\\":\\"log\\",\\"width\\":24,\\"height\\":6,\\"x\\":0,\\"y\\":47,\\"properties\\":{\\"view\\":\\"table\\",\\"title\\":\\"Distribution of Tasks\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"query\\":\\"SOURCE 'test-log-group' | fields @timestamp, message\\\\n| filter message like /Deploying/\\\\n| parse message \\\\\\" to flink-taskmanager-*\\\\\\" as @tmid\\\\n| stats count(*) by @tmid\\\\n| sort @timestamp desc\\\\n| limit 20\\"}},{\\"type\\":\\"log\\",\\"width\\":24,\\"height\\":6,\\"x\\":0,\\"y\\":53,\\"properties\\":{\\"view\\":\\"table\\",\\"title\\":\\"Change in Parallelism\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"query\\":\\"SOURCE 'test-log-group' | fields @timestamp, @parallelism\\\\n| filter message like /property: parallelism.default, /\\\\n| parse message \\\\\\"default, *\\\\\\" as @parallelism\\\\n| sort @timestamp asc\\\\n| limit 20\\"}},{\\"type\\":\\"log\\",\\"width\\":24,\\"height\\":6,\\"x\\":0,\\"y\\":59,\\"properties\\":{\\"view\\":\\"table\\",\\"title\\":\\"Access Denied\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"query\\":\\"SOURCE 'test-log-group' | fields @timestamp, @message, @messageType\\\\n| filter applicationARN like /arn:",
+              Object {
+                "Ref": "AWS::Partition",
+              },
+              ":kinesisanalytics:",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              ":",
+              Object {
+                "Ref": "AWS::AccountId",
+              },
+              ":application/test-application/\\\\n| filter @message like /AccessDenied/\\\\n| sort @timestamp desc\\\\n| limit 20\\"}},{\\"type\\":\\"log\\",\\"width\\":24,\\"height\\":6,\\"x\\":0,\\"y\\":65,\\"properties\\":{\\"view\\":\\"table\\",\\"title\\":\\"Source or Sink Not Found\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"query\\":\\"SOURCE 'test-log-group' | fields @timestamp, @message\\\\n| filter applicationARN like /arn:",
+              Object {
+                "Ref": "AWS::Partition",
+              },
+              ":kinesisanalytics:",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              ":",
+              Object {
+                "Ref": "AWS::AccountId",
+              },
+              ":application/test-application/\\\\n| filter @message like /ResourceNotFoundException/\\\\n| sort @timestamp desc\\\\n| limit 20\\"}},{\\"type\\":\\"log\\",\\"width\\":24,\\"height\\":6,\\"x\\":0,\\"y\\":71,\\"properties\\":{\\"view\\":\\"table\\",\\"title\\":\\"Application Task-Related Failures\\",\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"query\\":\\"SOURCE 'test-log-group' | fields @timestamp, @message\\\\n| filter applicationARN like /arn:",
+              Object {
+                "Ref": "AWS::Partition",
+              },
+              ":kinesisanalytics:",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              ":",
+              Object {
+                "Ref": "AWS::AccountId",
+              },
+              ":application/test-application/\\\\n| filter @message like /switched from RUNNING to FAILED/\\\\n| sort @timestamp desc\\\\n| limit 20\\"}}]}",
+            ],
+          ],
+        },
+      },
+      "Type": "AWS::CloudWatch::Dashboard",
+    },
+    "DashboardCheckpointAlarm3205A33F": Object {
+      "Properties": Object {
+        "ComparisonOperator": "GreaterThanThreshold",
+        "Dimensions": Array [
+          Object {
+            "Name": "Application",
+            "Value": "test-application",
+          },
+        ],
+        "EvaluationPeriods": 1,
+        "MetricName": "numberOfFailedCheckpoints",
+        "Namespace": "AWS/KinesisAnalytics",
+        "Period": 60,
+        "Statistic": "Average",
+        "Threshold": 0,
+        "TreatMissingData": "breaching",
+      },
+      "Type": "AWS::CloudWatch::Alarm",
+    },
+    "DashboardCpuUtilizationAlarm557F9515": Object {
+      "Properties": Object {
+        "ComparisonOperator": "GreaterThanThreshold",
+        "Dimensions": Array [
+          Object {
+            "Name": "Application",
+            "Value": "test-application",
+          },
+        ],
+        "EvaluationPeriods": 1,
+        "MetricName": "cpuUtilization",
+        "Namespace": "AWS/KinesisAnalytics",
+        "Period": 60,
+        "Statistic": "Maximum",
+        "Threshold": 80,
+        "TreatMissingData": "breaching",
+      },
+      "Type": "AWS::CloudWatch::Alarm",
+    },
+    "DashboardDowntimeAlarm0610A7CD": Object {
+      "Properties": Object {
+        "ComparisonOperator": "GreaterThanThreshold",
+        "Dimensions": Array [
+          Object {
+            "Name": "Application",
+            "Value": "test-application",
+          },
+        ],
+        "EvaluationPeriods": 1,
+        "MetricName": "downtime",
+        "Namespace": "AWS/KinesisAnalytics",
+        "Period": 60,
+        "Statistic": "Average",
+        "Threshold": 0,
+        "TreatMissingData": "breaching",
+      },
+      "Type": "AWS::CloudWatch::Alarm",
+    },
+    "DashboardGCPercentAlarmE5EE740C": Object {
+      "Properties": Object {
+        "ComparisonOperator": "GreaterThanThreshold",
+        "EvaluationPeriods": 1,
+        "Metrics": Array [
+          Object {
+            "Expression": "(m1 * 100)/60000",
+            "Id": "expr_1",
+            "Label": "Old Generation GC Time Percent",
+          },
+          Object {
+            "Id": "m1",
+            "MetricStat": Object {
+              "Metric": Object {
+                "Dimensions": Array [
+                  Object {
+                    "Name": "Application",
+                    "Value": "test-application",
+                  },
+                ],
+                "MetricName": "oldGenerationGCTime",
+                "Namespace": "AWS/KinesisAnalytics",
+              },
+              "Period": 60,
+              "Stat": "Maximum",
+            },
+            "ReturnData": false,
+          },
+        ],
+        "Threshold": 60,
+        "TreatMissingData": "breaching",
+      },
+      "Type": "AWS::CloudWatch::Alarm",
+    },
+    "DashboardHeapMemoryAlarmAA149A1B": Object {
+      "Properties": Object {
+        "ComparisonOperator": "GreaterThanThreshold",
+        "Dimensions": Array [
+          Object {
+            "Name": "Application",
+            "Value": "test-application",
+          },
+        ],
+        "EvaluationPeriods": 1,
+        "MetricName": "heapMemoryUtilization",
+        "Namespace": "AWS/KinesisAnalytics",
+        "Period": 60,
+        "Statistic": "Maximum",
+        "Threshold": 90,
+        "TreatMissingData": "breaching",
+      },
+      "Type": "AWS::CloudWatch::Alarm",
+    },
+    "DashboardRecordsOutAlarmCCE6886B": Object {
+      "Properties": Object {
+        "ComparisonOperator": "LessThanOrEqualToThreshold",
+        "Dimensions": Array [
+          Object {
+            "Name": "Application",
+            "Value": "test-application",
+          },
+        ],
+        "EvaluationPeriods": 1,
+        "MetricName": "numRecordsOutPerSecond",
+        "Namespace": "AWS/KinesisAnalytics",
+        "Period": 60,
+        "Statistic": "Average",
+        "Threshold": 0,
+        "TreatMissingData": "breaching",
+      },
+      "Type": "AWS::CloudWatch::Alarm",
+    },
+  },
+}
+`;
+
+exports[`kinesis data stream as source creates a dashboard for a Flink application 1`] = `
 Object {
   "Resources": Object {
     "Dashboard7A714131": Object {

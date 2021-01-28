@@ -29,11 +29,9 @@ There are two classes used for deserialization of incoming records: [Event](src/
 The sample application has several examples on how to handle HTTP requests and responses. You should update them (or use them as reference) for your use case.
 
 ### 3. (Optional) Update settings on the _createSource_ methods
-By default, the sample application will read data from a Kinesis data stream and invoke an API Gateway endpoint (both values are passed as [runtime properties](https://docs.aws.amazon.com/kinesisanalytics/latest/java/how-properties.html)). The complete list of settings for the source (_FlinkKinesisConsumer_) can be found on [GitHub](https://github.com/apache/flink/tree/release-1.8/flink-connectors/flink-connector-kinesis/src/main/java/org/apache/flink/streaming/connectors/kinesis/config).
+By default, the sample application will read data from a Kinesis data stream and invoke an API Gateway endpoint (both values are passed as [runtime properties](https://docs.aws.amazon.com/kinesisanalytics/latest/java/how-properties.html)). The complete list of settings for the source (_FlinkKinesisConsumer_) can be found on [GitHub](https://github.com/apache/flink/tree/release-1.11/flink-connectors/flink-connector-kinesis/src/main/java/org/apache/flink/streaming/connectors/kinesis/config).
 
 ### 4. Build the application using Apache Maven
-> **Note**: In order for your application to use the Apache Flink Kinesis connector, you must download, compile, and install Apache Flink. This connector is used to consume data from a Kinesis stream used as an application source, or to write data to a Kinesis stream used for application output. For more information, see [Using the Apache Flink Kinesis Streams Connector](https://docs.aws.amazon.com/kinesisanalytics/latest/java/how-creating-apps.html#how-creating-apps-building-kinesis).
-
 ```
-mvn clean package --quiet -Dflink.version=1.8.2
+mvn clean package --quiet -Dflink.version=1.11.1
 ```

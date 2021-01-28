@@ -26,7 +26,7 @@
 set -e
 
 # Important: CDK global version number
-cdk_version=1.74.0
+cdk_version=1.80.0
 
 # Check to see if input has been provided:
 if [ -z "$1" ] || [ -z "$2" ] || [ -z "$3" ]; then
@@ -73,7 +73,7 @@ for folder in */ ; do
     function_name=${PWD##*/}
     echo "Installing dependencies for $function_name"
 
-    for temp_folder in ".nyc_output" "v-env" "__pycache__"; do
+    for temp_folder in "coverage" "v-env" "__pycache__"; do
         if [ -d "$temp_folder" ]; then
             echo "$temp_folder exists, removing it"
             rm -rf $temp_folder
@@ -90,31 +90,14 @@ for folder in */ ; do
 done
 
 echo "------------------------------------------------------------------------------"
-echo "[Init] Download and compile Apache Flink"
-echo "------------------------------------------------------------------------------"
-cd $source_dir/kinesis
-flink_version=1.8.2
-flink_checksum="7451cafb920f954e851fad2bcb551c9dc24af0615a70c78f932455b260832a434893548de5058609c22d251d2e4c2a3bc6c1c2d2f93c7811b481651d2877d34b flink-$flink_version-src.tgz"
-
-wget https://archive.apache.org/dist/flink/flink-$flink_version/flink-$flink_version-src.tgz
-echo $flink_checksum | sha512sum -c
-
-tar -xf flink-$flink_version-src.tgz
-cd flink-$flink_version
-mvn clean install --quiet -Pinclude-kinesis -DskipTests -Dfast --projects flink-connectors/flink-connector-kinesis,flink-connectors/flink-connector-kafka
-
-echo "------------------------------------------------------------------------------"
 echo "[Init] Generate jar files for demo Java applications"
 echo "------------------------------------------------------------------------------"
 cd $source_dir/kinesis
+flink_version=1.11.1
+
 for folder in */ ; do
     cd "$folder"
     application_name=${PWD##*/}
-
-    if [ $application_name == flink-$flink_version ]; then
-        cd ..
-        continue
-    fi
 
     echo "Compiling application $application_name"
     mvn clean package --quiet -Dflink.version=$flink_version

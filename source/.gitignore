@@ -13,3 +13,6 @@ cdk.out
 
 # JS files in the lambda folder should not be ignored
 !lambda/**/*.js
+
+# Coverage reports
+test/coverage-reports

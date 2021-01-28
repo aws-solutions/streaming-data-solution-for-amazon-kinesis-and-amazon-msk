@@ -1,5 +1,5 @@
 /*********************************************************************************************************************
- *  Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.                                           *
+ *  Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.                                      *
  *                                                                                                                    *
  *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
  *  with the License. A copy of the License is located at                                                             *
@@ -48,7 +48,7 @@ export class KdsKdaApiGw extends cdk.Stack {
             type: 'Number',
             default: 24,
             minValue: 24,
-            maxValue: 168
+            maxValue: 8760
         });
 
         const enhancedMonitoring = new cdk.CfnParameter(this, 'EnableEnhancedMonitoring', {
@@ -102,7 +102,7 @@ export class KdsKdaApiGw extends cdk.Stack {
 
         const metricsLevel = new cdk.CfnParameter(this, 'MetricsLevel', {
             type: 'String',
-            default: 'OPERATOR',
+            default: 'TASK',
             allowedValues: FlinkApplication.AllowedMetricLevels
         });
 
@@ -261,7 +261,7 @@ export class KdsKdaApiGw extends cdk.Stack {
         });
 
         new cdk.CfnOutput(this, 'ApplicationName', {
-            description: 'Name of the Kinesis Data Analytics application',
+            description: 'Name of the Amazon Kinesis Data Analytics application',
             value: kda.ApplicationName
         });
     }
@@ -283,6 +283,21 @@ export class KdsKdaApiGw extends cdk.Stack {
             },
             existingLambdaObj: predictFareLambda
         });
+
+        (pattern.node.findChild('ApiAccessLogGroup').node.defaultChild as cwlogs.CfnLogGroup).cfnOptions.metadata = {
+            cfn_nag: {
+                rules_to_suppress: [
+                    {
+                        id: 'W84',
+                        reason: 'Log group data is always encrypted in CloudWatch Logs using an AWS Managed KMS Key'
+                    },
+                    {
+                        id: 'W86',
+                        reason: 'Log group retention is intentionally set to "Never Expire"'
+                    }
+                ]
+            }
+        };
 
         const predictFareModel = pattern.apiGateway.addModel('PredictFareModel', {
             schema: {

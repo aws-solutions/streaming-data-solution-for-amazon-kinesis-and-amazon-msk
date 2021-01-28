@@ -1,5 +1,5 @@
 /*********************************************************************************************************************
- *  Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.                                           *
+ *  Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.                                      *
  *                                                                                                                    *
  *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
  *  with the License. A copy of the License is located at                                                             *
@@ -66,7 +66,10 @@ public class SampleApplication {
     }
 
     private static StreamingFileSink<String> createDestination(ParameterTool parameter) {
+        // Built URI is dynamic, and can be changed without re-compiling the application.
+        @SuppressWarnings("squid:S1075")
         String s3SinkPath = "s3a://" + parameter.getRequired("OutputBucketName") + "/";
+
         LOG.info("Using {} as destination", s3SinkPath);
 
         return StreamingFileSink

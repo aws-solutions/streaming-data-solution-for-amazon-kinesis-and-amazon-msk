@@ -1,5 +1,5 @@
 /*********************************************************************************************************************
- *  Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.                                           *
+ *  Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.                                      *
  *                                                                                                                    *
  *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
  *  with the License. A copy of the License is located at                                                             *
@@ -17,7 +17,6 @@ import * as lambda from '@aws-cdk/aws-lambda';
 import { SolutionHelper } from '../lib/solution-helper';
 import { SolutionStackProps } from './solution-props';
 import { KafkaConsumer } from '../lib/msk-consumer';
-import { KafkaMonitoring } from '../lib/msk-monitoring';
 
 export class MskLambda extends cdk.Stack {
     constructor(scope: cdk.Construct, id: string, props: SolutionStackProps) {
@@ -64,15 +63,6 @@ export class MskLambda extends cdk.Stack {
         });
 
         //---------------------------------------------------------------------
-        // Monitoring (dashboard) configuration
-        const dashboardName = cdk.Fn.join('-', ['MSK2', 'Monitoring', cdk.Aws.REGION]);
-
-        new KafkaMonitoring(this, 'Monitoring', {
-            clusterArn: clusterArn.valueAsString,
-            dashboardName: dashboardName
-        });
-
-        //---------------------------------------------------------------------
         // Template metadata
 
         this.templateOptions.metadata = {
@@ -91,7 +81,7 @@ export class MskLambda extends cdk.Stack {
                         default: 'Maximum number of items to retrieve in a single batch'
                     },
                     [topicName.logicalId]: {
-                        default: 'Name of a Kafka topic to consume'
+                        default: 'Name of a Kafka topic to consume (topic must already exist before the stack is launched)'
                     }
                 }
             }
@@ -108,11 +98,6 @@ export class MskLambda extends cdk.Stack {
         new cdk.CfnOutput(this, 'LambdaMskMapping', {
             description: 'Identifier for the AWS Lambda event source mapping',
             value: lambdaConsumer.EventMapping.eventSourceMappingId
-        });
-
-        new cdk.CfnOutput(this, 'CloudWatchDashboardName', {
-            description: 'Name of the Amazon CloudWatch dashboard',
-            value: dashboardName
         });
     }
 }

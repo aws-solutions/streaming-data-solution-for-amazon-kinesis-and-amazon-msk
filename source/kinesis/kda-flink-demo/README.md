@@ -1,10 +1,15 @@
-# Demo consumer application
-A consumer is an application that processes all data from a Kinesis data stream. This [demo](src/main/java/com/demo/SampleApplication.java) is built using [Apache Flink](https://flink.apache.org/) (a popular framework and engine for processing data streams), and can be deployed as an application in Amazon Kinesis Data Analytics.
+# Demo consumer application (for Amazon Kinesis Data Streams)
+A consumer is an application that processes all data from a Kinesis data stream. This [demo](src/main/java/com/demo/SampleApplication.java) is built using [Apache Flink](https://flink.apache.org/) (a popular framework and engine for processing data streams) and can be deployed as an application in Amazon Kinesis Data Analytics.
 
 > Kinesis Data Analytics provides the underlying infrastructure for your Apache Flink applications. It handles core capabilities like provisioning compute resources, parallel computation, automatic scaling, and application backups (implemented as checkpoints and snapshots). You can use the high-level Flink programming features (such as operators, sources, and sinks) in the same way that you use them when hosting the Flink infrastructure yourself.
 
-## Apache Flink
-The Apache Flink programming model is based on two components:
+## Programming your Apache Flink application
+Applications primarily use either the [DataStream API](https://ci.apache.org/projects/flink/flink-docs-release-1.11/dev/datastream_api.html) or the [Table API](https://ci.apache.org/projects/flink/flink-docs-release-1.11/dev/table/). Other Apache Flink APIs are also available, but they are less commonly used in building streaming applications.
+
+> This demo uses the DataStream API, but the solution has a similar [example](/source/kinesis/kda-flink-kafka) using the Table API.
+
+### Apache Flink DataStream API
+The Apache Flink DataStream API programming model is based on two components:
 - **Data stream**: The structured representation of a continuous flow of data records.
 - **Transformation operator**: Takes one or more data streams as input, and produces one or more data streams as output.
 
@@ -52,11 +57,9 @@ The sample application is configured to use the same schema as the [KPL demo](/s
 The sample application uses the _timeWindow_ operator to find the maximum value for each stock symbol over a 10-second window that slides by 5 seconds. You should update it for your use case.
 
 ### 2. (Optional) Update settings on the _createSource_ and _createDestination_ methods
-By default, the sample application will read data from a Kinesis data stream and write the output to an Amazon S3 bucket (both values are passed as [runtime properties](https://docs.aws.amazon.com/kinesisanalytics/latest/java/how-properties.html)). The complete list of settings for the source (_FlinkKinesisConsumer_) and the sink (_StreamingFileSink_) can be found on [GitHub](https://github.com/apache/flink/tree/release-1.8/flink-connectors/flink-connector-kinesis/src/main/java/org/apache/flink/streaming/connectors/kinesis/config) and the [Apache Flink documentation](https://ci.apache.org/projects/flink/flink-docs-stable/dev/connectors/streamfile_sink.html), respectively.
+By default, the sample application will read data from a Kinesis data stream and write the output to an Amazon S3 bucket (both values are passed as [runtime properties](https://docs.aws.amazon.com/kinesisanalytics/latest/java/how-properties.html)). The complete list of settings for the source (_FlinkKinesisConsumer_) and the sink (_StreamingFileSink_) can be found on [GitHub](https://github.com/apache/flink/tree/release-1.11/flink-connectors/flink-connector-kinesis/src/main/java/org/apache/flink/streaming/connectors/kinesis/config) and the [Apache Flink documentation](https://ci.apache.org/projects/flink/flink-docs-stable/dev/connectors/streamfile_sink.html), respectively.
 
 ### 3. Build the application using Apache Maven
-> **Note**: In order for your application to use the Apache Flink Kinesis connector, you must download, compile, and install Apache Flink. This connector is used to consume data from a Kinesis stream used as an application source, or to write data to a Kinesis stream used for application output. For more information, see [Using the Apache Flink Kinesis Streams Connector](https://docs.aws.amazon.com/kinesisanalytics/latest/java/how-creating-apps.html#how-creating-apps-building-kinesis).
-
 ```
-mvn clean package --quiet -Dflink.version=1.8.2
+mvn clean package --quiet -Dflink.version=1.11.1
 ```

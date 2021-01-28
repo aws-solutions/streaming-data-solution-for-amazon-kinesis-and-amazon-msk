@@ -1,11 +1,11 @@
 {
   "name": "msk-lambda-kdf",
-  "version": "1.0.0",
+  "version": "1.3.0",
   "description": "lambda consumer that publishes MSK events to KDF",
   "main": "index.js",
   "scripts": {
     "pretest": "npm ci",
-    "test": "nyc --reporter=text mocha test/*.spec.js"
+    "test": "jest"
   },
   "private": true,
   "license": "Apache-2.0",
@@ -14,9 +14,20 @@
   },
   "devDependencies": {
     "chai": "4.2.0",
-    "mocha": "8.2.1",
-    "nyc": "15.1.0",
+    "jest": "^26.4.2",
     "sinon": "9.2.1",
     "aws-sdk-mock": "5.1.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "collectCoverage": true,
+    "coverageReporters": [
+      [
+        "lcov",
+        {
+          "projectRoot": "../../../"
+        }
+      ]
+    ]
   }
 }

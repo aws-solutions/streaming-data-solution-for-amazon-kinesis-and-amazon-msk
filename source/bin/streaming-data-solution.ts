@@ -9,6 +9,7 @@ import { KdsKdaApiGw } from '../patterns/kds-kda-apigw';
 import { MskStandalone } from '../patterns/msk-standalone-cluster';
 import { MskLambda } from '../patterns/msk-lambda';
 import { MskLambdaKdf } from '../patterns/msk-lambda-kdf';
+import { MskKdaS3 } from '../patterns/msk-kda-s3';
 
 const app = new cdk.App();
 const solutionIdKds = 'SO0124';
@@ -73,6 +74,15 @@ new MskLambdaKdf(
     'aws-streaming-data-solution-for-msk-using-aws-lambda-and-kinesis-data-firehose',
     {
         description: `(${solutionIdMsk}) - AWS Streaming Data Solution for Amazon MSK (MSK -> Lambda -> KDF). Version %%VERSION%%`,
+        solutionId: solutionIdMsk
+    }
+);
+
+new MskKdaS3(
+    app,
+    'aws-streaming-data-solution-for-msk-using-kinesis-data-analytics-and-amazon-s3',
+    {
+        description: `(${solutionIdMsk}) - AWS Streaming Data Solution for Amazon MSK (MSK -> KDA -> S3). Version %%VERSION%%`,
         solutionId: solutionIdMsk
     }
 );

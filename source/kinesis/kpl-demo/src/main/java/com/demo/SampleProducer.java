@@ -1,5 +1,5 @@
 /*********************************************************************************************************************
- *  Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.                                           *
+ *  Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.                                      *
  *                                                                                                                    *
  *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
  *  with the License. A copy of the License is located at                                                             *
@@ -45,7 +45,9 @@ public class SampleProducer {
     private static final String DEFAULT_REGION_NAME = "us-east-1";
     private static final String STREAM_NAME = "default-data-stream";
 
+    @SuppressWarnings("squid:S2245")
     private static final Random RANDOM = new Random();
+
     private static final String TIMESTAMP = Long.toString(System.currentTimeMillis());
     private static final int RECORDS_PER_SECOND = 100;
     private static final int SECONDS_TO_RUN_DEFAULT = 5;
@@ -110,29 +112,23 @@ public class SampleProducer {
 
         final ExecutorService callbackThreadPool = Executors.newCachedThreadPool();
 
-        // The lines within run() are the essence of the KPL API.
-        final Runnable putOneRecord = new Runnable() {
-            @Override
-            public void run() {
-                ByteBuffer data = generateData();
-                // TIMESTAMP is our partition key
-                ListenableFuture<UserRecordResult> f = producer.addUserRecord(streamName, TIMESTAMP, randomExplicitHashKey(), data);
-                Futures.addCallback(f, callback, callbackThreadPool);
-            }
+        final Runnable putOneRecord = () -> {
+            ByteBuffer data = generateData();
+            // TIMESTAMP is our partition key
+            ListenableFuture<UserRecordResult> f = producer.addUserRecord(streamName, TIMESTAMP, randomExplicitHashKey(), data);
+            Futures.addCallback(f, callback, callbackThreadPool);
         };
 
-        EXECUTOR.scheduleAtFixedRate(new Runnable() {
-            @Override
-            public void run() {
-                long put = sequenceNumber.get();
-                long total = RECORDS_PER_SECOND * secondsToRun;
-                double putPercent = 100.0 * put / total;
-                long done = completed.get();
-                double donePercent = 100.0 * done / total;
-                LOG.info(String.format(
-                        "Put %d of %d so far (%.2f %%), %d have completed (%.2f %%)",
-                        put, total, putPercent, done, donePercent));
-            }
+        EXECUTOR.scheduleAtFixedRate(() -> {
+            long put = sequenceNumber.get();
+
+            long total = RECORDS_PER_SECOND * secondsToRun;
+            double putPercent = 100.0 * put / total;
+
+            long done = completed.get();
+            double donePercent = 100.0 * done / total;
+
+            LOG.info(String.format("Put %d of %d so far (%.2f %%), %d have completed (%.2f %%)", put, total, putPercent, done, donePercent));
         }, 1, 1, TimeUnit.SECONDS);
 
         LOG.info(String.format(

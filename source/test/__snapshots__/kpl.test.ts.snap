@@ -50,7 +50,7 @@ Object {
         "UserData": Object {
           "Fn::Base64": "#!/bin/bash
 yum update -y
-yum install -y java-1.8.0-openjdk-devel
+amazon-linux-extras install java-openjdk11 -y
 java -version
 aws s3 cp s3://test-bucket/test-key.zip /tmp/producer.zip
 unzip /tmp/producer.zip -d /tmp && rm -f /tmp/producer.zip",

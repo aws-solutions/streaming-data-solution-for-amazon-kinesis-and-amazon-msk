@@ -23,7 +23,7 @@ Object {
         "UserData": Object {
           "Fn::Base64": "#!/bin/bash
 yum update -y
-yum install java-1.8.0 -y
+yum install java-1.8.0 python3 -y
 mkdir -p /home/kafka && cd /home/kafka
 wget https://archive.apache.org/dist/kafka/2.6.0/kafka_2.12-2.6.0.tgz
 tar -xzf kafka_2.12-2.6.0.tgz --strip 1 && rm kafka_2.12-2.6.0.tgz

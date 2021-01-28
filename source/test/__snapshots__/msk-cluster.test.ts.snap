@@ -22,6 +22,8 @@ Object {
     },
     "KafkaVersion": Object {
       "AllowedValues": Array [
+        "2.7.0",
+        "2.6.1",
         "2.6.0",
         "2.5.1",
         "2.4.1.1",
@@ -56,6 +58,12 @@ Object {
       },
       "Properties": Object {
         "GroupDescription": "Security group for the MSK cluster",
+        "Tags": Array [
+          Object {
+            "Key": "Name",
+            "Value": "msk-cluster-sg",
+          },
+        ],
         "VpcId": "my-vpc-id",
       },
       "Type": "AWS::EC2::SecurityGroup",
@@ -190,6 +198,16 @@ Object {
     },
     "TestMskLogGroupCF743213": Object {
       "DeletionPolicy": "Retain",
+      "Metadata": Object {
+        "cfn_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "W84",
+              "reason": "Log group data is always encrypted in CloudWatch Logs using an AWS Managed KMS Key",
+            },
+          ],
+        },
+      },
       "Properties": Object {
         "RetentionInDays": 731,
       },
@@ -216,6 +234,12 @@ Object {
       },
       "Properties": Object {
         "GroupDescription": "Security group for the MSK cluster",
+        "Tags": Array [
+          Object {
+            "Key": "Name",
+            "Value": "msk-cluster-sg",
+          },
+        ],
         "VpcId": "my-vpc-id",
       },
       "Type": "AWS::EC2::SecurityGroup",
@@ -343,6 +367,16 @@ Object {
     },
     "TestMskLogGroupCF743213": Object {
       "DeletionPolicy": "Retain",
+      "Metadata": Object {
+        "cfn_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "W84",
+              "reason": "Log group data is always encrypted in CloudWatch Logs using an AWS Managed KMS Key",
+            },
+          ],
+        },
+      },
       "Properties": Object {
         "RetentionInDays": 731,
       },
@@ -369,6 +403,12 @@ Object {
       },
       "Properties": Object {
         "GroupDescription": "Security group for the MSK cluster",
+        "Tags": Array [
+          Object {
+            "Key": "Name",
+            "Value": "msk-cluster-sg",
+          },
+        ],
         "VpcId": "my-vpc-id",
       },
       "Type": "AWS::EC2::SecurityGroup",
@@ -496,6 +536,16 @@ Object {
     },
     "TestMskLogGroupCF743213": Object {
       "DeletionPolicy": "Retain",
+      "Metadata": Object {
+        "cfn_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "W84",
+              "reason": "Log group data is always encrypted in CloudWatch Logs using an AWS Managed KMS Key",
+            },
+          ],
+        },
+      },
       "Properties": Object {
         "RetentionInDays": 731,
       },
@@ -522,6 +572,12 @@ Object {
       },
       "Properties": Object {
         "GroupDescription": "Security group for the MSK cluster",
+        "Tags": Array [
+          Object {
+            "Key": "Name",
+            "Value": "msk-cluster-sg",
+          },
+        ],
         "VpcId": "my-vpc-id",
       },
       "Type": "AWS::EC2::SecurityGroup",
@@ -649,6 +705,16 @@ Object {
     },
     "TestMskLogGroupCF743213": Object {
       "DeletionPolicy": "Retain",
+      "Metadata": Object {
+        "cfn_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "W84",
+              "reason": "Log group data is always encrypted in CloudWatch Logs using an AWS Managed KMS Key",
+            },
+          ],
+        },
+      },
       "Properties": Object {
         "RetentionInDays": 731,
       },

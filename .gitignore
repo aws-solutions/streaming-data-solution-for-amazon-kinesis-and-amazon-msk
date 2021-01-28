@@ -210,6 +210,9 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 
+# linting, scanning configurations, sonarqube
+.scannerwork/
+
 # Translations
 *.mo
 *.pot
@@ -264,10 +267,6 @@ dmypy.json
 
 ### VisualStudioCode ###
 .vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
 
 ### VisualStudioCode Patch ###
 # Ignore all local history of files

@@ -1,6 +1,6 @@
 AWS Streaming Data Solution for Amazon Kinesis and AWS Streaming Data Solution for Amazon MSK
 
-Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 **********************
 THIRD PARTY COMPONENTS
@@ -11,8 +11,6 @@ Amazon Kinesis Client Library For Java under the Apache License Version 2.0
 Amazon Kinesis Producer Library under the Apache License Version 2.0
 Apache Maven Compiler Plugin under the Apache License Version 2.0
 Apache Maven Shade Plugin under the Apache License Version 2.0
-aws-sdk-mock under the Apache License Version 2.0
-aws-sdk under the Apache License Version 2.0
 AWS CDK under the Apache License Version 2.0
 AWS Java SDK :: Auth under the Apache License Version 2.0
 AWS Java SDK :: HTTP Clients :: Netty Non Blocking I/O under the Apache License Version 2.0
@@ -21,9 +19,17 @@ AWS Kinesis Analytics Java Flink Connectors under the Apache License Version 2.0
 AWS Kinesis Analytics Java Flink Runtime under the Apache License Version 2.0
 AWS SDK For Java BOM under the Apache License Version 2.0
 AWS Solutions Constructs under the Apache License Version 2.0
+aws-sdk under the Apache License Version 2.0
+aws-sdk-mock under the Apache License Version 2.0
 chai under the Massachusetts Institute of Technology (MIT) license
 Coverage.py under the Apache License Version 2.0
 crhelper under the Apache License Version 2.0
+Flink : Clients under the Apache License Version 2.0
+Flink : FileSystems : S3 FS Hadoop under the Apache License Version 2.0
+Flink : Formats : Json under the Apache License Version 2.0
+Flink : Table : API Java Bridge under the Apache License Version 2.0
+Flink : Table : Common under the Apache License Version 2.0
+Flink : Table : Planner Blink under the Apache License Version 2.0
 Flink Connector Kafka under the Apache License Version 2.0
 Flink Connector Kinesis under the Apache License Version 2.0
 Flink JSON under the Apache License Version 2.0
@@ -31,8 +37,7 @@ Flink Streaming Java under the Apache License Version 2.0
 Gson under the Apache License Version 2.0
 Jest under the Massachusetts Institute of Technology (MIT) license
 JSON In Java under the JSON License
-mocha under the Massachusetts Institute of Technology (MIT) license
-nyc under the ISC license
+Project Lombok under the Massachusetts Institute of Technology (MIT) license
 requests under the Apache License Version 2.0
 sinon under the BSD-3-Clause license
 SLF4J LOG4J-12 Binding under the Massachusetts Institute of Technology (MIT) license

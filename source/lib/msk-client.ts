@@ -1,5 +1,5 @@
 /*********************************************************************************************************************
- *  Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.                                           *
+ *  Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.                                      *
  *                                                                                                                    *
  *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
  *  with the License. A copy of the License is located at                                                             *
@@ -40,7 +40,7 @@ export class KafkaClient extends cdk.Construct {
         const userDataCommands = [
             '#!/bin/bash',
             'yum update -y',
-            'yum install java-1.8.0 -y',
+            'yum install java-1.8.0 python3 -y',
 
             'mkdir -p /home/kafka && cd /home/kafka',
             `wget https://archive.apache.org/dist/kafka/${props.kafkaVersion}/kafka_2.12-${props.kafkaVersion}.tgz`,

@@ -1,5 +1,5 @@
 /*********************************************************************************************************************
- *  Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.                                           *
+ *  Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.                                      *
  *                                                                                                                    *
  *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
  *  with the License. A copy of the License is located at                                                             *
@@ -65,12 +65,4 @@ test.each([0, -1])('shard count must be positive', (invalidShardCount) => {
         retentionPeriod: cdk.Duration.days(1),
         shardCount: invalidShardCount
     })).toThrowError(/shardCount must be a positive number/);
-});
-
-test.each([23, 169])('retention period must be between allowed values', (invalidHours) => {
-    expect(() => new DataStream(stack, 'TestDataStream', {
-        enableEnhancedMonitoring: 'true',
-        retentionPeriod: cdk.Duration.hours(invalidHours),
-        shardCount: 2
-    })).toThrowError(`retentionPeriod must be between 24 and 168 hours. Received ${invalidHours}`);
 });

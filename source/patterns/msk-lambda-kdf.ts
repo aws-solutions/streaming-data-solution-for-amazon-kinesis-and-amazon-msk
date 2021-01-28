@@ -1,5 +1,5 @@
 /*********************************************************************************************************************
- *  Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.                                           *
+ *  Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.                                      *
  *                                                                                                                    *
  *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
  *  with the License. A copy of the License is located at                                                             *
@@ -14,12 +14,12 @@
 import * as cdk from '@aws-cdk/core';
 import * as lambda from '@aws-cdk/aws-lambda';
 import * as iam from '@aws-cdk/aws-iam';
+import * as logs from '@aws-cdk/aws-logs';
 
 import { SolutionHelper } from '../lib/solution-helper';
 import { SolutionStackProps } from './solution-props';
 import { EncryptedBucket } from '../lib/s3-bucket';
 import { KafkaConsumer } from '../lib/msk-consumer';
-import { KafkaMonitoring } from '../lib/msk-monitoring';
 import { KinesisFirehoseToS3 } from '@aws-solutions-constructs/aws-kinesisfirehose-s3';
 
 export class MskLambdaKdf extends cdk.Stack {
@@ -57,6 +57,9 @@ export class MskLambdaKdf extends cdk.Stack {
             existingBucketObj: outputBucket.Bucket,
             kinesisFirehoseProps: {
                 deliveryStreamType: 'DirectPut',
+                deliveryStreamEncryptionConfigurationInput: {
+                    keyType: 'AWS_OWNED_CMK'
+                },
                 extendedS3DestinationConfiguration: {
                     bufferingHints: {
                         intervalInSeconds: bufferingInterval.valueAsNumber,
@@ -68,6 +71,21 @@ export class MskLambdaKdf extends cdk.Stack {
                 }
             }
         });
+
+        (kdfToS3.node.findChild('firehose-log-group').node.defaultChild as logs.CfnLogGroup).cfnOptions.metadata = {
+            cfn_nag: {
+                rules_to_suppress: [
+                    {
+                        id: 'W84',
+                        reason: 'Log group data is always encrypted in CloudWatch Logs using an AWS Managed KMS Key'
+                    },
+                    {
+                        id: 'W86',
+                        reason: 'Log group retention is intentionally set to "Never Expire"'
+                    }
+                ]
+            }
+        };
 
         //---------------------------------------------------------------------
         // Lambda function configuration
@@ -121,15 +139,6 @@ export class MskLambdaKdf extends cdk.Stack {
         });
 
         //---------------------------------------------------------------------
-        // Monitoring (dashboard) configuration
-        const dashboardName = cdk.Fn.join('-', ['MSK3', 'Monitoring', cdk.Aws.REGION]);
-
-        new KafkaMonitoring(this, 'Monitoring', {
-            clusterArn: clusterArn.valueAsString,
-            dashboardName: dashboardName
-        });
-
-        //---------------------------------------------------------------------
         // Template metadata
 
         this.templateOptions.metadata = {
@@ -152,7 +161,7 @@ export class MskLambdaKdf extends cdk.Stack {
                         default: 'Maximum number of items to retrieve in a single batch'
                     },
                     [topicName.logicalId]: {
-                        default: 'Name of a Kafka topic to consume'
+                        default: 'Name of a Kafka topic to consume (topic must already exist before the stack is launched)'
                     },
 
                     [bufferingSize.logicalId]: {
@@ -188,11 +197,6 @@ export class MskLambdaKdf extends cdk.Stack {
         new cdk.CfnOutput(this, 'OutputBucketName', {
             description: 'Name of the Amazon S3 destination bucket',
             value: outputBucket.Bucket.bucketName
-        });
-
-        new cdk.CfnOutput(this, 'CloudWatchDashboardName', {
-            description: 'Name of the Amazon CloudWatch dashboard',
-            value: dashboardName
         });
     }
 }

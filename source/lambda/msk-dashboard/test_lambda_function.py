@@ -1,5 +1,5 @@
 ######################################################################################################################
-#  Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.                                           #
+#  Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.                                      #
 #                                                                                                                    #
 #  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    #
 #  with the License. A copy of the License is located at                                                             #
@@ -18,6 +18,10 @@ from botocore.stub import Stubber
 from unittest.mock import patch
 
 class LambdaTest(unittest.TestCase):
+    AWS_KAFKA_DIMENSION = 'AWS/Kafka'
+    CLUSTER_DIMENSION = 'Cluster Name'
+    BROKER_ID_DIMENSION = 'Broker ID'
+
     @classmethod
     def setUpClass(cls):
         cls._cloudwatch = botocore.session.get_session().create_client('cloudwatch')
@@ -62,7 +66,7 @@ class LambdaTest(unittest.TestCase):
         self.assertTrue(mock_client.assert_called)
 
     def test_03_create_metrics_for_cluster(self):
-        expected = [['AWS/Kafka', 'GlobalPartitionCount', 'Cluster Name', 'my-cluster']]
+        expected = [[self.AWS_KAFKA_DIMENSION, 'GlobalPartitionCount', self.CLUSTER_DIMENSION, 'my-cluster']]
 
         from lambda_function import _generate_metrics_without_brokers
         actual = _generate_metrics_without_brokers('my-cluster', 'GlobalPartitionCount')
@@ -70,10 +74,26 @@ class LambdaTest(unittest.TestCase):
 
     def test_04_create_metrics_for_brokers(self):
         expected = [
-            ['AWS/Kafka', 'GlobalPartitionCount', 'Cluster Name', 'my-cluster', 'Broker ID', '1'],
-            ['AWS/Kafka', 'GlobalPartitionCount', 'Cluster Name', 'my-cluster', 'Broker ID', '2'],
-            ['AWS/Kafka', 'GlobalPartitionCount', 'Cluster Name', 'my-cluster', 'Broker ID', '3'],
-            ['AWS/Kafka', 'GlobalPartitionCount', 'Cluster Name', 'my-cluster', 'Broker ID', '4']
+            [
+                self.AWS_KAFKA_DIMENSION, 'GlobalPartitionCount',
+                self.CLUSTER_DIMENSION, 'my-cluster',
+                self.BROKER_ID_DIMENSION, '1'
+            ],
+            [
+                self.AWS_KAFKA_DIMENSION, 'GlobalPartitionCount',
+                self.CLUSTER_DIMENSION, 'my-cluster',
+                self.BROKER_ID_DIMENSION, '2'
+            ],
+            [
+                self.AWS_KAFKA_DIMENSION, 'GlobalPartitionCount',
+                self.CLUSTER_DIMENSION, 'my-cluster',
+                self.BROKER_ID_DIMENSION, '3'
+            ],
+            [
+                self.AWS_KAFKA_DIMENSION, 'GlobalPartitionCount',
+                self.CLUSTER_DIMENSION, 'my-cluster',
+                self.BROKER_ID_DIMENSION, '4'
+            ]
         ]
 
         from lambda_function import _generate_metrics_with_brokers
@@ -92,7 +112,7 @@ class LambdaTest(unittest.TestCase):
             'width': 6, 'height': 3,
             'properties': {
                 'metrics': [
-                    ['AWS/Kafka', 'ZooKeeperRequestLatencyMsMean', 'Cluster Name', 'my-cluster']
+                    [self.AWS_KAFKA_DIMENSION, 'ZooKeeperRequestLatencyMsMean', self.CLUSTER_DIMENSION, 'my-cluster']
                 ],
                 'view': 'singleValue',
                 'stacked': False,
@@ -127,8 +147,16 @@ class LambdaTest(unittest.TestCase):
             'width': 12, 'height': 6,
             'properties': {
                 'metrics': [
-                    ['AWS/Kafka', 'KafkaDataLogsDiskUsed', 'Cluster Name', 'my-cluster', 'Broker ID', '1'],
-                    ['AWS/Kafka', 'KafkaDataLogsDiskUsed', 'Cluster Name', 'my-cluster', 'Broker ID', '2']
+                    [
+                        self.AWS_KAFKA_DIMENSION, 'KafkaDataLogsDiskUsed',
+                        self.CLUSTER_DIMENSION, 'my-cluster',
+                        self.BROKER_ID_DIMENSION, '1'
+                    ],
+                    [
+                        self.AWS_KAFKA_DIMENSION, 'KafkaDataLogsDiskUsed',
+                        self.CLUSTER_DIMENSION, 'my-cluster',
+                        self.BROKER_ID_DIMENSION, '2'
+                    ]
                 ],
                 'view': 'timeSeries',
                 'stacked': False,

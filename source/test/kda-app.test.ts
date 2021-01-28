@@ -1,5 +1,5 @@
 /*********************************************************************************************************************
- *  Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.                                           *
+ *  Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.                                      *
  *                                                                                                                    *
  *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
  *  with the License. A copy of the License is located at                                                             *
@@ -81,6 +81,17 @@ describe('successful scenarios', () => {
                     rules_to_suppress: [{
                         id: 'W11',
                         reason: 'EC2 actions in VPC policy do not support resource level permissions'
+                    }]
+                }
+            }
+        }, ResourcePart.CompleteDefinition));
+
+        expectCDK(stack).to(haveResource('AWS::Logs::LogGroup', {
+            Metadata: {
+                cfn_nag: {
+                    rules_to_suppress: [{
+                        id: 'W84',
+                        reason: 'Log group data is always encrypted in CloudWatch Logs using an AWS Managed KMS Key'
                     }]
                 }
             }

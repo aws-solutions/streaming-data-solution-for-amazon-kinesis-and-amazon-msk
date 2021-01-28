@@ -1,5 +1,5 @@
 ######################################################################################################################
-#  Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.                                           #
+#  Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.                                      #
 #                                                                                                                    #
 #  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    #
 #  with the License. A copy of the License is located at                                                             #
@@ -95,7 +95,7 @@ stub_application_without_vpc = {
         'ApplicationConfigurationDescription': {},
         'ApplicationARN': 'some-arn',
         'ApplicationName': 'test-application',
-        'RuntimeEnvironment': 'FLINK-1_8',
+        'RuntimeEnvironment': 'FLINK-1_11',
         'ApplicationStatus': 'READY',
         'ApplicationVersionId': 99
     }
@@ -131,7 +131,7 @@ stub_application_with_vpc = {
         },
         'ApplicationARN': 'some-arn',
         'ApplicationName': 'test-application',
-        'RuntimeEnvironment': 'FLINK-1_8',
+        'RuntimeEnvironment': 'FLINK-1_11',
         'ApplicationStatus': 'READY',
         'ApplicationVersionId': 50
     }

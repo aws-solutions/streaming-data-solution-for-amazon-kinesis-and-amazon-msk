@@ -1,5 +1,5 @@
 /*********************************************************************************************************************
- *  Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.                                           *
+ *  Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.                                      *
  *                                                                                                                    *
  *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
  *  with the License. A copy of the License is located at                                                             *
@@ -46,7 +46,7 @@ export class KafkaCluster extends cdk.Construct {
     private MAX_SUBNETS: number = 3;
 
     public static get AllowedKafkaVersions(): string[] {
-        return ['2.6.0', '2.5.1', '2.4.1.1', '2.3.1', '2.2.1'];
+        return ['2.7.0', '2.6.1', '2.6.0', '2.5.1', '2.4.1.1', '2.3.1', '2.2.1'];
     }
 
     public static get AllowedInstanceTypes(): string[] {
@@ -98,7 +98,16 @@ export class KafkaCluster extends cdk.Construct {
         }
 
         this.SecurityGroup = this.createSecurityGroup(props.brokerVpcId);
+
         const logGroup = new logs.LogGroup(this, 'LogGroup', { removalPolicy: cdk.RemovalPolicy.RETAIN });
+        (logGroup.node.defaultChild as logs.CfnLogGroup).cfnOptions.metadata = {
+            cfn_nag: {
+                rules_to_suppress: [{
+                    id: 'W84',
+                    reason: 'Log group data is always encrypted in CloudWatch Logs using an AWS Managed KMS Key'
+                }]
+            }
+        };
 
         this.Cluster = new msk.CfnCluster(this, 'KafkaCluster', {
             clusterName: this.ClusterName,
@@ -140,7 +149,8 @@ export class KafkaCluster extends cdk.Construct {
     private createSecurityGroup(vpcId: string): ec2.CfnSecurityGroup {
         const securityGroup = new ec2.CfnSecurityGroup(this, 'ClusterSG', {
             vpcId: vpcId,
-            groupDescription: 'Security group for the MSK cluster'
+            groupDescription: 'Security group for the MSK cluster',
+            tags: [{ key: 'Name', value: 'msk-cluster-sg' }]
         });
 
         securityGroup.cfnOptions.metadata = {

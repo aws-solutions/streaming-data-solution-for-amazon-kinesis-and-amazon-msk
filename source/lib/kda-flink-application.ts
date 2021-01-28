@@ -1,5 +1,5 @@
 /*********************************************************************************************************************
- *  Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.                                           *
+ *  Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.                                      *
  *                                                                                                                    *
  *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
  *  with the License. A copy of the License is located at                                                             *
@@ -93,7 +93,7 @@ export class FlinkApplication extends cdk.Construct {
         });
 
         this.Application = new analytics.CfnApplicationV2(this, 'Application', {
-            runtimeEnvironment: 'FLINK-1_8',
+            runtimeEnvironment: 'FLINK-1_11',
             serviceExecutionRole: this.Role.roleArn,
             applicationConfiguration: {
                 applicationCodeConfiguration: {
@@ -129,7 +129,7 @@ export class FlinkApplication extends cdk.Construct {
         });
 
         this.configureLogging(logStream.logStreamName);
-
+        this.addCfnNagSuppressions();
         this.createCustomResource(props.subnetIds, props.securityGroupIds);
     }
 
@@ -184,16 +184,6 @@ export class FlinkApplication extends cdk.Construct {
             }
         });
 
-        const cfnRole = role.node.defaultChild as iam.CfnRole;
-        cfnRole.cfnOptions.metadata = {
-            cfn_nag: {
-                rules_to_suppress: [{
-                    id: 'W11',
-                    reason: 'EC2 actions in VPC policy do not support resource level permissions'
-                }]
-            }
-        };
-
         return role;
     }
 
@@ -204,6 +194,26 @@ export class FlinkApplication extends cdk.Construct {
             applicationName: this.ApplicationName,
             cloudWatchLoggingOption: { logStreamArn }
         });
+    }
+
+    private addCfnNagSuppressions() {
+        (this.Role.node.defaultChild as iam.CfnRole).cfnOptions.metadata = {
+            cfn_nag: {
+                rules_to_suppress: [{
+                    id: 'W11',
+                    reason: 'EC2 actions in VPC policy do not support resource level permissions'
+                }]
+            }
+        };
+
+        (this.LogGroup.node.defaultChild as logs.CfnLogGroup).cfnOptions.metadata = {
+            cfn_nag: {
+                rules_to_suppress: [{
+                    id: 'W84',
+                    reason: 'Log group data is always encrypted in CloudWatch Logs using an AWS Managed KMS Key'
+                }]
+            }
+        };
     }
 
     private createCustomResource(subnets?: string[], securityGroups?: string[]) {
