@@ -37,7 +37,7 @@ The [AWS Streaming Data Solution for Amazon Kinesis](https://aws.amazon.com/solu
 ```
 
 ## Deployment
-You can launch this solution with one click from the [solution home pages]:
+You can launch this solution with one click from the solution home pages:
 - [AWS Streaming Data Solution for Amazon Kinesis](https://aws.amazon.com/solutions/implementations/aws-streaming-data-solution-for-amazon-kinesis)
 - [AWS Streaming Data Solution for Amazon MSK](https://aws.amazon.com/solutions/implementations/aws-streaming-data-solution-for-amazon-msk)
 
@@ -119,7 +119,7 @@ If the application is running during the stack deletion, its status will change 
 - [Amazon Kinesis Replay](https://github.com/aws-samples/amazon-kinesis-replay)
 - [Amazon Kinesis Data Analytics Java Examples](https://github.com/aws-samples/amazon-kinesis-data-analytics-java-examples)
 - [Flink: Hands-on Training](https://ci.apache.org/projects/flink/flink-docs-master/learn-flink/)
-- [Streaming Analytics Workshop](https://streaming-analytics.workshop.aws/flink-on-kda/)
+- [Streaming Analytics Workshop](https://streaming-analytics.workshop.aws/flink-on-kda.html)
 - [Kinesis Scaling Utility](https://github.com/awslabs/amazon-kinesis-scaling-utils)
 - [Amazon MSK Labs](https://amazonmsk-labs.workshop.aws/en)
 - [Using Amazon MSK as an event source for AWS Lambda](https://aws.amazon.com/blogs/compute/using-amazon-msk-as-an-event-source-for-aws-lambda/)
