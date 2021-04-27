@@ -11,8 +11,8 @@
 #  and limitations under the License.                                                                                #
 ######################################################################################################################
 
-import unittest
-import boto3
+import unittest, boto3, os, json
+import botocore.config
 import botocore.session
 from botocore.stub import Stubber
 from unittest.mock import patch
@@ -20,7 +20,10 @@ from unittest.mock import patch
 class LambdaTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls._kinesisAnalytics = botocore.session.get_session().create_client('kinesisanalyticsv2')
+        os.environ['AWS_SDK_USER_AGENT'] = '{ "user_agent_extra": "AwsSolution/SO9999/v0.0.1" }'
+        config = botocore.config.Config(**json.loads(os.environ['AWS_SDK_USER_AGENT']))
+
+        cls._kinesisAnalytics = botocore.session.get_session().create_client('kinesisanalyticsv2', config=config)
         stubber = Stubber(cls._kinesisAnalytics)
 
         stubber.add_response('describe_application', stub_application_without_vpc)
@@ -38,6 +41,10 @@ class LambdaTest(unittest.TestCase):
         stubber.add_response('delete_application_vpc_configuration', stub_delete_config)
 
         stubber.activate()
+
+    @classmethod
+    def tearDownClass(cls):
+        del os.environ['AWS_SDK_USER_AGENT']
 
     @patch.object(boto3, 'client')
     def test_01_add_config_noop(self, mock_client):

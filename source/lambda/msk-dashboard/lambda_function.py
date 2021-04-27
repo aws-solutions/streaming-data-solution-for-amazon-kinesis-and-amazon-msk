@@ -11,11 +11,13 @@
 #  and limitations under the License.                                                                                #
 ######################################################################################################################
 
-import boto3, collections, logging, json
+import boto3, collections, logging, os, json
 from crhelper import CfnResource
+from botocore import config
 
-client_cloudwatch = boto3.client('cloudwatch')
-client_kafka = boto3.client('kafka')
+config = config.Config(**json.loads(os.environ['AWS_SDK_USER_AGENT']))
+client_cloudwatch = boto3.client('cloudwatch', config=config)
+client_kafka = boto3.client('kafka', config=config)
 
 helper = CfnResource(json_logging=True, log_level='INFO')
 logger = logging.getLogger(__name__)

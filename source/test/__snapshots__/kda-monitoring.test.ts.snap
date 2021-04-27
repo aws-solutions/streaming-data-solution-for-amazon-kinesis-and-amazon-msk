@@ -88,7 +88,7 @@ Object {
               Object {
                 "Ref": "AWS::Region",
               },
-              "\\",\\"metrics\\":[[{\\"label\\":\\"Old Generation GC Count Rate\\",\\"expression\\":\\"RATE(METRICS()) * 60\\"}],[\\"AWS/KinesisAnalytics\\",\\"oldGenerationGCCount\\",\\"Application\\",\\"test-application\\",{\\"label\\":\\"\\",\\"period\\":60,\\"stat\\":\\"Maximum\\",\\"visible\\":false,\\"id\\":\\"m1\\"}]],\\"yAxis\\":{\\"left\\":{\\"showUnits\\":false},\\"right\\":{\\"showUnits\\":false}}}},{\\"type\\":\\"text\\",\\"width\\":24,\\"height\\":1,\\"x\\":0,\\"y\\":26,\\"properties\\":{\\"markdown\\":\\"\\\\n# Flink Application Progress\\\\n\\"}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":0,\\"y\\":27,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Incoming Records (Per Second)\\",\\"region\\":\\"",
+              "\\",\\"metrics\\":[[{\\"label\\":\\"Old Generation GC Count Rate\\",\\"expression\\":\\"RATE(METRICS()) * 60\\",\\"period\\":60}],[\\"AWS/KinesisAnalytics\\",\\"oldGenerationGCCount\\",\\"Application\\",\\"test-application\\",{\\"label\\":\\"\\",\\"period\\":60,\\"stat\\":\\"Maximum\\",\\"visible\\":false,\\"id\\":\\"m1\\"}]],\\"yAxis\\":{\\"left\\":{\\"showUnits\\":false},\\"right\\":{\\"showUnits\\":false}}}},{\\"type\\":\\"text\\",\\"width\\":24,\\"height\\":1,\\"x\\":0,\\"y\\":26,\\"properties\\":{\\"markdown\\":\\"\\\\n# Flink Application Progress\\\\n\\"}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":0,\\"y\\":27,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Incoming Records (Per Second)\\",\\"region\\":\\"",
               Object {
                 "Ref": "AWS::Region",
               },
@@ -115,7 +115,7 @@ Object {
               Object {
                 "Ref": "AWS::Region",
               },
-              "\\",\\"metrics\\":[[{\\"label\\":\\"Event Time Latency\\",\\"expression\\":\\"m1 - m2\\"}],[\\"AWS/KinesisAnalytics\\",\\"currentOutputWatermark\\",\\"Application\\",\\"test-application\\",{\\"label\\":\\"\\",\\"period\\":60,\\"stat\\":\\"Minimum\\",\\"visible\\":false,\\"id\\":\\"m1\\"}],[\\"AWS/KinesisAnalytics\\",\\"currentInputWatermark\\",\\"Application\\",\\"test-application\\",{\\"label\\":\\"\\",\\"period\\":60,\\"stat\\":\\"Minimum\\",\\"visible\\":false,\\"id\\":\\"m2\\"}]],\\"yAxis\\":{\\"left\\":{\\"showUnits\\":false},\\"right\\":{\\"showUnits\\":false}}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":6,\\"y\\":33,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Late Records Dropped\\",\\"region\\":\\"",
+              "\\",\\"metrics\\":[[{\\"label\\":\\"Event Time Latency\\",\\"expression\\":\\"m1 - m2\\",\\"period\\":60}],[\\"AWS/KinesisAnalytics\\",\\"currentOutputWatermark\\",\\"Application\\",\\"test-application\\",{\\"label\\":\\"\\",\\"period\\":60,\\"stat\\":\\"Minimum\\",\\"visible\\":false,\\"id\\":\\"m1\\"}],[\\"AWS/KinesisAnalytics\\",\\"currentInputWatermark\\",\\"Application\\",\\"test-application\\",{\\"label\\":\\"\\",\\"period\\":60,\\"stat\\":\\"Minimum\\",\\"visible\\":false,\\"id\\":\\"m2\\"}]],\\"yAxis\\":{\\"left\\":{\\"showUnits\\":false},\\"right\\":{\\"showUnits\\":false}}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":6,\\"y\\":33,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Late Records Dropped\\",\\"region\\":\\"",
               Object {
                 "Ref": "AWS::Region",
               },
@@ -407,7 +407,7 @@ Object {
               Object {
                 "Ref": "AWS::Region",
               },
-              "\\",\\"metrics\\":[[{\\"label\\":\\"Old Generation GC Count Rate\\",\\"expression\\":\\"RATE(METRICS()) * 60\\"}],[\\"AWS/KinesisAnalytics\\",\\"oldGenerationGCCount\\",\\"Application\\",\\"test-application\\",{\\"label\\":\\"\\",\\"period\\":60,\\"stat\\":\\"Maximum\\",\\"visible\\":false,\\"id\\":\\"m1\\"}]],\\"yAxis\\":{\\"left\\":{\\"showUnits\\":false},\\"right\\":{\\"showUnits\\":false}}}},{\\"type\\":\\"text\\",\\"width\\":24,\\"height\\":1,\\"x\\":0,\\"y\\":26,\\"properties\\":{\\"markdown\\":\\"\\\\n# Flink Application Progress\\\\n\\"}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":0,\\"y\\":27,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Incoming Records (Per Second)\\",\\"region\\":\\"",
+              "\\",\\"metrics\\":[[{\\"label\\":\\"Old Generation GC Count Rate\\",\\"expression\\":\\"RATE(METRICS()) * 60\\",\\"period\\":60}],[\\"AWS/KinesisAnalytics\\",\\"oldGenerationGCCount\\",\\"Application\\",\\"test-application\\",{\\"label\\":\\"\\",\\"period\\":60,\\"stat\\":\\"Maximum\\",\\"visible\\":false,\\"id\\":\\"m1\\"}]],\\"yAxis\\":{\\"left\\":{\\"showUnits\\":false},\\"right\\":{\\"showUnits\\":false}}}},{\\"type\\":\\"text\\",\\"width\\":24,\\"height\\":1,\\"x\\":0,\\"y\\":26,\\"properties\\":{\\"markdown\\":\\"\\\\n# Flink Application Progress\\\\n\\"}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":0,\\"y\\":27,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Incoming Records (Per Second)\\",\\"region\\":\\"",
               Object {
                 "Ref": "AWS::Region",
               },
@@ -434,7 +434,7 @@ Object {
               Object {
                 "Ref": "AWS::Region",
               },
-              "\\",\\"metrics\\":[[{\\"label\\":\\"Event Time Latency\\",\\"expression\\":\\"m1 - m2\\"}],[\\"AWS/KinesisAnalytics\\",\\"currentOutputWatermark\\",\\"Application\\",\\"test-application\\",{\\"label\\":\\"\\",\\"period\\":60,\\"stat\\":\\"Minimum\\",\\"visible\\":false,\\"id\\":\\"m1\\"}],[\\"AWS/KinesisAnalytics\\",\\"currentInputWatermark\\",\\"Application\\",\\"test-application\\",{\\"label\\":\\"\\",\\"period\\":60,\\"stat\\":\\"Minimum\\",\\"visible\\":false,\\"id\\":\\"m2\\"}]],\\"yAxis\\":{\\"left\\":{\\"showUnits\\":false},\\"right\\":{\\"showUnits\\":false}}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":6,\\"y\\":33,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Late Records Dropped\\",\\"region\\":\\"",
+              "\\",\\"metrics\\":[[{\\"label\\":\\"Event Time Latency\\",\\"expression\\":\\"m1 - m2\\",\\"period\\":60}],[\\"AWS/KinesisAnalytics\\",\\"currentOutputWatermark\\",\\"Application\\",\\"test-application\\",{\\"label\\":\\"\\",\\"period\\":60,\\"stat\\":\\"Minimum\\",\\"visible\\":false,\\"id\\":\\"m1\\"}],[\\"AWS/KinesisAnalytics\\",\\"currentInputWatermark\\",\\"Application\\",\\"test-application\\",{\\"label\\":\\"\\",\\"period\\":60,\\"stat\\":\\"Minimum\\",\\"visible\\":false,\\"id\\":\\"m2\\"}]],\\"yAxis\\":{\\"left\\":{\\"showUnits\\":false},\\"right\\":{\\"showUnits\\":false}}}},{\\"type\\":\\"metric\\",\\"width\\":6,\\"height\\":6,\\"x\\":6,\\"y\\":33,\\"properties\\":{\\"view\\":\\"timeSeries\\",\\"title\\":\\"Late Records Dropped\\",\\"region\\":\\"",
               Object {
                 "Ref": "AWS::Region",
               },

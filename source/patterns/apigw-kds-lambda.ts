@@ -13,14 +13,13 @@
 
 import * as cdk from '@aws-cdk/core';
 import * as lambda from '@aws-cdk/aws-lambda';
-import * as logs from '@aws-cdk/aws-logs';
 
 import { ApiGatewayToKinesisStreams } from '@aws-solutions-constructs/aws-apigateway-kinesisstreams';
 import { KinesisStreamsToLambda } from '@aws-solutions-constructs/aws-kinesisstreams-lambda';
 
 import { DataStream } from '../lib/kds-data-stream';
 import { SolutionHelper } from '../lib/solution-helper';
-import { SolutionStackProps } from './solution-props';
+import { SolutionStackProps } from '../bin/solution-props';
 import { DataStreamMonitoring } from '../lib/kds-monitoring';
 
 export class ApiGwKdsLambda extends cdk.Stack {
@@ -88,21 +87,6 @@ export class ApiGwKdsLambda extends cdk.Stack {
             existingStreamObj: kds.Stream
         });
 
-        (apiGwToKds.node.findChild('ApiAccessLogGroup').node.defaultChild as logs.CfnLogGroup).cfnOptions.metadata = {
-            cfn_nag: {
-                rules_to_suppress: [
-                    {
-                        id: 'W84',
-                        reason: 'Log group data is always encrypted in CloudWatch Logs using an AWS Managed KMS Key'
-                    },
-                    {
-                        id: 'W86',
-                        reason: 'Log group retention is intentionally set to "Never Expire"'
-                    }
-                ]
-            }
-        };
-
         //---------------------------------------------------------------------
         // Lambda function configuration
 
@@ -132,7 +116,7 @@ export class ApiGwKdsLambda extends cdk.Stack {
             createCloudWatchAlarms: false,
             deploySqsDlqQueue: true,
             lambdaFunctionProps: {
-                runtime: lambda.Runtime.NODEJS_12_X,
+                runtime: lambda.Runtime.NODEJS_14_X,
                 handler: 'index.handler',
                 code: lambda.Code.fromAsset('lambda/kds-lambda-consumer'),
                 timeout: cdk.Duration.minutes(5)

@@ -11,10 +11,12 @@
 #  and limitations under the License.                                                                                #
 ######################################################################################################################
 
-import boto3
+import boto3, os, json
 from crhelper import CfnResource
+from botocore import config
 
-client_kinesis = boto3.client('kinesis')
+config = config.Config(**json.loads(os.environ['AWS_SDK_USER_AGENT']))
+client_kinesis = boto3.client('kinesis', config=config)
 helper = CfnResource(json_logging=True)
 
 def _enhance_monitoring(stream_name, enable):

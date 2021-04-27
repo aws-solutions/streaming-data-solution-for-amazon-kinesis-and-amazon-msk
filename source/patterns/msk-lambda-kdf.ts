@@ -14,10 +14,9 @@
 import * as cdk from '@aws-cdk/core';
 import * as lambda from '@aws-cdk/aws-lambda';
 import * as iam from '@aws-cdk/aws-iam';
-import * as logs from '@aws-cdk/aws-logs';
 
 import { SolutionHelper } from '../lib/solution-helper';
-import { SolutionStackProps } from './solution-props';
+import { SolutionStackProps } from '../bin/solution-props';
 import { EncryptedBucket } from '../lib/s3-bucket';
 import { KafkaConsumer } from '../lib/msk-consumer';
 import { KinesisFirehoseToS3 } from '@aws-solutions-constructs/aws-kinesisfirehose-s3';
@@ -71,21 +70,6 @@ export class MskLambdaKdf extends cdk.Stack {
                 }
             }
         });
-
-        (kdfToS3.node.findChild('firehose-log-group').node.defaultChild as logs.CfnLogGroup).cfnOptions.metadata = {
-            cfn_nag: {
-                rules_to_suppress: [
-                    {
-                        id: 'W84',
-                        reason: 'Log group data is always encrypted in CloudWatch Logs using an AWS Managed KMS Key'
-                    },
-                    {
-                        id: 'W86',
-                        reason: 'Log group retention is intentionally set to "Never Expire"'
-                    }
-                ]
-            }
-        };
 
         //---------------------------------------------------------------------
         // Lambda function configuration

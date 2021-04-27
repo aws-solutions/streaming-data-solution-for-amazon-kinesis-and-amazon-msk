@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2021-04-12
+### Added
+- Templates to be used for the [Amazon MSK Labs](https://amazonmsk-labs.workshop.aws/en/) (under the `labs` folder). These assets are not published on the [solution landing page](https://aws.amazon.com/solutions/implementations/aws-streaming-data-solution-for-amazon-msk/), but instead are used during workshops (that provide customers with hands-on experience of the Amazon MSK service by learning its features, configurations, and ecosystem tools).
+- New parameter (`EbsVolumeSize`) to the `aws-streaming-data-solution-for-msk` template, allowing customers to provide the size (in GiB) of the EBS volume for the broker nodes.
+- Support for enhanced partition-level monitoring to the Amazon MSK cluster. When enabled, this monitoring level makes the following metrics available in Amazon CloudWatch (at an additional cost): `EstimatedTimeLag` and `OffsetLag`.
+
+### Changed
+- AWS Lambda functions to use the [Node.js 14.x runtime](https://aws.amazon.com/blogs/compute/node-js-14-x-runtime-now-available-in-aws-lambda/).
+- AWS CDK and AWS Solutions Constructs to version 1.95.2
+
 ## [1.3.0] - 2021-01-28
 ### Added
 - Support for Apache Kafka versions 2.7.0 and 2.6.1. For a complete list of improvements and bug fixes, see the Apache Kafka release notes for [2.7.0](https://downloads.apache.org/kafka/2.7.0/RELEASE_NOTES.html) and [2.6.1](https://downloads.apache.org/kafka/2.6.1/RELEASE_NOTES.html).

@@ -24,7 +24,7 @@ import { DataStream } from '../lib/kds-data-stream';
 import { KinesisProducer } from '../lib/kpl-producer';
 import { FlinkApplication } from '../lib/kda-flink-application';
 import { SolutionHelper } from '../lib/solution-helper';
-import { SolutionStackProps } from './solution-props';
+import { SolutionStackProps } from '../bin/solution-props';
 import { ApplicationMonitoring } from '../lib/kda-monitoring';
 import { ExecutionRole } from '../lib/lambda-role-cloudwatch';
 
@@ -269,7 +269,7 @@ export class KdsKdaApiGw extends cdk.Stack {
     private createFarePredictionEndpoint(): [apigw.RestApi, string] {
         const functionRole = new ExecutionRole(this, 'PredictFareRole');
         const predictFareLambda =  new lambda.Function(this, 'PredictFareLambda', {
-            runtime: lambda.Runtime.NODEJS_12_X,
+            runtime: lambda.Runtime.NODEJS_14_X,
             code: lambda.Code.fromAsset('lambda/taxi-fare-endpoint'),
             handler: 'index.handler',
             role: functionRole.Role
@@ -283,21 +283,6 @@ export class KdsKdaApiGw extends cdk.Stack {
             },
             existingLambdaObj: predictFareLambda
         });
-
-        (pattern.node.findChild('ApiAccessLogGroup').node.defaultChild as cwlogs.CfnLogGroup).cfnOptions.metadata = {
-            cfn_nag: {
-                rules_to_suppress: [
-                    {
-                        id: 'W84',
-                        reason: 'Log group data is always encrypted in CloudWatch Logs using an AWS Managed KMS Key'
-                    },
-                    {
-                        id: 'W86',
-                        reason: 'Log group retention is intentionally set to "Never Expire"'
-                    }
-                ]
-            }
-        };
 
         const predictFareModel = pattern.apiGateway.addModel('PredictFareModel', {
             schema: {

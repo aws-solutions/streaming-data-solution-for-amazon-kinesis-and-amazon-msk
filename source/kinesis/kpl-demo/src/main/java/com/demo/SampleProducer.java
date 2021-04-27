@@ -79,6 +79,9 @@ public class SampleProducer {
      * Sample usage:
      * java -jar aws-kpl-demo.jar my-stream us-east-1 10
      */
+
+    // Demo producer is supposed to be run from the command line and accept parameters.
+    @SuppressWarnings("squid:S4823")
     public static void main(String[] args) throws Exception {
         final String streamName = getArgIfPresent(args, 0, STREAM_NAME);
         final String region = getArgIfPresent(args, 1, DEFAULT_REGION_NAME);
@@ -122,7 +125,7 @@ public class SampleProducer {
         EXECUTOR.scheduleAtFixedRate(() -> {
             long put = sequenceNumber.get();
 
-            long total = RECORDS_PER_SECOND * secondsToRun;
+            long total = (long)RECORDS_PER_SECOND * secondsToRun;
             double putPercent = 100.0 * put / total;
 
             long done = completed.get();
@@ -138,7 +141,7 @@ public class SampleProducer {
         ));
         executeAtTargetRate(EXECUTOR, putOneRecord, sequenceNumber, secondsToRun, RECORDS_PER_SECOND);
 
-        EXECUTOR.awaitTermination(secondsToRun + 1, TimeUnit.SECONDS);
+        EXECUTOR.awaitTermination(secondsToRun + 1L, TimeUnit.SECONDS);
 
         LOG.info("Waiting for remaining puts to finish...");
         producer.flushSync();

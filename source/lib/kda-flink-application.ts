@@ -18,6 +18,7 @@ import * as logs from '@aws-cdk/aws-logs';
 import * as lambda from '@aws-cdk/aws-lambda';
 
 import { ExecutionRole } from './lambda-role-cloudwatch';
+import { CfnNagHelper } from './cfn-nag-helper';
 
 export interface FlinkApplicationProps {
     readonly environmentProperties: analytics.CfnApplicationV2.PropertyGroupProperty;
@@ -128,9 +129,10 @@ export class FlinkApplication extends cdk.Construct {
             }
         });
 
-        this.configureLogging(logStream.logStreamName);
-        this.addCfnNagSuppressions();
         this.createCustomResource(props.subnetIds, props.securityGroupIds);
+        this.configureLogging(logStream.logStreamName);
+
+        this.addCfnNagSuppressions();
     }
 
     private createRole(bucketArn: string, fileKey: string): iam.IRole {
@@ -197,23 +199,11 @@ export class FlinkApplication extends cdk.Construct {
     }
 
     private addCfnNagSuppressions() {
-        (this.Role.node.defaultChild as iam.CfnRole).cfnOptions.metadata = {
-            cfn_nag: {
-                rules_to_suppress: [{
-                    id: 'W11',
-                    reason: 'EC2 actions in VPC policy do not support resource level permissions'
-                }]
-            }
-        };
-
-        (this.LogGroup.node.defaultChild as logs.CfnLogGroup).cfnOptions.metadata = {
-            cfn_nag: {
-                rules_to_suppress: [{
-                    id: 'W84',
-                    reason: 'Log group data is always encrypted in CloudWatch Logs using an AWS Managed KMS Key'
-                }]
-            }
-        };
+        const cfnRole = this.Role.node.defaultChild as iam.CfnRole;
+        CfnNagHelper.addSuppressions(cfnRole, {
+            Id: 'W11',
+            Reason: 'EC2 actions in VPC policy do not support resource level permissions'
+        });
     }
 
     private createCustomResource(subnets?: string[], securityGroups?: string[]) {

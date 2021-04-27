@@ -26,6 +26,7 @@ test('creates custom resource for CloudWatch dashboard', () => {
     });
 
     expect(SynthUtils.toCloudFormation(stack)).toMatchSnapshot();
+
     expectCDK(stack).to(haveResource('AWS::IAM::Role', {
         Metadata: {
             cfn_nag: {

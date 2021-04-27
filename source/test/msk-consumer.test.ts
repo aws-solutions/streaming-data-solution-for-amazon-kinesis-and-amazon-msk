@@ -19,10 +19,16 @@ import { KafkaConsumer } from '../lib/msk-consumer';
 
 describe('successful scenarios', () => {
     let stack: cdk.Stack;
+    let lambdaCodeParams: lambda.CfnParametersCodeProps;
 
     beforeEach(() => {
         const app = new cdk.App();
         stack = new cdk.Stack(app, 'TestStack1');
+
+        lambdaCodeParams = {
+            bucketNameParam: new cdk.CfnParameter(stack, 'LambdaCodeBucket'),
+            objectKeyParam: new cdk.CfnParameter(stack, 'LambdaCodeKey'),
+        };
     });
 
     test('creates a MSK Lambda consumer', () => {
@@ -32,7 +38,7 @@ describe('successful scenarios', () => {
             enabled: true,
             startingPosition: lambda.StartingPosition.LATEST,
             timeout: cdk.Duration.minutes(1),
-            code: lambda.Code.fromInline('foo'),
+            code: lambda.Code.fromCfnParameters(lambdaCodeParams),
             topicName: 'my-topic',
             environmentVariables: {
                 'MY_ENV_VARIABLE': 'foo'
@@ -64,7 +70,7 @@ describe('successful scenarios', () => {
             enabled: true,
             startingPosition: lambda.StartingPosition.LATEST,
             timeout: cdk.Duration.minutes(1),
-            code: lambda.Code.fromInline('foo'),
+            code: lambda.Code.fromCfnParameters(lambdaCodeParams),
             topicName: topicName.valueAsString
         });
 
@@ -79,10 +85,16 @@ describe('successful scenarios', () => {
 
 describe('validation tests', () => {
     let stack: cdk.Stack;
+    let lambdaCodeParams: lambda.CfnParametersCodeProps;
 
     beforeEach(() => {
         const app = new cdk.App();
         stack = new cdk.Stack(app, 'TestStack2');
+
+        lambdaCodeParams = {
+            bucketNameParam: new cdk.CfnParameter(stack, 'LambdaCodeBucket'),
+            objectKeyParam: new cdk.CfnParameter(stack, 'LambdaCodeKey'),
+        };
     });
 
     test.each([0, 841])('timeout must be between allowed values', (invalidTimeoutSeconds) => {
@@ -92,7 +104,7 @@ describe('validation tests', () => {
             enabled: true,
             startingPosition: lambda.StartingPosition.LATEST,
             timeout: cdk.Duration.seconds(invalidTimeoutSeconds),
-            code: lambda.Code.fromInline('foo'),
+            code: lambda.Code.fromCfnParameters(lambdaCodeParams),
             topicName: 'my-topic'
         })).toThrowError(`timeout must be a value between 1 and 840 seconds (given ${invalidTimeoutSeconds})`);
     });
@@ -104,7 +116,7 @@ describe('validation tests', () => {
             enabled: true,
             startingPosition: lambda.StartingPosition.LATEST,
             timeout: cdk.Duration.minutes(1),
-            code: lambda.Code.fromInline('foo'),
+            code: lambda.Code.fromCfnParameters(lambdaCodeParams),
             topicName: 'my-topic'
         })).toThrowError(`batchSize must be between 1 and 10000 (given ${invalidBatchSize})`);
     });

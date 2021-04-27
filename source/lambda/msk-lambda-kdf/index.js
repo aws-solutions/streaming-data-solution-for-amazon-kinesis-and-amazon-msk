@@ -19,9 +19,13 @@ const FIREHOSE_MAX_RECORDS = 500;
 const FIREHOSE_MAX_SIZE_BYTES = 4194304;
 const FIREHOSE_RETRIES = 3;
 
-exports.sleep = (seconds) => child_process.execSync(`sleep ${seconds}`);
+// OS command does not accept any user input.
+exports.sleep = (seconds) => child_process.execSync(`sleep ${seconds}`); // NOSONAR (javascript:S4721)
+
 const _putRecords = async (records) => {
-    const firehose = new AWS.Firehose();
+    const options = JSON.parse(process.env.AWS_SDK_USER_AGENT);
+    const firehose = new AWS.Firehose(options);
+
     return await firehose.putRecordBatch({
         DeliveryStreamName: process.env.DELIVERY_STREAM_NAME,
         Records: records
@@ -56,9 +60,11 @@ const _putRecordsBatch = async (records, batchNumber) => {
             }
         }
 
-        // Back off for a random value between 1 and 5 seconds
-        const secondsToWait = Math.floor(Math.random() * 5) + 1;
+        // A pseudorandom number generator can be used here.
+        const secondsToWait = Math.floor(Math.random() * 5) + 1; // NOSONAR (javascript:S2245)
         console.info(`[Batch #${batchNumber}] Retry #${++retries}: Resending ${numberOfFailures} failed record(s) after ${secondsToWait} second(s)`);
+
+        // Back off for a random value between 1 and 5 seconds
         this.sleep(secondsToWait);
 
         response = await _putRecords(retryBatch);

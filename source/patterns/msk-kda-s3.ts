@@ -18,7 +18,7 @@ import { FlinkApplication } from '../lib/kda-flink-application';
 import { EncryptedBucket } from '../lib/s3-bucket';
 import { KafkaMetadata } from '../lib/msk-custom-resource';
 import { SolutionHelper } from '../lib/solution-helper';
-import { SolutionStackProps } from './solution-props';
+import { SolutionStackProps } from '../bin/solution-props';
 import { ApplicationMonitoring } from '../lib/kda-monitoring';
 
 export class MskKdaS3 extends cdk.Stack {

@@ -11,10 +11,13 @@
 #  and limitations under the License.                                                                                #
 ######################################################################################################################
 
-import boto3, logging
+import boto3, logging, os, json
 from crhelper import CfnResource
+from botocore import config
 
-client_kafka = boto3.client('kafka')
+config = config.Config(**json.loads(os.environ['AWS_SDK_USER_AGENT']))
+client_kafka = boto3.client('kafka', config=config)
+
 helper = CfnResource(json_logging=True, log_level='INFO')
 
 def _get_networking_config(cluster_arn):

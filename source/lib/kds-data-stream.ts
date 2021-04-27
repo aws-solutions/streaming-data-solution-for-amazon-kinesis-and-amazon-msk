@@ -17,6 +17,7 @@ import * as lambda from '@aws-cdk/aws-lambda';
 import * as iam from '@aws-cdk/aws-iam';
 
 import { ExecutionRole } from './lambda-role-cloudwatch';
+import { CfnNagHelper } from './cfn-nag-helper';
 
 export interface DataStreamProps {
     readonly shardCount: number;
@@ -44,27 +45,21 @@ export class DataStream extends cdk.Construct {
     }
 
     private createCustomResource(enableEnhancedMonitoring: string) {
-        const monitoringPolicy = new iam.PolicyDocument({
-            statements: [new iam.PolicyStatement({
-                resources: ['*'],
-                actions: ['kinesis:EnableEnhancedMonitoring', 'kinesis:DisableEnhancedMonitoring']
-            })]
-        });
-
         const customResouceRole = new ExecutionRole(this, 'Role', {
             inlinePolicyName: 'MonitoringPolicy',
-            inlinePolicyDocument: monitoringPolicy
+            inlinePolicyDocument: new iam.PolicyDocument({
+                statements: [new iam.PolicyStatement({
+                    resources: ['*'],
+                    actions: ['kinesis:EnableEnhancedMonitoring', 'kinesis:DisableEnhancedMonitoring']
+                })]
+            })
         });
 
         const cfnRole = customResouceRole.Role.node.defaultChild as iam.CfnRole;
-        cfnRole.cfnOptions.metadata = {
-            cfn_nag: {
-                rules_to_suppress: [{
-                    id: 'W11',
-                    reason: 'Kinesis enhanced monitoring actions do not support resource level permissions'
-                }]
-            }
-        };
+        CfnNagHelper.addSuppressions(cfnRole, {
+            Id: 'W11',
+            Reason: 'Kinesis enhanced monitoring actions do not support resource level permissions'
+        });
 
         const customResourceFunction = new lambda.Function(this, 'CustomResource', {
             runtime: lambda.Runtime.PYTHON_3_8,
@@ -77,8 +72,8 @@ export class DataStream extends cdk.Construct {
         new cdk.CustomResource(this, 'EnhancedMonitoring', {
             serviceToken: customResourceFunction.functionArn,
             properties: {
-                EnableEnhancedMonitoring: enableEnhancedMonitoring,
-                StreamName: this.Stream.streamName
+                'EnableEnhancedMonitoring': enableEnhancedMonitoring,
+                'StreamName': this.Stream.streamName
             },
             resourceType: 'Custom::EnhancedMonitoring'
         });

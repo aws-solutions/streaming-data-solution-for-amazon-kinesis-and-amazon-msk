@@ -60,7 +60,7 @@ The third pattern includes an AWS Lambda function that consumes data from an Apa
 
 The fourth pattern includes an Amazon Kinesis Data Analytics application that reads data from an existing topic in Amazon MSK (using Apache Flink, which guarantees exactly-once processing) and saves the results to an Amazon S3 bucket.
 
-The solution provides a [demo consumer application](/source/kinesis/kda-flink-kafka), in order to demonstrate how to use the Apache Flink Table API. The schema used is the same one provided in [Getting Started with Amazon Kinesis Data Analytics for Apache Flink (Table API)](https://docs.aws.amazon.com/kinesisanalytics/latest/java/gs-table-table.html):
+The solution provides a [demo consumer application](/source/kinesis/kda-flink-kafka), in order to demonstrate how to use the Apache Flink Table API. The schema used is the same one provided in [Getting Started with Amazon Kinesis Data Analytics for Apache Flink (Table API)](https://docs.aws.amazon.com/kinesisanalytics/latest/java/gs-table.html):
 
 ```json
 {

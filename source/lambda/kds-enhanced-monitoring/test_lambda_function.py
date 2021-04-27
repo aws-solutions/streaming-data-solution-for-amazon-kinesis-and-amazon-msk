@@ -11,8 +11,8 @@
 #  and limitations under the License.                                                                                #
 ######################################################################################################################
 
-import unittest
-import boto3
+import unittest, boto3, os, json
+import botocore.config
 import botocore.session
 from botocore.stub import Stubber
 from unittest.mock import patch
@@ -31,7 +31,10 @@ all_metrics = [
 class LambdaTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls._kinesis = botocore.session.get_session().create_client('kinesis')
+        os.environ['AWS_SDK_USER_AGENT'] = '{ "user_agent_extra": "AwsSolution/SO9999/v0.0.1" }'
+        config = botocore.config.Config(**json.loads(os.environ['AWS_SDK_USER_AGENT']))
+
+        cls._kinesis = botocore.session.get_session().create_client('kinesis', config=config)
         stubber = Stubber(cls._kinesis)
 
         stubber.add_response('enable_enhanced_monitoring', {
@@ -45,6 +48,10 @@ class LambdaTest(unittest.TestCase):
         })
 
         stubber.activate()
+
+    @classmethod
+    def tearDownClass(cls):
+        del os.environ['AWS_SDK_USER_AGENT']
 
     @patch.object(boto3, 'client')
     def test_01_enable_monitoring(self, mock_client):

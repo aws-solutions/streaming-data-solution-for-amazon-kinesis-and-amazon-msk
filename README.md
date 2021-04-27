@@ -29,6 +29,7 @@ The [AWS Streaming Data Solution for Amazon Kinesis](https://aws.amazon.com/solu
 ├── source
 │   ├── bin                  [Entrypoint of the CDK application]
 │   ├── docs                 [Architecture diagrams for each solution]
+│   ├── labs                 [Templates for the Amazon MSK Labs]
 │   ├── kinesis              [Demo applications for the KPL and Apache Flink]
 │   ├── lambda               [Custom resources for features not supported by CloudFormation]
 │   ├── lib                  [Constructs for the components of the solution]
@@ -48,7 +49,7 @@ To customize the solution, follow the steps below:
 
 ### Prerequisites
 * [AWS Command Line Interface](https://aws.amazon.com/cli/)
-* Node.js 12.x or later
+* Node.js 14.x or later
 * Python 3.8 or later
 * Java 11 (only required if using Apache Flink)
 * Apache Maven 3.1 (only required if using Apache Flink)
@@ -119,7 +120,7 @@ If the application is running during the stack deletion, its status will change 
 - [Amazon Kinesis Replay](https://github.com/aws-samples/amazon-kinesis-replay)
 - [Amazon Kinesis Data Analytics Java Examples](https://github.com/aws-samples/amazon-kinesis-data-analytics-java-examples)
 - [Flink: Hands-on Training](https://ci.apache.org/projects/flink/flink-docs-master/learn-flink/)
-- [Streaming Analytics Workshop](https://streaming-analytics.workshop.aws/flink-on-kda.html)
+- [Streaming Analytics Workshop](https://streaming-analytics.workshop.aws/flink-on-kda)
 - [Kinesis Scaling Utility](https://github.com/awslabs/amazon-kinesis-scaling-utils)
 - [Amazon MSK Labs](https://amazonmsk-labs.workshop.aws/en)
 - [Using Amazon MSK as an event source for AWS Lambda](https://aws.amazon.com/blogs/compute/using-amazon-msk-as-an-event-source-for-aws-lambda/)

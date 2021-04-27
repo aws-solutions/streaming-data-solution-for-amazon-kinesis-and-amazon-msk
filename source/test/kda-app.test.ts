@@ -85,17 +85,6 @@ describe('successful scenarios', () => {
                 }
             }
         }, ResourcePart.CompleteDefinition));
-
-        expectCDK(stack).to(haveResource('AWS::Logs::LogGroup', {
-            Metadata: {
-                cfn_nag: {
-                    rules_to_suppress: [{
-                        id: 'W84',
-                        reason: 'Log group data is always encrypted in CloudWatch Logs using an AWS Managed KMS Key'
-                    }]
-                }
-            }
-        }, ResourcePart.CompleteDefinition));
     });
 });
 

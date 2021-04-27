@@ -16,6 +16,7 @@ import * as lambda from '@aws-cdk/aws-lambda';
 import * as iam from '@aws-cdk/aws-iam';
 
 import { ExecutionRole } from './lambda-role-cloudwatch';
+import { CfnNagHelper } from './cfn-nag-helper';
 
 export interface KafkaConsumerProps {
     readonly clusterArn: string;
@@ -38,8 +39,8 @@ export class KafkaConsumer extends cdk.Construct {
     private MAX_BATCH_SIZE: number = 10000;
     private MIN_TIMEOUT_SECONDS: number = 1;
 
-    // According to the Lambda docs (https://docs.aws.amazon.com/lambda/latest/dg/with-msk.html#services-msk-configure):
-    // The maximum supported function execution time is 14 minutes
+    // According to the Lambda docs (https://docs.aws.amazon.com/lambda/latest/dg/kafka-using-cluster.html#kafka-hosting-how-it-works):
+    // For Amazon MSK and self-managed Apache Kafka, the maximum amount of time that Lambda allows a function to run before stopping it is 14 minutes.
     private MAX_TIMEOUT_SECONDS: number = 840;
 
     constructor(scope: cdk.Construct, id: string, props: KafkaConsumerProps) {
@@ -56,40 +57,35 @@ export class KafkaConsumer extends cdk.Construct {
             throw new Error(`timeout must be a value between ${this.MIN_TIMEOUT_SECONDS} and ${this.MAX_TIMEOUT_SECONDS} seconds (given ${timeoutSeconds})`);
         }
 
-        const mskPolicy = new iam.PolicyDocument({
-            statements: [
-                new iam.PolicyStatement({
-                    actions: [
-                        'kafka:DescribeCluster',
-                        'kafka:GetBootstrapBrokers',
-                        'ec2:CreateNetworkInterface',
-                        'ec2:DescribeNetworkInterfaces',
-                        'ec2:DescribeVpcs',
-                        'ec2:DeleteNetworkInterface',
-                        'ec2:DescribeSubnets',
-                        'ec2:DescribeSecurityGroups'
-                    ],
-                    resources: ['*']
-                })
-            ]
-        });
-
         const executionRole = new ExecutionRole(this, 'Role', {
             inlinePolicyName: 'MskPolicy',
-            inlinePolicyDocument: mskPolicy
+            inlinePolicyDocument: new iam.PolicyDocument({
+                statements: [
+                    new iam.PolicyStatement({
+                        actions: [
+                            'kafka:DescribeCluster',
+                            'kafka:GetBootstrapBrokers',
+                            'ec2:CreateNetworkInterface',
+                            'ec2:DescribeNetworkInterfaces',
+                            'ec2:DescribeVpcs',
+                            'ec2:DeleteNetworkInterface',
+                            'ec2:DescribeSubnets',
+                            'ec2:DescribeSecurityGroups'
+                        ],
+                        resources: ['*']
+                    })
+                ]
+            })
         });
 
-        (executionRole.Role.node.defaultChild as iam.CfnRole).cfnOptions.metadata = {
-            cfn_nag: {
-                rules_to_suppress: [{
-                    id: 'W11',
-                    reason: 'Actions do not support resource level permissions'
-                }]
-            }
-        };
+        const cfnRole = executionRole.Role.node.defaultChild as iam.CfnRole;
+        CfnNagHelper.addSuppressions(cfnRole, {
+            Id: 'W11',
+            Reason: 'Actions do not support resource level permissions'
+        });
 
         this.Function = new lambda.Function(this, 'Consumer', {
-            runtime: lambda.Runtime.NODEJS_12_X,
+            runtime: lambda.Runtime.NODEJS_14_X,
             handler: 'index.handler',
             role: executionRole.Role,
             code: props.code,

@@ -19,7 +19,7 @@ import { KinesisProducer } from '../lib/kpl-producer';
 import { FlinkApplication } from '../lib/kda-flink-application';
 import { EncryptedBucket } from '../lib/s3-bucket';
 import { SolutionHelper } from '../lib/solution-helper';
-import { SolutionStackProps } from './solution-props';
+import { SolutionStackProps } from '../bin/solution-props';
 import { ApplicationMonitoring } from '../lib/kda-monitoring';
 
 export class KplKdsKda extends cdk.Stack {

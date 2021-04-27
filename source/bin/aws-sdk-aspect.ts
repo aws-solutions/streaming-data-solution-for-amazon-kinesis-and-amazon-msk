@@ -1,5 +1,5 @@
 /*********************************************************************************************************************
- *  Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.                                      *
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
  *                                                                                                                    *
  *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
  *  with the License. A copy of the License is located at                                                             *
@@ -12,28 +12,29 @@
  *********************************************************************************************************************/
 
 import * as cdk from '@aws-cdk/core';
-import { expect as expectCDK, haveResource, ResourcePart, SynthUtils } from '@aws-cdk/assert';
+import * as lambda from '@aws-cdk/aws-lambda';
 
-import { KafkaMetadata } from '../lib/msk-custom-resource';
+export class AwsSdkConfig extends cdk.Construct implements cdk.IAspect {
+    private readonly solutionId: string;
 
-test('creates custom resource for cluster metadata', () => {
-    const app = new cdk.App();
-    const stack = new cdk.Stack(app, 'TestStack');
+    constructor(scope: cdk.Construct, id: string, solutionId: string) {
+        super(scope, id);
+        this.solutionId = solutionId;
+    }
 
-    new KafkaMetadata(stack, 'Msk', {
-        clusterArn: 'my-cluster-arn'
-    });
+    public visit(node: cdk.IConstruct): void {
+        let userAgent = '';
 
-    expect(SynthUtils.toCloudFormation(stack)).toMatchSnapshot();
+        if (node instanceof lambda.Function) {
+            const runtimeFamily = node.runtime.family;
 
-    expectCDK(stack).to(haveResource('AWS::IAM::Role', {
-        Metadata: {
-            cfn_nag: {
-                rules_to_suppress: [{
-                    id: 'W11',
-                    reason: 'MSK actions do not support resource level permissions'
-                }]
+            if (runtimeFamily == lambda.RuntimeFamily.NODEJS) {
+                userAgent = `{ "customUserAgent": "AwsSolution/${this.solutionId}/%%VERSION%%" }`;
+            } else if (runtimeFamily == lambda.RuntimeFamily.PYTHON) {
+                userAgent = `{ "user_agent_extra": "AwsSolution/${this.solutionId}/%%VERSION%%" }`
             }
+
+            node.addEnvironment('AWS_SDK_USER_AGENT', userAgent);
         }
-    }, ResourcePart.CompleteDefinition));
-});
+    }
+}

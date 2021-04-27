@@ -15,6 +15,8 @@ import * as cdk from '@aws-cdk/core';
 import * as ec2 from '@aws-cdk/aws-ec2';
 import * as iam from '@aws-cdk/aws-iam';
 
+import { CfnNagHelper } from './cfn-nag-helper';
+
 export interface KafkaClientProps {
     readonly vpcId: string;
     readonly subnetId: string;
@@ -103,13 +105,9 @@ export class KafkaClient extends cdk.Construct {
     private addW12Suppression(policy: iam.Policy, reason: string) {
         const cfnPolicy = policy.node.defaultChild as iam.CfnPolicy;
 
-        cfnPolicy.cfnOptions.metadata = {
-            cfn_nag: {
-                rules_to_suppress: [{
-                    id: 'W12',
-                    reason: reason
-                }]
-            }
-        };
+        CfnNagHelper.addSuppressions(cfnPolicy, {
+            Id: 'W12',
+            Reason: reason
+        });
     }
 }

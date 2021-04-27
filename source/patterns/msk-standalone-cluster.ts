@@ -14,7 +14,7 @@
 import * as cdk from '@aws-cdk/core';
 
 import { SolutionHelper } from '../lib/solution-helper';
-import { SolutionStackProps } from './solution-props';
+import { SolutionStackProps } from '../bin/solution-props';
 import { KafkaCluster } from '../lib/msk-cluster';
 import { KafkaClient } from '../lib/msk-client';
 import { KafkaMonitoring } from '../lib/msk-monitoring';
@@ -50,6 +50,13 @@ export class MskStandalone extends cdk.Stack {
             allowedValues: KafkaCluster.AllowedMonitoringLevels
         });
 
+        const ebsVolumeSize = new cdk.CfnParameter(this, 'EbsVolumeSize', {
+            type: 'Number',
+            default: 1000,
+            minValue: KafkaCluster.MinStorageSizeGiB,
+            maxValue: KafkaCluster.MaxStorageSizeGiB
+        });
+
         //---------------------------------------------------------------------
         // Networking configuration
 
@@ -66,6 +73,7 @@ export class MskStandalone extends cdk.Stack {
             numberOfBrokerNodes: brokerNodes.valueAsNumber,
             brokerInstanceType: brokerInstanceType.valueAsString,
             monitoringLevel: monitoringLevel.valueAsString,
+            ebsVolumeSize: ebsVolumeSize.valueAsNumber,
 
             brokerVpcId: brokerVpc.valueAsString,
             brokerSubnets: brokerSubnets.valueAsList
@@ -124,7 +132,13 @@ export class MskStandalone extends cdk.Stack {
                 ParameterGroups: [
                     {
                         Label: { default: 'Broker configuration' },
-                        Parameters: [kafkaVersion.logicalId, brokerNodes.logicalId, brokerInstanceType.logicalId, monitoringLevel.logicalId]
+                        Parameters: [
+                            kafkaVersion.logicalId,
+                            brokerNodes.logicalId,
+                            brokerInstanceType.logicalId,
+                            monitoringLevel.logicalId,
+                            ebsVolumeSize.logicalId
+                        ]
                     },
                     {
                         Label: { default: 'Networking configuration' },
@@ -147,6 +161,9 @@ export class MskStandalone extends cdk.Stack {
                     },
                     [monitoringLevel.logicalId]: {
                         default: 'Level of monitoring for the cluster'
+                    },
+                    [ebsVolumeSize.logicalId]: {
+                        default: 'EBS storage volume per broker (in GiB)'
                     },
 
                     [brokerVpc.logicalId]: {

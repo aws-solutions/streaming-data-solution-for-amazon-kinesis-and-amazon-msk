@@ -11,10 +11,13 @@
 #  and limitations under the License.                                                                                #
 ######################################################################################################################
 
-import boto3, logging
+import boto3, logging, os, json
 from crhelper import CfnResource
+from botocore import config
 
-client_kinesis_analytics = boto3.client('kinesisanalyticsv2')
+config = config.Config(**json.loads(os.environ['AWS_SDK_USER_AGENT']))
+client_kinesis_analytics = boto3.client('kinesisanalyticsv2', config=config)
+
 helper = CfnResource(json_logging=True)
 logger = logging.getLogger(__name__)
 

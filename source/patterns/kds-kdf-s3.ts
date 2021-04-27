@@ -18,7 +18,7 @@ import * as firehose from '@aws-cdk/aws-kinesisfirehose';
 import { DataStream } from '../lib/kds-data-stream';
 import { EncryptedBucket } from '../lib/s3-bucket';
 import { SolutionHelper } from '../lib/solution-helper';
-import { SolutionStackProps } from './solution-props';
+import { SolutionStackProps } from '../bin/solution-props';
 import { DeliveryStreamMonitoring } from '../lib/kdf-monitoring';
 
 export class KdsKdfS3 extends cdk.Stack {

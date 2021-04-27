@@ -9,6 +9,12 @@ Object {
     "ClusterArn": Object {
       "Type": "String",
     },
+    "LambdaCodeBucket": Object {
+      "Type": "String",
+    },
+    "LambdaCodeKey": Object {
+      "Type": "String",
+    },
     "TopicName": Object {
       "Type": "String",
     },
@@ -20,7 +26,12 @@ Object {
       ],
       "Properties": Object {
         "Code": Object {
-          "ZipFile": "foo",
+          "S3Bucket": Object {
+            "Ref": "LambdaCodeBucket",
+          },
+          "S3Key": Object {
+            "Ref": "LambdaCodeKey",
+          },
         },
         "Handler": "index.handler",
         "Role": Object {
@@ -29,7 +40,7 @@ Object {
             "Arn",
           ],
         },
-        "Runtime": "nodejs12.x",
+        "Runtime": "nodejs14.x",
         "Timeout": 60,
       },
       "Type": "AWS::Lambda::Function",
@@ -148,6 +159,14 @@ Object {
 
 exports[`successful scenarios creates a MSK Lambda consumer 1`] = `
 Object {
+  "Parameters": Object {
+    "LambdaCodeBucket": Object {
+      "Type": "String",
+    },
+    "LambdaCodeKey": Object {
+      "Type": "String",
+    },
+  },
   "Resources": Object {
     "TestMskConsumer4592A744": Object {
       "DependsOn": Array [
@@ -155,7 +174,12 @@ Object {
       ],
       "Properties": Object {
         "Code": Object {
-          "ZipFile": "foo",
+          "S3Bucket": Object {
+            "Ref": "LambdaCodeBucket",
+          },
+          "S3Key": Object {
+            "Ref": "LambdaCodeKey",
+          },
         },
         "Environment": Object {
           "Variables": Object {
@@ -169,7 +193,7 @@ Object {
             "Arn",
           ],
         },
-        "Runtime": "nodejs12.x",
+        "Runtime": "nodejs14.x",
         "Timeout": 60,
       },
       "Type": "AWS::Lambda::Function",

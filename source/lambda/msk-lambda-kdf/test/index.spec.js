@@ -85,12 +85,16 @@ const createResponse = (numberOfRecords, failedPutCount) => {
 
 describe('MSK Lambda to KDF', () => {
     beforeEach(() => {
+        process.env.AWS_SDK_USER_AGENT = '{ "customUserAgent": "AwsSolution/SO9999/v0.0.1" }';
         process.env.DELIVERY_STREAM_NAME = 'test-stream';
+
         sinon.stub(lambdaFn, 'sleep').callsFake();
     });
 
     afterEach(() => {
+        delete process.env.AWS_SDK_USER_AGENT;
         delete process.env.DELIVERY_STREAM_NAME;
+
         lambdaFn.sleep.restore();
         AWS.restore('Firehose');
     });

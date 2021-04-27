@@ -15,7 +15,7 @@ import * as cdk from '@aws-cdk/core';
 import * as lambda from '@aws-cdk/aws-lambda';
 
 import { SolutionHelper } from '../lib/solution-helper';
-import { SolutionStackProps } from './solution-props';
+import { SolutionStackProps } from '../bin/solution-props';
 import { KafkaConsumer } from '../lib/msk-consumer';
 
 export class MskLambda extends cdk.Stack {

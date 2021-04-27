@@ -16,6 +16,7 @@ import * as lambda from '@aws-cdk/aws-lambda';
 import * as iam from '@aws-cdk/aws-iam';
 
 import { ExecutionRole } from './lambda-role-cloudwatch';
+import { CfnNagHelper } from './cfn-nag-helper';
 
 export interface KafkaMonitoringProps {
     readonly clusterArn: string;
@@ -26,32 +27,27 @@ export class KafkaMonitoring extends cdk.Construct {
     constructor(scope: cdk.Construct, id: string, props: KafkaMonitoringProps) {
         super(scope, id);
 
-        const dashboardPolicy = new iam.PolicyDocument({
-            statements: [
-                new iam.PolicyStatement({
-                    actions: ['cloudwatch:PutDashboard', 'cloudwatch:DeleteDashboards'],
-                    resources: [`arn:${cdk.Aws.PARTITION}:cloudwatch::${cdk.Aws.ACCOUNT_ID}:dashboard/${props.dashboardName}`]
-                }),
-                new iam.PolicyStatement({
-                    actions: ['kafka:DescribeCluster'],
-                    resources: ['*']
-                })
-            ]
-        });
-
         const monitoringRole = new ExecutionRole(this, 'Role', {
             inlinePolicyName: 'DashboardPolicy',
-            inlinePolicyDocument: dashboardPolicy
+            inlinePolicyDocument: new iam.PolicyDocument({
+                statements: [
+                    new iam.PolicyStatement({
+                        actions: ['cloudwatch:PutDashboard', 'cloudwatch:DeleteDashboards'],
+                        resources: [`arn:${cdk.Aws.PARTITION}:cloudwatch::${cdk.Aws.ACCOUNT_ID}:dashboard/${props.dashboardName}`]
+                    }),
+                    new iam.PolicyStatement({
+                        actions: ['kafka:DescribeCluster'],
+                        resources: ['*']
+                    })
+                ]
+            })
         });
 
-        (monitoringRole.Role.node.defaultChild as iam.CfnRole).cfnOptions.metadata = {
-            cfn_nag: {
-                rules_to_suppress: [{
-                    id: 'W11',
-                    reason: 'DescribeCluster does not support resource level permissions'
-                }]
-            }
-        };
+        const cfnRole = monitoringRole.Role.node.defaultChild as iam.CfnRole;
+        CfnNagHelper.addSuppressions(cfnRole, {
+            Id: 'W11',
+            Reason: 'DescribeCluster does not support resource level permissions'
+        });
 
         const monitoringFunction = new lambda.Function(this, 'Function', {
             runtime: lambda.Runtime.PYTHON_3_8,

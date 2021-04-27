@@ -16,6 +16,8 @@ import * as ec2 from '@aws-cdk/aws-ec2';
 import * as iam from '@aws-cdk/aws-iam';
 import * as kinesis from '@aws-cdk/aws-kinesis';
 
+import { CfnNagHelper } from './cfn-nag-helper';
+
 export interface KinesisProducerProps {
     readonly vpcId: string;
     readonly subnetId: string;
@@ -144,14 +146,10 @@ export class KinesisProducer extends cdk.Construct {
             ]
         });
 
-        securityGroup.cfnOptions.metadata = {
-            cfn_nag: {
-                rules_to_suppress: [{
-                    id: 'W5',
-                    reason: 'Outbound access is allowed to connect to Kinesis'
-                }]
-            }
-        };
+        CfnNagHelper.addSuppressions(securityGroup, {
+            Id: 'W5',
+            Reason: 'Outbound access is allowed to connect to Kinesis'
+        });
 
         return securityGroup;
     }
@@ -159,13 +157,9 @@ export class KinesisProducer extends cdk.Construct {
     private addW12Suppression(policy: iam.Policy, reason: string) {
         const cfnPolicy = policy.node.defaultChild as iam.CfnPolicy;
 
-        cfnPolicy.cfnOptions.metadata = {
-            cfn_nag: {
-                rules_to_suppress: [{
-                    id: 'W12',
-                    reason: reason
-                }]
-            }
-        };
+        CfnNagHelper.addSuppressions(cfnPolicy, {
+            Id: 'W12',
+            Reason: reason
+        });
     }
 }

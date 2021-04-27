@@ -6,6 +6,9 @@ Object {
     "ClientSubnets": Object {
       "Type": "List<AWS::EC2::Subnet::Id>",
     },
+    "EbsVolumeSize": Object {
+      "Type": "Number",
+    },
     "InstanceType": Object {
       "AllowedValues": Array [
         "kafka.m5.large",
@@ -37,6 +40,7 @@ Object {
         "DEFAULT",
         "PER_BROKER",
         "PER_TOPIC_PER_BROKER",
+        "PER_TOPIC_PER_PARTITION",
       ],
       "Type": "String",
     },
@@ -46,16 +50,6 @@ Object {
   },
   "Resources": Object {
     "TestMskClusterSG891444DD": Object {
-      "Metadata": Object {
-        "cfn_nag": Object {
-          "rules_to_suppress": Array [
-            Object {
-              "id": "F1000",
-              "reason": "No egress rule defined as default (all traffic allowed outbound) is sufficient for this resource",
-            },
-          ],
-        },
-      },
       "Properties": Object {
         "GroupDescription": "Security group for the MSK cluster",
         "Tags": Array [
@@ -143,6 +137,13 @@ Object {
               "Ref": "TestMskClusterSG891444DD",
             },
           ],
+          "StorageInfo": Object {
+            "EBSStorageInfo": Object {
+              "VolumeSize": Object {
+                "Ref": "EbsVolumeSize",
+              },
+            },
+          },
         },
         "ClusterName": Object {
           "Fn::Join": Array [
@@ -198,16 +199,6 @@ Object {
     },
     "TestMskLogGroupCF743213": Object {
       "DeletionPolicy": "Retain",
-      "Metadata": Object {
-        "cfn_nag": Object {
-          "rules_to_suppress": Array [
-            Object {
-              "id": "W84",
-              "reason": "Log group data is always encrypted in CloudWatch Logs using an AWS Managed KMS Key",
-            },
-          ],
-        },
-      },
       "Properties": Object {
         "RetentionInDays": 731,
       },
@@ -222,16 +213,6 @@ exports[`successful scenarios creates a MSK cluster 1`] = `
 Object {
   "Resources": Object {
     "TestMskClusterSG891444DD": Object {
-      "Metadata": Object {
-        "cfn_nag": Object {
-          "rules_to_suppress": Array [
-            Object {
-              "id": "F1000",
-              "reason": "No egress rule defined as default (all traffic allowed outbound) is sufficient for this resource",
-            },
-          ],
-        },
-      },
       "Properties": Object {
         "GroupDescription": "Security group for the MSK cluster",
         "Tags": Array [
@@ -318,6 +299,11 @@ Object {
               "Ref": "TestMskClusterSG891444DD",
             },
           ],
+          "StorageInfo": Object {
+            "EBSStorageInfo": Object {
+              "VolumeSize": 1000,
+            },
+          },
         },
         "ClusterName": Object {
           "Fn::Join": Array [
@@ -367,16 +353,6 @@ Object {
     },
     "TestMskLogGroupCF743213": Object {
       "DeletionPolicy": "Retain",
-      "Metadata": Object {
-        "cfn_nag": Object {
-          "rules_to_suppress": Array [
-            Object {
-              "id": "W84",
-              "reason": "Log group data is always encrypted in CloudWatch Logs using an AWS Managed KMS Key",
-            },
-          ],
-        },
-      },
       "Properties": Object {
         "RetentionInDays": 731,
       },
@@ -391,16 +367,6 @@ exports[`successful scenarios creates a MSK cluster 2`] = `
 Object {
   "Resources": Object {
     "TestMskClusterSG891444DD": Object {
-      "Metadata": Object {
-        "cfn_nag": Object {
-          "rules_to_suppress": Array [
-            Object {
-              "id": "F1000",
-              "reason": "No egress rule defined as default (all traffic allowed outbound) is sufficient for this resource",
-            },
-          ],
-        },
-      },
       "Properties": Object {
         "GroupDescription": "Security group for the MSK cluster",
         "Tags": Array [
@@ -487,6 +453,11 @@ Object {
               "Ref": "TestMskClusterSG891444DD",
             },
           ],
+          "StorageInfo": Object {
+            "EBSStorageInfo": Object {
+              "VolumeSize": 1000,
+            },
+          },
         },
         "ClusterName": Object {
           "Fn::Join": Array [
@@ -536,16 +507,6 @@ Object {
     },
     "TestMskLogGroupCF743213": Object {
       "DeletionPolicy": "Retain",
-      "Metadata": Object {
-        "cfn_nag": Object {
-          "rules_to_suppress": Array [
-            Object {
-              "id": "W84",
-              "reason": "Log group data is always encrypted in CloudWatch Logs using an AWS Managed KMS Key",
-            },
-          ],
-        },
-      },
       "Properties": Object {
         "RetentionInDays": 731,
       },
@@ -560,16 +521,6 @@ exports[`successful scenarios creates a MSK cluster 3`] = `
 Object {
   "Resources": Object {
     "TestMskClusterSG891444DD": Object {
-      "Metadata": Object {
-        "cfn_nag": Object {
-          "rules_to_suppress": Array [
-            Object {
-              "id": "F1000",
-              "reason": "No egress rule defined as default (all traffic allowed outbound) is sufficient for this resource",
-            },
-          ],
-        },
-      },
       "Properties": Object {
         "GroupDescription": "Security group for the MSK cluster",
         "Tags": Array [
@@ -656,6 +607,11 @@ Object {
               "Ref": "TestMskClusterSG891444DD",
             },
           ],
+          "StorageInfo": Object {
+            "EBSStorageInfo": Object {
+              "VolumeSize": 1000,
+            },
+          },
         },
         "ClusterName": Object {
           "Fn::Join": Array [
@@ -705,16 +661,6 @@ Object {
     },
     "TestMskLogGroupCF743213": Object {
       "DeletionPolicy": "Retain",
-      "Metadata": Object {
-        "cfn_nag": Object {
-          "rules_to_suppress": Array [
-            Object {
-              "id": "W84",
-              "reason": "Log group data is always encrypted in CloudWatch Logs using an AWS Managed KMS Key",
-            },
-          ],
-        },
-      },
       "Properties": Object {
         "RetentionInDays": 731,
       },

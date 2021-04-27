@@ -25,9 +25,6 @@
 [ "$DEBUG" == 'true' ] && set -x
 set -e
 
-# Important: CDK global version number
-cdk_version=1.80.0
-
 # Check to see if input has been provided:
 if [ -z "$1" ] || [ -z "$2" ] || [ -z "$3" ]; then
     echo "Please provide all required parameters for the build script"
@@ -57,6 +54,11 @@ mkdir -p $build_dist_dir
 
 rm -rf $staging_dist_dir
 mkdir -p $staging_dist_dir
+
+echo "------------------------------------------------------------------------------"
+echo "[Init] Get version of the AWS CDK"
+echo "------------------------------------------------------------------------------"
+cdk_version=$(node get-cdk-version.js)
 
 echo "------------------------------------------------------------------------------"
 echo "[Init] Install dependencies for the cdk-solution-helper"

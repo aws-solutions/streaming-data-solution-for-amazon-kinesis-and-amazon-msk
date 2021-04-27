@@ -12,7 +12,7 @@
  *********************************************************************************************************************/
 
 import * as cdk from '@aws-cdk/core';
-import { expect as expectCDK, SynthUtils, haveResourceLike, haveResource, ResourcePart } from '@aws-cdk/assert';
+import { expect as expectCDK, SynthUtils, haveResourceLike } from '@aws-cdk/assert';
 
 import { KafkaCluster } from '../lib/msk-cluster';
 
@@ -32,6 +32,7 @@ describe('successful scenarios', () => {
             numberOfBrokerNodes: validNodeCount,
             brokerInstanceType: 'kafka.m5.large',
             monitoringLevel: 'DEFAULT',
+            ebsVolumeSize: 1000,
 
             brokerVpcId: 'my-vpc-id',
             brokerSubnets: twoSubnets
@@ -40,28 +41,6 @@ describe('successful scenarios', () => {
         expect(SynthUtils.toCloudFormation(stack)).toMatchSnapshot();
         expect(cluster.ClusterArn).not.toBeUndefined();
         expect(cluster.SecurityGroupId).not.toBeUndefined();
-
-        expectCDK(stack).to(haveResource('AWS::Logs::LogGroup', {
-            Metadata: {
-                cfn_nag: {
-                    rules_to_suppress: [{
-                        id: 'W84',
-                        reason: 'Log group data is always encrypted in CloudWatch Logs using an AWS Managed KMS Key'
-                    }]
-                }
-            }
-        }, ResourcePart.CompleteDefinition));
-
-        expectCDK(stack).to(haveResource('AWS::EC2::SecurityGroup', {
-            Metadata: {
-                cfn_nag: {
-                    rules_to_suppress: [{
-                        id: 'F1000',
-                        reason: 'No egress rule defined as default (all traffic allowed outbound) is sufficient for this resource'
-                    }]
-                }
-            }
-        }, ResourcePart.CompleteDefinition));
 
         for (const rule of KafkaCluster.RequiredRules) {
             expectCDK(stack).to(haveResourceLike('AWS::EC2::SecurityGroupIngress', {
@@ -79,13 +58,14 @@ describe('successful scenarios', () => {
         const kafkaVersion = new cdk.CfnParameter(stack, 'KafkaVersion', { allowedValues: KafkaCluster.AllowedKafkaVersions });
         const instanceType = new cdk.CfnParameter(stack, 'InstanceType', { allowedValues: KafkaCluster.AllowedInstanceTypes });
         const monitoringLevel = new cdk.CfnParameter(stack, 'MonitoringLevel', { allowedValues: KafkaCluster.AllowedMonitoringLevels });
+        const volumeSize = new cdk.CfnParameter(stack, 'EbsVolumeSize', { type: 'Number' });
 
         new KafkaCluster(stack, 'TestMsk', {
             kafkaVersion: kafkaVersion.valueAsString,
             numberOfBrokerNodes: numberOfBrokerNodes.valueAsNumber,
             brokerInstanceType: instanceType.valueAsString,
-
             monitoringLevel: monitoringLevel.valueAsString,
+            ebsVolumeSize: volumeSize.valueAsNumber,
 
             brokerVpcId: 'my-vpc-id',
             brokerSubnets: clientSubnets.valueAsList
@@ -120,6 +100,7 @@ describe('validation tests', () => {
             numberOfBrokerNodes: 2,
             brokerInstanceType: 'kafka.m5.large',
             monitoringLevel: 'DEFAULT',
+            ebsVolumeSize: 1000,
 
             brokerVpcId: 'my-vpc-id',
             brokerSubnets: subnets
@@ -132,6 +113,7 @@ describe('validation tests', () => {
             numberOfBrokerNodes: invalidNodeCount,
             brokerInstanceType: 'kafka.m5.large',
             monitoringLevel: 'DEFAULT',
+            ebsVolumeSize: 1000,
 
             brokerVpcId: 'my-vpc-id',
             brokerSubnets: twoSubnets
@@ -144,10 +126,24 @@ describe('validation tests', () => {
             numberOfBrokerNodes: invalidNodeCount,
             brokerInstanceType: 'kafka.m5.large',
             monitoringLevel: 'DEFAULT',
+            ebsVolumeSize: 1000,
 
             brokerVpcId: 'my-vpc-id',
             brokerSubnets: twoSubnets
         })).toThrowError(/numberOfBrokerNodes must be a multiple of brokerSubnets/);
+    });
+
+    test.each([0, 16385])('volume size must be between allowed values', (invalidSize) => {
+        expect(() => new KafkaCluster(stack, 'TestMsk', {
+            kafkaVersion: '2.2.1',
+            numberOfBrokerNodes: 2,
+            brokerInstanceType: 'kafka.m5.large',
+            monitoringLevel: 'DEFAULT',
+            ebsVolumeSize: invalidSize,
+
+            brokerVpcId: 'my-vpc-id',
+            brokerSubnets: twoSubnets
+        })).toThrowError(`ebsVolumeSize must be a value between 1 and 16384 GiB (given ${invalidSize})`);
     });
 
     test('invalid kafka version', () => {
@@ -156,6 +152,7 @@ describe('validation tests', () => {
             numberOfBrokerNodes: 2,
             brokerInstanceType: 'kafka.m5.large',
             monitoringLevel: 'DEFAULT',
+            ebsVolumeSize: 1000,
 
             brokerVpcId: 'my-vpc-id',
             brokerSubnets: twoSubnets
@@ -168,6 +165,7 @@ describe('validation tests', () => {
             numberOfBrokerNodes: 2,
             brokerInstanceType: 'FOO',
             monitoringLevel: 'DEFAULT',
+            ebsVolumeSize: 1000,
 
             brokerVpcId: 'my-vpc-id',
             brokerSubnets: twoSubnets
@@ -180,6 +178,7 @@ describe('validation tests', () => {
             numberOfBrokerNodes: 2,
             brokerInstanceType: 'kafka.m5.large',
             monitoringLevel: 'FOO',
+            ebsVolumeSize: 1000,
 
             brokerVpcId: 'my-vpc-id',
             brokerSubnets: twoSubnets

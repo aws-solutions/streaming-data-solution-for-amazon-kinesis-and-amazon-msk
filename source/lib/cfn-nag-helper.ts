@@ -12,28 +12,43 @@
  *********************************************************************************************************************/
 
 import * as cdk from '@aws-cdk/core';
-import { expect as expectCDK, haveResource, ResourcePart, SynthUtils } from '@aws-cdk/assert';
 
-import { KafkaMetadata } from '../lib/msk-custom-resource';
+export interface CfnNagSuppression {
+    Id: string;
+    Reason: string;
+}
 
-test('creates custom resource for cluster metadata', () => {
-    const app = new cdk.App();
-    const stack = new cdk.Stack(app, 'TestStack');
+export class CfnNagHelper {
+    public static addSuppressions(resource: cdk.CfnResource, suppressions: CfnNagSuppression | CfnNagSuppression[]) {
+        let rules = [];
 
-    new KafkaMetadata(stack, 'Msk', {
-        clusterArn: 'my-cluster-arn'
-    });
-
-    expect(SynthUtils.toCloudFormation(stack)).toMatchSnapshot();
-
-    expectCDK(stack).to(haveResource('AWS::IAM::Role', {
-        Metadata: {
-            cfn_nag: {
-                rules_to_suppress: [{
-                    id: 'W11',
-                    reason: 'MSK actions do not support resource level permissions'
-                }]
+        if (suppressions instanceof Array) {
+            for (const suppression of suppressions) {
+                rules.push({ id: suppression.Id, reason: suppression.Reason });
             }
+        } else {
+            rules.push({ id: suppressions.Id, reason: suppressions.Reason });
         }
-    }, ResourcePart.CompleteDefinition));
-});
+
+        if (resource.cfnOptions.metadata?.cfn_nag) {
+            // If the CfnResource already contains some suppressions, we don't want to erase them.
+            const existingRules = resource.cfnOptions.metadata.cfn_nag.rules_to_suppress;
+            rules = [...existingRules, ...rules];
+        }
+
+        // It's possible that multiple constructs try to add the same suppression.
+        // We only keep one occurrence (last) of each.
+        // Based on https://stackoverflow.com/a/56768137
+        const uniqueRules = [
+            ...new Map(
+                rules.map(rule => [rule.id, rule])
+            ).values()
+        ];
+
+        resource.cfnOptions.metadata = {
+            cfn_nag: {
+                rules_to_suppress: uniqueRules
+            }
+        };
+    }
+}

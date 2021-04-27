@@ -16,6 +16,7 @@ import * as lambda from '@aws-cdk/aws-lambda';
 import * as iam from '@aws-cdk/aws-iam';
 
 import { ExecutionRole } from './lambda-role-cloudwatch';
+import { CfnNagHelper } from './cfn-nag-helper';
 
 export interface KafkaMetadataProps {
     readonly clusterArn: string;
@@ -51,14 +52,11 @@ export class KafkaMetadata extends cdk.Construct {
             })
         });
 
-        (metadataRole.Role.node.defaultChild as iam.CfnRole).cfnOptions.metadata = {
-            cfn_nag: {
-                rules_to_suppress: [{
-                    id: 'W11',
-                    reason: 'MSK actions do not support resource level permissions'
-                }]
-            }
-        };
+        const cfnRole = metadataRole.Role.node.defaultChild as iam.CfnRole;
+        CfnNagHelper.addSuppressions(cfnRole, {
+            Id: 'W11',
+            Reason: 'MSK actions do not support resource level permissions'
+        });
 
         const metadataFunction = new lambda.Function(this, 'CustomResource', {
             runtime: lambda.Runtime.PYTHON_3_8,

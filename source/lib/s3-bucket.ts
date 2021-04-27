@@ -14,6 +14,8 @@
 import * as cdk from '@aws-cdk/core';
 import * as s3 from '@aws-cdk/aws-s3';
 
+import { CfnNagHelper, CfnNagSuppression } from './cfn-nag-helper';
+
 export interface EncryptedBucketProps {
     readonly enableIntelligentTiering: boolean;
 }
@@ -59,23 +61,18 @@ export class EncryptedBucket extends cdk.Construct {
     }
 
     private addCfnNagSuppressions(bucket: s3.IBucket, includeW35?: boolean) {
-        const rules = [{
-            id: 'W51',
-            reason: 'This bucket does not need a bucket policy'
+        const rules: CfnNagSuppression[] = [{
+            Id: 'W51',
+            Reason: 'This bucket does not need a bucket policy'
         }];
 
         if (includeW35) {
             rules.push({
-                id: 'W35',
-                reason: 'This bucket is used to store access logs for another bucket'
+                Id: 'W35',
+                Reason: 'This bucket is used to store access logs for another bucket'
             });
         }
 
-        const cfnBucket = bucket.node.defaultChild as s3.CfnBucket;
-        cfnBucket.cfnOptions.metadata = {
-            cfn_nag: {
-                rules_to_suppress: rules
-            }
-        };
+        CfnNagHelper.addSuppressions(bucket.node.defaultChild as s3.CfnBucket, rules);
     }
 }

@@ -21,6 +21,7 @@ export interface KafkaClusterProps {
     readonly numberOfBrokerNodes: number;
     readonly brokerInstanceType: string;
     readonly monitoringLevel: string;
+    readonly ebsVolumeSize: number;
 
     readonly brokerVpcId: string;
     readonly brokerSubnets: string[];
@@ -54,7 +55,15 @@ export class KafkaCluster extends cdk.Construct {
     }
 
     public static get AllowedMonitoringLevels(): string[] {
-        return ['DEFAULT', 'PER_BROKER', 'PER_TOPIC_PER_BROKER'];
+        return ['DEFAULT', 'PER_BROKER', 'PER_TOPIC_PER_BROKER', 'PER_TOPIC_PER_PARTITION'];
+    }
+
+    public static get MinStorageSizeGiB(): number {
+        return 1;
+    }
+
+    public static get MaxStorageSizeGiB(): number {
+        return 16384;
     }
 
     public static get RequiredRules() {
@@ -97,17 +106,14 @@ export class KafkaCluster extends cdk.Construct {
             }
         }
 
+        const volumeSize = props.ebsVolumeSize;
+        if (!cdk.Token.isUnresolved(volumeSize) && (volumeSize < KafkaCluster.MinStorageSizeGiB || volumeSize > KafkaCluster.MaxStorageSizeGiB)) {
+            throw new Error(`ebsVolumeSize must be a value between ${KafkaCluster.MinStorageSizeGiB} and ${KafkaCluster.MaxStorageSizeGiB} GiB (given ${volumeSize})`);
+        }
+
         this.SecurityGroup = this.createSecurityGroup(props.brokerVpcId);
 
         const logGroup = new logs.LogGroup(this, 'LogGroup', { removalPolicy: cdk.RemovalPolicy.RETAIN });
-        (logGroup.node.defaultChild as logs.CfnLogGroup).cfnOptions.metadata = {
-            cfn_nag: {
-                rules_to_suppress: [{
-                    id: 'W84',
-                    reason: 'Log group data is always encrypted in CloudWatch Logs using an AWS Managed KMS Key'
-                }]
-            }
-        };
 
         this.Cluster = new msk.CfnCluster(this, 'KafkaCluster', {
             clusterName: this.ClusterName,
@@ -117,7 +123,12 @@ export class KafkaCluster extends cdk.Construct {
                 brokerAzDistribution: 'DEFAULT',
                 instanceType: props.brokerInstanceType,
                 clientSubnets: props.brokerSubnets,
-                securityGroups: [this.SecurityGroupId]
+                securityGroups: [this.SecurityGroupId],
+                storageInfo: {
+                    ebsStorageInfo: {
+                        volumeSize: volumeSize
+                    }
+                }
             },
             loggingInfo: {
                 brokerLogs: {
@@ -152,15 +163,6 @@ export class KafkaCluster extends cdk.Construct {
             groupDescription: 'Security group for the MSK cluster',
             tags: [{ key: 'Name', value: 'msk-cluster-sg' }]
         });
-
-        securityGroup.cfnOptions.metadata = {
-            cfn_nag: {
-                rules_to_suppress: [{
-                    id: 'F1000',
-                    reason: 'No egress rule defined as default (all traffic allowed outbound) is sufficient for this resource'
-                }]
-            }
-        };
 
         KafkaCluster.RequiredRules.forEach((rule, index) => {
             new ec2.CfnSecurityGroupIngress(this, `IngressRule${index}`, {

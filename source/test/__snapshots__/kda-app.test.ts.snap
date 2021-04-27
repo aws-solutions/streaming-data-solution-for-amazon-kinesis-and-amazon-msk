@@ -17,16 +17,16 @@ Object {
     },
   },
   "Parameters": Object {
-    "AssetParameterseacd10f082998c95d05d240e47985091f04f44a3bb3e30b1a48e24730a264dedArtifactHashFCC6EC3A": Object {
-      "Description": "Artifact hash for asset \\"eacd10f082998c95d05d240e47985091f04f44a3bb3e30b1a48e24730a264ded\\"",
+    "AssetParameters16f6ef58d4260266ae0eaf9d1a5352876f9be2277054c0fb1bd2fd7d0b4d0ec6ArtifactHashEEF9AD82": Object {
+      "Description": "Artifact hash for asset \\"16f6ef58d4260266ae0eaf9d1a5352876f9be2277054c0fb1bd2fd7d0b4d0ec6\\"",
       "Type": "String",
     },
-    "AssetParameterseacd10f082998c95d05d240e47985091f04f44a3bb3e30b1a48e24730a264dedS3Bucket49F6084A": Object {
-      "Description": "S3 bucket for asset \\"eacd10f082998c95d05d240e47985091f04f44a3bb3e30b1a48e24730a264ded\\"",
+    "AssetParameters16f6ef58d4260266ae0eaf9d1a5352876f9be2277054c0fb1bd2fd7d0b4d0ec6S3BucketA5B04E5F": Object {
+      "Description": "S3 bucket for asset \\"16f6ef58d4260266ae0eaf9d1a5352876f9be2277054c0fb1bd2fd7d0b4d0ec6\\"",
       "Type": "String",
     },
-    "AssetParameterseacd10f082998c95d05d240e47985091f04f44a3bb3e30b1a48e24730a264dedS3VersionKey73EC50A4": Object {
-      "Description": "S3 key for asset version \\"eacd10f082998c95d05d240e47985091f04f44a3bb3e30b1a48e24730a264ded\\"",
+    "AssetParameters16f6ef58d4260266ae0eaf9d1a5352876f9be2277054c0fb1bd2fd7d0b4d0ec6S3VersionKey22DE63CD": Object {
+      "Description": "S3 key for asset version \\"16f6ef58d4260266ae0eaf9d1a5352876f9be2277054c0fb1bd2fd7d0b4d0ec6\\"",
       "Type": "String",
     },
   },
@@ -173,7 +173,7 @@ Object {
       "Properties": Object {
         "Code": Object {
           "S3Bucket": Object {
-            "Ref": "AssetParameterseacd10f082998c95d05d240e47985091f04f44a3bb3e30b1a48e24730a264dedS3Bucket49F6084A",
+            "Ref": "AssetParameters16f6ef58d4260266ae0eaf9d1a5352876f9be2277054c0fb1bd2fd7d0b4d0ec6S3BucketA5B04E5F",
           },
           "S3Key": Object {
             "Fn::Join": Array [
@@ -186,7 +186,7 @@ Object {
                       "Fn::Split": Array [
                         "||",
                         Object {
-                          "Ref": "AssetParameterseacd10f082998c95d05d240e47985091f04f44a3bb3e30b1a48e24730a264dedS3VersionKey73EC50A4",
+                          "Ref": "AssetParameters16f6ef58d4260266ae0eaf9d1a5352876f9be2277054c0fb1bd2fd7d0b4d0ec6S3VersionKey22DE63CD",
                         },
                       ],
                     },
@@ -199,7 +199,7 @@ Object {
                       "Fn::Split": Array [
                         "||",
                         Object {
-                          "Ref": "AssetParameterseacd10f082998c95d05d240e47985091f04f44a3bb3e30b1a48e24730a264dedS3VersionKey73EC50A4",
+                          "Ref": "AssetParameters16f6ef58d4260266ae0eaf9d1a5352876f9be2277054c0fb1bd2fd7d0b4d0ec6S3VersionKey22DE63CD",
                         },
                       ],
                     },
@@ -379,16 +379,6 @@ Object {
     },
     "TestApplicationLogGroup970A3DC7": Object {
       "DeletionPolicy": "Retain",
-      "Metadata": Object {
-        "cfn_nag": Object {
-          "rules_to_suppress": Array [
-            Object {
-              "id": "W84",
-              "reason": "Log group data is always encrypted in CloudWatch Logs using an AWS Managed KMS Key",
-            },
-          ],
-        },
-      },
       "Properties": Object {
         "RetentionInDays": 7,
       },
