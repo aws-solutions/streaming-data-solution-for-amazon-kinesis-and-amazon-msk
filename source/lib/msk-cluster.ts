@@ -47,7 +47,7 @@ export class KafkaCluster extends cdk.Construct {
     private MAX_SUBNETS: number = 3;
 
     public static get AllowedKafkaVersions(): string[] {
-        return ['2.7.0', '2.6.1', '2.6.0', '2.5.1', '2.4.1.1', '2.3.1', '2.2.1'];
+        return ['2.8.0', '2.7.0', '2.6.2', '2.6.1', '2.6.0', '2.5.1', '2.4.1.1', '2.3.1', '2.2.1'];
     }
 
     public static get AllowedInstanceTypes(): string[] {

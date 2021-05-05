@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.1] - 2021-04-28
+### Added
+- Support for Apache Kafka versions 2.8.0 and 2.6.2. For a complete list of improvements and bug fixes, see the Apache Kafka release notes for [2.8.0](https://downloads.apache.org/kafka/2.8.0/RELEASE_NOTES.html) and [2.6.2](https://downloads.apache.org/kafka/2.6.2/RELEASE_NOTES.html).
+
 ## [1.4.0] - 2021-04-12
 ### Added
 - Templates to be used for the [Amazon MSK Labs](https://amazonmsk-labs.workshop.aws/en/) (under the `labs` folder). These assets are not published on the [solution landing page](https://aws.amazon.com/solutions/implementations/aws-streaming-data-solution-for-amazon-msk/), but instead are used during workshops (that provide customers with hands-on experience of the Amazon MSK service by learning its features, configurations, and ecosystem tools).

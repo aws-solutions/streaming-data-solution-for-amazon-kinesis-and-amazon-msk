@@ -28,7 +28,7 @@ export class MskStandalone extends cdk.Stack {
 
         const kafkaVersion = new cdk.CfnParameter(this, 'KafkaVersion', {
             type: 'String',
-            default: '2.7.0',
+            default: '2.8.0',
             allowedValues: KafkaCluster.AllowedKafkaVersions
         });
 
