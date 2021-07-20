@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.2] - 2021-07-20
+### Fixed
+- Location of GitHub repository for MSK Labs assets.
+
 ## [1.4.1] - 2021-04-28
 ### Added
 - Support for Apache Kafka versions 2.8.0 and 2.6.2. For a complete list of improvements and bug fixes, see the Apache Kafka release notes for [2.8.0](https://downloads.apache.org/kafka/2.8.0/RELEASE_NOTES.html) and [2.6.2](https://downloads.apache.org/kafka/2.6.2/RELEASE_NOTES.html).

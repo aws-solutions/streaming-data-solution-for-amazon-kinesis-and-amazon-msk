@@ -38,7 +38,7 @@ export class MskClientStack extends cdk.Stack {
 
         const userDataLocation = new cdk.CfnParameter(this, 'UserDataLocation', {
             type: 'String',
-            default: 'https://github.com/aws-samples/aws-msk-labs-resources'
+            default: 'https://github.com/aws-samples/lab-resources-for-amazon-msk'
         });
 
         const setupScript = new cdk.CfnParameter(this, 'SetupScript', {
