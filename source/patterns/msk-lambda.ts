@@ -24,7 +24,6 @@ export class MskLambda extends cdk.Stack {
 
         //---------------------------------------------------------------------
         // Lambda function configuration
-
         const clusterArn = new cdk.CfnParameter(this, 'ClusterArn', {
             type: 'String',
             allowedPattern: 'arn:(aws[a-zA-Z0-9-]*):([a-zA-Z0-9\\-])+:([a-z]{2}(-gov)?-[a-z]+-\\d{1})?:(\\d{12})?:(.*)',
@@ -44,8 +43,14 @@ export class MskLambda extends cdk.Stack {
             constraintDescription: 'Topic name must not be empty'
         });
 
+        const secretArn = new cdk.CfnParameter(this, 'SecretArn', {
+            type: 'String',
+            maxLength: 200
+        });
+
         const lambdaConsumer = new KafkaConsumer(this, 'LambdaFn', {
             clusterArn: clusterArn.valueAsString,
+            scramSecretArn: secretArn.valueAsString,
             batchSize: batchSize.valueAsNumber,
             startingPosition: lambda.StartingPosition.LATEST,
             topicName: topicName.valueAsString,
@@ -56,7 +61,6 @@ export class MskLambda extends cdk.Stack {
 
         //---------------------------------------------------------------------
         // Solution metrics
-
         new SolutionHelper(this, 'SolutionHelper', {
             solutionId: props.solutionId,
             pattern: MskLambda.name
@@ -64,13 +68,12 @@ export class MskLambda extends cdk.Stack {
 
         //---------------------------------------------------------------------
         // Template metadata
-
         this.templateOptions.metadata = {
             'AWS::CloudFormation::Interface': {
                 ParameterGroups: [
                     {
                         Label: { default: 'AWS Lambda consumer configuration' },
-                        Parameters: [clusterArn.logicalId, batchSize.logicalId, topicName.logicalId]
+                        Parameters: [clusterArn.logicalId, batchSize.logicalId, topicName.logicalId, secretArn.logicalId]
                     }
                 ],
                 ParameterLabels: {
@@ -82,6 +85,9 @@ export class MskLambda extends cdk.Stack {
                     },
                     [topicName.logicalId]: {
                         default: 'Name of a Kafka topic to consume (topic must already exist before the stack is launched)'
+                    },
+                    [secretArn.logicalId]: {
+                        default: '(Optional) Secret ARN used for SASL/SCRAM authentication of the brokers in your MSK cluster'
                     }
                 }
             }
@@ -89,15 +95,9 @@ export class MskLambda extends cdk.Stack {
 
         //---------------------------------------------------------------------
         // Stack outputs
-
         new cdk.CfnOutput(this, 'LambdaFunctionName', {
             description: 'Name of the AWS Lambda function',
             value: lambdaConsumer.Function.functionName
-        });
-
-        new cdk.CfnOutput(this, 'LambdaMskMapping', {
-            description: 'Identifier for the AWS Lambda event source mapping',
-            value: lambdaConsumer.EventMapping.eventSourceMappingId
         });
     }
 }

@@ -2,6 +2,20 @@
 
 exports[`successful scenarios accepts CloudFormation parameters 1`] = `
 Object {
+  "Conditions": Object {
+    "TestMskEnableIAMConditionF946AB65": Object {
+      "Fn::Equals": Array [
+        "None",
+        "IAM access control",
+      ],
+    },
+    "TestMskEnableSCRAMConditionA8CE99C1": Object {
+      "Fn::Equals": Array [
+        "None",
+        "SASL/SCRAM authentication",
+      ],
+    },
+  },
   "Parameters": Object {
     "ClientSubnets": Object {
       "Type": "List<AWS::EC2::Subnet::Id>",
@@ -26,6 +40,7 @@ Object {
     "KafkaVersion": Object {
       "AllowedValues": Array [
         "2.8.0",
+        "2.7.1",
         "2.7.0",
         "2.6.2",
         "2.6.1",
@@ -124,6 +139,36 @@ Object {
       },
       "Type": "AWS::EC2::SecurityGroupIngress",
     },
+    "TestMskIngressRule460B95A77": Object {
+      "Properties": Object {
+        "Description": "SASL/SCRAM",
+        "FromPort": 9096,
+        "GroupId": Object {
+          "Ref": "TestMskClusterSG891444DD",
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": Object {
+          "Ref": "TestMskClusterSG891444DD",
+        },
+        "ToPort": 9096,
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
+    },
+    "TestMskIngressRule5CDEAF845": Object {
+      "Properties": Object {
+        "Description": "IAM",
+        "FromPort": 9098,
+        "GroupId": Object {
+          "Ref": "TestMskClusterSG891444DD",
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": Object {
+          "Ref": "TestMskClusterSG891444DD",
+        },
+        "ToPort": 9098,
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
+    },
     "TestMskKafkaClusterD73AA77B": Object {
       "Properties": Object {
         "BrokerNodeGroupInfo": Object {
@@ -143,6 +188,28 @@ Object {
             "EBSStorageInfo": Object {
               "VolumeSize": Object {
                 "Ref": "EbsVolumeSize",
+              },
+            },
+          },
+        },
+        "ClientAuthentication": Object {
+          "Sasl": Object {
+            "Iam": Object {
+              "Enabled": Object {
+                "Fn::If": Array [
+                  "TestMskEnableIAMConditionF946AB65",
+                  true,
+                  false,
+                ],
+              },
+            },
+            "Scram": Object {
+              "Enabled": Object {
+                "Fn::If": Array [
+                  "TestMskEnableSCRAMConditionA8CE99C1",
+                  true,
+                  false,
+                ],
               },
             },
           },
@@ -213,6 +280,20 @@ Object {
 
 exports[`successful scenarios creates a MSK cluster 1`] = `
 Object {
+  "Conditions": Object {
+    "TestMskEnableIAMConditionF946AB65": Object {
+      "Fn::Equals": Array [
+        "None",
+        "IAM access control",
+      ],
+    },
+    "TestMskEnableSCRAMConditionA8CE99C1": Object {
+      "Fn::Equals": Array [
+        "None",
+        "SASL/SCRAM authentication",
+      ],
+    },
+  },
   "Resources": Object {
     "TestMskClusterSG891444DD": Object {
       "Properties": Object {
@@ -287,6 +368,36 @@ Object {
       },
       "Type": "AWS::EC2::SecurityGroupIngress",
     },
+    "TestMskIngressRule460B95A77": Object {
+      "Properties": Object {
+        "Description": "SASL/SCRAM",
+        "FromPort": 9096,
+        "GroupId": Object {
+          "Ref": "TestMskClusterSG891444DD",
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": Object {
+          "Ref": "TestMskClusterSG891444DD",
+        },
+        "ToPort": 9096,
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
+    },
+    "TestMskIngressRule5CDEAF845": Object {
+      "Properties": Object {
+        "Description": "IAM",
+        "FromPort": 9098,
+        "GroupId": Object {
+          "Ref": "TestMskClusterSG891444DD",
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": Object {
+          "Ref": "TestMskClusterSG891444DD",
+        },
+        "ToPort": 9098,
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
+    },
     "TestMskKafkaClusterD73AA77B": Object {
       "Properties": Object {
         "BrokerNodeGroupInfo": Object {
@@ -304,6 +415,28 @@ Object {
           "StorageInfo": Object {
             "EBSStorageInfo": Object {
               "VolumeSize": 1000,
+            },
+          },
+        },
+        "ClientAuthentication": Object {
+          "Sasl": Object {
+            "Iam": Object {
+              "Enabled": Object {
+                "Fn::If": Array [
+                  "TestMskEnableIAMConditionF946AB65",
+                  true,
+                  false,
+                ],
+              },
+            },
+            "Scram": Object {
+              "Enabled": Object {
+                "Fn::If": Array [
+                  "TestMskEnableSCRAMConditionA8CE99C1",
+                  true,
+                  false,
+                ],
+              },
             },
           },
         },
@@ -328,7 +461,7 @@ Object {
           },
         },
         "EnhancedMonitoring": "DEFAULT",
-        "KafkaVersion": "2.2.1",
+        "KafkaVersion": "2.8.0",
         "LoggingInfo": Object {
           "BrokerLogs": Object {
             "CloudWatchLogs": Object {
@@ -367,6 +500,20 @@ Object {
 
 exports[`successful scenarios creates a MSK cluster 2`] = `
 Object {
+  "Conditions": Object {
+    "TestMskEnableIAMConditionF946AB65": Object {
+      "Fn::Equals": Array [
+        "None",
+        "IAM access control",
+      ],
+    },
+    "TestMskEnableSCRAMConditionA8CE99C1": Object {
+      "Fn::Equals": Array [
+        "None",
+        "SASL/SCRAM authentication",
+      ],
+    },
+  },
   "Resources": Object {
     "TestMskClusterSG891444DD": Object {
       "Properties": Object {
@@ -441,6 +588,36 @@ Object {
       },
       "Type": "AWS::EC2::SecurityGroupIngress",
     },
+    "TestMskIngressRule460B95A77": Object {
+      "Properties": Object {
+        "Description": "SASL/SCRAM",
+        "FromPort": 9096,
+        "GroupId": Object {
+          "Ref": "TestMskClusterSG891444DD",
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": Object {
+          "Ref": "TestMskClusterSG891444DD",
+        },
+        "ToPort": 9096,
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
+    },
+    "TestMskIngressRule5CDEAF845": Object {
+      "Properties": Object {
+        "Description": "IAM",
+        "FromPort": 9098,
+        "GroupId": Object {
+          "Ref": "TestMskClusterSG891444DD",
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": Object {
+          "Ref": "TestMskClusterSG891444DD",
+        },
+        "ToPort": 9098,
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
+    },
     "TestMskKafkaClusterD73AA77B": Object {
       "Properties": Object {
         "BrokerNodeGroupInfo": Object {
@@ -458,6 +635,28 @@ Object {
           "StorageInfo": Object {
             "EBSStorageInfo": Object {
               "VolumeSize": 1000,
+            },
+          },
+        },
+        "ClientAuthentication": Object {
+          "Sasl": Object {
+            "Iam": Object {
+              "Enabled": Object {
+                "Fn::If": Array [
+                  "TestMskEnableIAMConditionF946AB65",
+                  true,
+                  false,
+                ],
+              },
+            },
+            "Scram": Object {
+              "Enabled": Object {
+                "Fn::If": Array [
+                  "TestMskEnableSCRAMConditionA8CE99C1",
+                  true,
+                  false,
+                ],
+              },
             },
           },
         },
@@ -482,7 +681,7 @@ Object {
           },
         },
         "EnhancedMonitoring": "DEFAULT",
-        "KafkaVersion": "2.2.1",
+        "KafkaVersion": "2.8.0",
         "LoggingInfo": Object {
           "BrokerLogs": Object {
             "CloudWatchLogs": Object {
@@ -521,6 +720,20 @@ Object {
 
 exports[`successful scenarios creates a MSK cluster 3`] = `
 Object {
+  "Conditions": Object {
+    "TestMskEnableIAMConditionF946AB65": Object {
+      "Fn::Equals": Array [
+        "None",
+        "IAM access control",
+      ],
+    },
+    "TestMskEnableSCRAMConditionA8CE99C1": Object {
+      "Fn::Equals": Array [
+        "None",
+        "SASL/SCRAM authentication",
+      ],
+    },
+  },
   "Resources": Object {
     "TestMskClusterSG891444DD": Object {
       "Properties": Object {
@@ -595,6 +808,36 @@ Object {
       },
       "Type": "AWS::EC2::SecurityGroupIngress",
     },
+    "TestMskIngressRule460B95A77": Object {
+      "Properties": Object {
+        "Description": "SASL/SCRAM",
+        "FromPort": 9096,
+        "GroupId": Object {
+          "Ref": "TestMskClusterSG891444DD",
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": Object {
+          "Ref": "TestMskClusterSG891444DD",
+        },
+        "ToPort": 9096,
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
+    },
+    "TestMskIngressRule5CDEAF845": Object {
+      "Properties": Object {
+        "Description": "IAM",
+        "FromPort": 9098,
+        "GroupId": Object {
+          "Ref": "TestMskClusterSG891444DD",
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": Object {
+          "Ref": "TestMskClusterSG891444DD",
+        },
+        "ToPort": 9098,
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
+    },
     "TestMskKafkaClusterD73AA77B": Object {
       "Properties": Object {
         "BrokerNodeGroupInfo": Object {
@@ -612,6 +855,28 @@ Object {
           "StorageInfo": Object {
             "EBSStorageInfo": Object {
               "VolumeSize": 1000,
+            },
+          },
+        },
+        "ClientAuthentication": Object {
+          "Sasl": Object {
+            "Iam": Object {
+              "Enabled": Object {
+                "Fn::If": Array [
+                  "TestMskEnableIAMConditionF946AB65",
+                  true,
+                  false,
+                ],
+              },
+            },
+            "Scram": Object {
+              "Enabled": Object {
+                "Fn::If": Array [
+                  "TestMskEnableSCRAMConditionA8CE99C1",
+                  true,
+                  false,
+                ],
+              },
             },
           },
         },
@@ -636,7 +901,7 @@ Object {
           },
         },
         "EnhancedMonitoring": "DEFAULT",
-        "KafkaVersion": "2.2.1",
+        "KafkaVersion": "2.8.0",
         "LoggingInfo": Object {
           "BrokerLogs": Object {
             "CloudWatchLogs": Object {
@@ -648,6 +913,446 @@ Object {
           },
         },
         "NumberOfBrokerNodes": 6,
+        "OpenMonitoring": Object {
+          "Prometheus": Object {
+            "JmxExporter": Object {
+              "EnabledInBroker": true,
+            },
+            "NodeExporter": Object {
+              "EnabledInBroker": true,
+            },
+          },
+        },
+      },
+      "Type": "AWS::MSK::Cluster",
+    },
+    "TestMskLogGroupCF743213": Object {
+      "DeletionPolicy": "Retain",
+      "Properties": Object {
+        "RetentionInDays": 731,
+      },
+      "Type": "AWS::Logs::LogGroup",
+      "UpdateReplacePolicy": "Retain",
+    },
+  },
+}
+`;
+
+exports[`successful scenarios uses IAM for access control 1`] = `
+Object {
+  "Conditions": Object {
+    "TestMskEnableIAMConditionF946AB65": Object {
+      "Fn::Equals": Array [
+        "IAM access control",
+        "IAM access control",
+      ],
+    },
+    "TestMskEnableSCRAMConditionA8CE99C1": Object {
+      "Fn::Equals": Array [
+        "IAM access control",
+        "SASL/SCRAM authentication",
+      ],
+    },
+  },
+  "Resources": Object {
+    "TestMskClusterSG891444DD": Object {
+      "Properties": Object {
+        "GroupDescription": "Security group for the MSK cluster",
+        "Tags": Array [
+          Object {
+            "Key": "Name",
+            "Value": "msk-cluster-sg",
+          },
+        ],
+        "VpcId": "my-vpc-id",
+      },
+      "Type": "AWS::EC2::SecurityGroup",
+    },
+    "TestMskIngressRule0C59EED6B": Object {
+      "Properties": Object {
+        "Description": "ZooKeeper Plaintext",
+        "FromPort": 2181,
+        "GroupId": Object {
+          "Ref": "TestMskClusterSG891444DD",
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": Object {
+          "Ref": "TestMskClusterSG891444DD",
+        },
+        "ToPort": 2181,
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
+    },
+    "TestMskIngressRule1E08B69D9": Object {
+      "Properties": Object {
+        "Description": "ZooKeeper TLS",
+        "FromPort": 2182,
+        "GroupId": Object {
+          "Ref": "TestMskClusterSG891444DD",
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": Object {
+          "Ref": "TestMskClusterSG891444DD",
+        },
+        "ToPort": 2182,
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
+    },
+    "TestMskIngressRule2463D5365": Object {
+      "Properties": Object {
+        "Description": "Bootstrap servers Plaintext",
+        "FromPort": 9092,
+        "GroupId": Object {
+          "Ref": "TestMskClusterSG891444DD",
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": Object {
+          "Ref": "TestMskClusterSG891444DD",
+        },
+        "ToPort": 9092,
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
+    },
+    "TestMskIngressRule3A5524C16": Object {
+      "Properties": Object {
+        "Description": "Bootstrap servers TLS",
+        "FromPort": 9094,
+        "GroupId": Object {
+          "Ref": "TestMskClusterSG891444DD",
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": Object {
+          "Ref": "TestMskClusterSG891444DD",
+        },
+        "ToPort": 9094,
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
+    },
+    "TestMskIngressRule460B95A77": Object {
+      "Properties": Object {
+        "Description": "SASL/SCRAM",
+        "FromPort": 9096,
+        "GroupId": Object {
+          "Ref": "TestMskClusterSG891444DD",
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": Object {
+          "Ref": "TestMskClusterSG891444DD",
+        },
+        "ToPort": 9096,
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
+    },
+    "TestMskIngressRule5CDEAF845": Object {
+      "Properties": Object {
+        "Description": "IAM",
+        "FromPort": 9098,
+        "GroupId": Object {
+          "Ref": "TestMskClusterSG891444DD",
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": Object {
+          "Ref": "TestMskClusterSG891444DD",
+        },
+        "ToPort": 9098,
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
+    },
+    "TestMskKafkaClusterD73AA77B": Object {
+      "Properties": Object {
+        "BrokerNodeGroupInfo": Object {
+          "BrokerAZDistribution": "DEFAULT",
+          "ClientSubnets": Array [
+            "subnet-a",
+            "subnet-b",
+          ],
+          "InstanceType": "kafka.m5.large",
+          "SecurityGroups": Array [
+            Object {
+              "Ref": "TestMskClusterSG891444DD",
+            },
+          ],
+          "StorageInfo": Object {
+            "EBSStorageInfo": Object {
+              "VolumeSize": 1000,
+            },
+          },
+        },
+        "ClientAuthentication": Object {
+          "Sasl": Object {
+            "Iam": Object {
+              "Enabled": Object {
+                "Fn::If": Array [
+                  "TestMskEnableIAMConditionF946AB65",
+                  true,
+                  false,
+                ],
+              },
+            },
+            "Scram": Object {
+              "Enabled": Object {
+                "Fn::If": Array [
+                  "TestMskEnableSCRAMConditionA8CE99C1",
+                  true,
+                  false,
+                ],
+              },
+            },
+          },
+        },
+        "ClusterName": Object {
+          "Fn::Join": Array [
+            "-",
+            Array [
+              "kafka-cluster",
+              Object {
+                "Ref": "AWS::AccountId",
+              },
+            ],
+          ],
+        },
+        "EncryptionInfo": Object {
+          "EncryptionAtRest": Object {
+            "DataVolumeKMSKeyId": "alias/aws/kafka",
+          },
+          "EncryptionInTransit": Object {
+            "ClientBroker": "TLS",
+            "InCluster": true,
+          },
+        },
+        "EnhancedMonitoring": "DEFAULT",
+        "KafkaVersion": "2.8.0",
+        "LoggingInfo": Object {
+          "BrokerLogs": Object {
+            "CloudWatchLogs": Object {
+              "Enabled": true,
+              "LogGroup": Object {
+                "Ref": "TestMskLogGroupCF743213",
+              },
+            },
+          },
+        },
+        "NumberOfBrokerNodes": 2,
+        "OpenMonitoring": Object {
+          "Prometheus": Object {
+            "JmxExporter": Object {
+              "EnabledInBroker": true,
+            },
+            "NodeExporter": Object {
+              "EnabledInBroker": true,
+            },
+          },
+        },
+      },
+      "Type": "AWS::MSK::Cluster",
+    },
+    "TestMskLogGroupCF743213": Object {
+      "DeletionPolicy": "Retain",
+      "Properties": Object {
+        "RetentionInDays": 731,
+      },
+      "Type": "AWS::Logs::LogGroup",
+      "UpdateReplacePolicy": "Retain",
+    },
+  },
+}
+`;
+
+exports[`successful scenarios uses SCRAM for access control 1`] = `
+Object {
+  "Conditions": Object {
+    "TestMskEnableIAMConditionF946AB65": Object {
+      "Fn::Equals": Array [
+        "SASL/SCRAM authentication",
+        "IAM access control",
+      ],
+    },
+    "TestMskEnableSCRAMConditionA8CE99C1": Object {
+      "Fn::Equals": Array [
+        "SASL/SCRAM authentication",
+        "SASL/SCRAM authentication",
+      ],
+    },
+  },
+  "Resources": Object {
+    "TestMskClusterSG891444DD": Object {
+      "Properties": Object {
+        "GroupDescription": "Security group for the MSK cluster",
+        "Tags": Array [
+          Object {
+            "Key": "Name",
+            "Value": "msk-cluster-sg",
+          },
+        ],
+        "VpcId": "my-vpc-id",
+      },
+      "Type": "AWS::EC2::SecurityGroup",
+    },
+    "TestMskIngressRule0C59EED6B": Object {
+      "Properties": Object {
+        "Description": "ZooKeeper Plaintext",
+        "FromPort": 2181,
+        "GroupId": Object {
+          "Ref": "TestMskClusterSG891444DD",
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": Object {
+          "Ref": "TestMskClusterSG891444DD",
+        },
+        "ToPort": 2181,
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
+    },
+    "TestMskIngressRule1E08B69D9": Object {
+      "Properties": Object {
+        "Description": "ZooKeeper TLS",
+        "FromPort": 2182,
+        "GroupId": Object {
+          "Ref": "TestMskClusterSG891444DD",
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": Object {
+          "Ref": "TestMskClusterSG891444DD",
+        },
+        "ToPort": 2182,
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
+    },
+    "TestMskIngressRule2463D5365": Object {
+      "Properties": Object {
+        "Description": "Bootstrap servers Plaintext",
+        "FromPort": 9092,
+        "GroupId": Object {
+          "Ref": "TestMskClusterSG891444DD",
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": Object {
+          "Ref": "TestMskClusterSG891444DD",
+        },
+        "ToPort": 9092,
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
+    },
+    "TestMskIngressRule3A5524C16": Object {
+      "Properties": Object {
+        "Description": "Bootstrap servers TLS",
+        "FromPort": 9094,
+        "GroupId": Object {
+          "Ref": "TestMskClusterSG891444DD",
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": Object {
+          "Ref": "TestMskClusterSG891444DD",
+        },
+        "ToPort": 9094,
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
+    },
+    "TestMskIngressRule460B95A77": Object {
+      "Properties": Object {
+        "Description": "SASL/SCRAM",
+        "FromPort": 9096,
+        "GroupId": Object {
+          "Ref": "TestMskClusterSG891444DD",
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": Object {
+          "Ref": "TestMskClusterSG891444DD",
+        },
+        "ToPort": 9096,
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
+    },
+    "TestMskIngressRule5CDEAF845": Object {
+      "Properties": Object {
+        "Description": "IAM",
+        "FromPort": 9098,
+        "GroupId": Object {
+          "Ref": "TestMskClusterSG891444DD",
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": Object {
+          "Ref": "TestMskClusterSG891444DD",
+        },
+        "ToPort": 9098,
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
+    },
+    "TestMskKafkaClusterD73AA77B": Object {
+      "Properties": Object {
+        "BrokerNodeGroupInfo": Object {
+          "BrokerAZDistribution": "DEFAULT",
+          "ClientSubnets": Array [
+            "subnet-a",
+            "subnet-b",
+          ],
+          "InstanceType": "kafka.m5.large",
+          "SecurityGroups": Array [
+            Object {
+              "Ref": "TestMskClusterSG891444DD",
+            },
+          ],
+          "StorageInfo": Object {
+            "EBSStorageInfo": Object {
+              "VolumeSize": 1000,
+            },
+          },
+        },
+        "ClientAuthentication": Object {
+          "Sasl": Object {
+            "Iam": Object {
+              "Enabled": Object {
+                "Fn::If": Array [
+                  "TestMskEnableIAMConditionF946AB65",
+                  true,
+                  false,
+                ],
+              },
+            },
+            "Scram": Object {
+              "Enabled": Object {
+                "Fn::If": Array [
+                  "TestMskEnableSCRAMConditionA8CE99C1",
+                  true,
+                  false,
+                ],
+              },
+            },
+          },
+        },
+        "ClusterName": Object {
+          "Fn::Join": Array [
+            "-",
+            Array [
+              "kafka-cluster",
+              Object {
+                "Ref": "AWS::AccountId",
+              },
+            ],
+          ],
+        },
+        "EncryptionInfo": Object {
+          "EncryptionAtRest": Object {
+            "DataVolumeKMSKeyId": "alias/aws/kafka",
+          },
+          "EncryptionInTransit": Object {
+            "ClientBroker": "TLS",
+            "InCluster": true,
+          },
+        },
+        "EnhancedMonitoring": "DEFAULT",
+        "KafkaVersion": "2.8.0",
+        "LoggingInfo": Object {
+          "BrokerLogs": Object {
+            "CloudWatchLogs": Object {
+              "Enabled": true,
+              "LogGroup": Object {
+                "Ref": "TestMskLogGroupCF743213",
+              },
+            },
+          },
+        },
+        "NumberOfBrokerNodes": 2,
         "OpenMonitoring": Object {
           "Prometheus": Object {
             "JmxExporter": Object {

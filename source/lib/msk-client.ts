@@ -24,6 +24,7 @@ export interface KafkaClientProps {
     readonly instanceType: string;
 
     readonly kafkaVersion: string;
+    readonly clusterName: string;
     readonly clusterSecurityGroupId: string;
 }
 
@@ -37,21 +38,36 @@ export class KafkaClient extends cdk.Construct {
     constructor(scope: cdk.Construct, id: string, props: KafkaClientProps) {
         super(scope, id);
 
-        const instanceProfile = this.createInstanceProfile();
+        const instanceProfile = this.createInstanceProfile(props.clusterName);
 
         const userDataCommands = [
             '#!/bin/bash',
             'yum update -y',
-            'yum install java-1.8.0 python3 -y',
+            'yum install java-11-amazon-corretto-headless python3 -y',
 
             'mkdir -p /home/kafka && cd /home/kafka',
             `wget https://archive.apache.org/dist/kafka/${props.kafkaVersion}/kafka_2.12-${props.kafkaVersion}.tgz`,
             `tar -xzf kafka_2.12-${props.kafkaVersion}.tgz --strip 1 && rm kafka_2.12-${props.kafkaVersion}.tgz`,
 
+            'wget https://github.com/aws/aws-msk-iam-auth/releases/download/1.1.0/aws-msk-iam-auth-1.1.0-all.jar',
+            'mv aws-msk-iam-auth-1.1.0-all.jar ./libs',
+
             `find /usr/lib/jvm/ -name "cacerts" | xargs -I '{}' cp '{}' /tmp/kafka.client.truststore.jks`,
-            `touch bin/client.properties`,
-            `echo "security.protocol=SSL" >> bin/client.properties`,
-            `echo "ssl.truststore.location=/tmp/kafka.client.truststore.jks" >> bin/client.properties`,
+
+            `touch bin/client-ssl.properties`,
+            `echo "security.protocol=SSL" >> bin/client-ssl.properties`,
+            `echo "ssl.truststore.location=/tmp/kafka.client.truststore.jks" >> bin/client-ssl.properties`,
+
+            `touch bin/client-sasl.properties`,
+            `echo "security.protocol=SASL_SSL" >> bin/client-sasl.properties`,
+            `echo "sasl.mechanism=SCRAM-SHA-512" >> bin/client-sasl.properties`,
+            `echo "ssl.truststore.location=/tmp/kafka.client.truststore.jks" >> bin/client-sasl.properties`,
+
+            `touch bin/client-iam.properties`,
+            `echo "security.protocol=SASL_SSL" >> bin/client-iam.properties`,
+            `echo "sasl.mechanism=AWS_MSK_IAM" >> bin/client-iam.properties`,
+            `echo "sasl.jaas.config = software.amazon.msk.auth.iam.IAMLoginModule required;" >> bin/client-iam.properties`,
+            `echo "sasl.client.callback.handler.class = software.amazon.msk.auth.iam.IAMClientCallbackHandler" >> bin/client-iam.properties`,
         ];
 
         this.Instance = new ec2.CfnInstance(this, 'Client', {
@@ -65,7 +81,7 @@ export class KafkaClient extends cdk.Construct {
         })
     }
 
-    private createInstanceProfile(): iam.CfnInstanceProfile {
+    private createInstanceProfile(clusterName: string): iam.CfnInstanceProfile {
         const role = new iam.Role(this, 'Role', {
             assumedBy: new iam.ServicePrincipal('ec2.amazonaws.com')
         });
@@ -87,10 +103,48 @@ export class KafkaClient extends cdk.Construct {
         ssmPolicy.attachToRole(role);
 
         const mskPolicy = new iam.Policy(this, 'MskPolicy', {
-            statements: [new iam.PolicyStatement({
-                resources: ['*'],
-                actions: ['kafka:DescribeCluster', 'kafka:GetBootstrapBrokers']
-            })]
+            statements: [
+                new iam.PolicyStatement({
+                    sid: 'ClusterMetadata',
+                    resources: ['*'],
+                    actions: ['kafka:DescribeCluster', 'kafka:GetBootstrapBrokers']
+                }),
+
+                // For topics and groups, the resources contain "/*/*":
+                // - The first one refers to the cluster UUID
+                // - The second one refers to the topic / group name
+                // Since this is meant to be a generic client, we use "*" so that this instance can create any topics or groups.
+                new iam.PolicyStatement({
+                    sid: 'ClusterAPIs',
+                    resources: [
+                        // The cluster ARN in MSK contains an UUID, which is only available after the cluster is created.
+                        // Example: arn:${Partition}:kafka:${Region}:${Account}:cluster/${ClusterName}/${UUID}
+                        `arn:${cdk.Aws.PARTITION}:kafka:${cdk.Aws.REGION}:${cdk.Aws.ACCOUNT_ID}:cluster/${clusterName}/*`,
+                        `arn:${cdk.Aws.PARTITION}:kafka:${cdk.Aws.REGION}:${cdk.Aws.ACCOUNT_ID}:group/${clusterName}/*/*`
+                    ],
+                    actions: [
+                        'kafka-cluster:Connect',
+                        'kafka-cluster:DescribeCluster',
+                        'kafka-cluster:AlterGroup',
+                        'kafka-cluster:DescribeGroup',
+                        'kafka-cluster:DeleteGroup'
+                    ]
+                }),
+                new iam.PolicyStatement({
+                    sid: 'ProducerAPIs',
+                    resources: [
+                        `arn:${cdk.Aws.PARTITION}:kafka:${cdk.Aws.REGION}:${cdk.Aws.ACCOUNT_ID}:topic/${clusterName}/*/*`
+                    ],
+                    actions: ['kafka-cluster:*Topic*', 'kafka-cluster:WriteData']
+                }),
+                new iam.PolicyStatement({
+                    sid: 'ConsumerAPIs',
+                    resources: [
+                        `arn:${cdk.Aws.PARTITION}:kafka:${cdk.Aws.REGION}:${cdk.Aws.ACCOUNT_ID}:topic/${clusterName}/*/*`
+                    ],
+                    actions: ['kafka-cluster:*Topic*', 'kafka-cluster:ReadData']
+                }),
+            ]
         });
 
         this.addW12Suppression(mskPolicy, 'MSK actions do not support resource level permissions');

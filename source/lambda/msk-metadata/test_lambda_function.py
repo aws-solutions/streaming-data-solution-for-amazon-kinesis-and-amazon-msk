@@ -20,6 +20,8 @@ from unittest.mock import patch
 class LambdaTest(unittest.TestCase):
     BOOTSTRAP_SERVER_PLAINTEXT = 'bootstrap-url1-plaintext:9092,bootstrap-url2-plaintext:9092'
     BOOTSTRAP_SERVER_TLS = 'bootstrap-url1-tls:9094,bootstrap-url2-tls:9094'
+    BOOTSTRAP_SERVER_IAM = 'bootstrap-url1-iam:9096,bootstrap-url2-iam:9096'
+
     CLIENT_SUBNETS = ['subnet-a', 'subnet-b']
     SECURITY_GROUPS = ['sg-abc123']
 
@@ -55,6 +57,11 @@ class LambdaTest(unittest.TestCase):
         stubber.add_response('get_bootstrap_brokers', {
             'BootstrapBrokerString': cls.BOOTSTRAP_SERVER_PLAINTEXT,
             'BootstrapBrokerStringTls': cls.BOOTSTRAP_SERVER_TLS
+        })
+
+        # Cluster configured for "IAM access control"
+        stubber.add_response('get_bootstrap_brokers', {
+            'BootstrapBrokerStringSaslIam': cls.BOOTSTRAP_SERVER_IAM
         })
 
         stubber.activate()
@@ -99,4 +106,15 @@ class LambdaTest(unittest.TestCase):
         bootstrap_servers = _get_bootstrap_brokers('my-cluster-arn')
 
         self.assertEqual(self.BOOTSTRAP_SERVER_TLS, bootstrap_servers)
-        self.assertNotEquals(self.BOOTSTRAP_SERVER_PLAINTEXT, bootstrap_servers)
+        self.assertNotEqual(self.BOOTSTRAP_SERVER_PLAINTEXT, bootstrap_servers)
+
+    @patch.object(boto3, 'client')
+    def test_05_get_bootstrap_servers_iam(self, mock_client):
+        mock_client.return_value = self._kafka
+
+        try:
+            from lambda_function import _get_bootstrap_brokers
+            _get_bootstrap_brokers('my-cluster-arn')
+            self.fail('Custom resource should fail when cluster is using IAM')
+        except:
+            pass

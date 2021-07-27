@@ -112,6 +112,7 @@ Object {
       "Condition": "HelperAnonymousDatatoAWS6303A68E",
       "DeletionPolicy": "Delete",
       "Properties": Object {
+        "AccessControlMethod": "IAM access control",
         "BrokerInstanceType": "kafka.m5.large",
         "BufferingInterval": 300,
         "BufferingSize": 5,

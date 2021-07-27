@@ -13,6 +13,8 @@
 
 import * as cdk from '@aws-cdk/core';
 import * as lambda from '@aws-cdk/aws-lambda';
+import * as apigw from '@aws-cdk/aws-apigateway';
+import * as cognito from '@aws-cdk/aws-cognito';
 
 import { ApiGatewayToKinesisStreams } from '@aws-solutions-constructs/aws-apigateway-kinesisstreams';
 import { KinesisStreamsToLambda } from '@aws-solutions-constructs/aws-kinesisstreams-lambda';
@@ -28,7 +30,6 @@ export class ApiGwKdsLambda extends cdk.Stack {
 
         //---------------------------------------------------------------------
         // Kinesis Data Stream configuration
-
         const shardCount = new cdk.CfnParameter(this, 'ShardCount', {
             type: 'Number',
             default: 2,
@@ -57,7 +58,6 @@ export class ApiGwKdsLambda extends cdk.Stack {
 
         //---------------------------------------------------------------------
         // API Gateway configuration
-
         const rateLimit = new cdk.CfnParameter(this, 'ThrottlingRateLimit', {
             type: 'Number',
             default: 100,
@@ -72,6 +72,14 @@ export class ApiGwKdsLambda extends cdk.Stack {
             maxValue: 5000
         });
 
+        /*
+            The following method will create an user pool and an app client.
+            If you have existing resources, you can modify this file to import them:
+                cognito.UserPool.fromUserPoolArn(this, 'ExistingUserPool', 'my-user-pool-arn');
+                cognito.UserPoolClient.fromUserPoolClientId(this, 'ExistingAppClient', 'my-client-id');
+        */
+        const { userPool, userPoolClient } = this.createCognitoResources();
+
         const apiGwToKds = new ApiGatewayToKinesisStreams(this, 'ApiGwKds', {
             apiGatewayProps: {
                 restApiName: `${cdk.Aws.STACK_NAME}-kinesis-proxy`,
@@ -82,6 +90,12 @@ export class ApiGwKdsLambda extends cdk.Stack {
                             throttlingBurstLimit: burstLimit.valueAsNumber
                         }
                     }
+                },
+                defaultMethodOptions: {
+                    authorizationType: apigw.AuthorizationType.COGNITO,
+                    authorizer: new apigw.CognitoUserPoolsAuthorizer(this, 'ApiAuthorizer', {
+                        cognitoUserPools: [userPool]
+                    })
                 }
             },
             existingStreamObj: kds.Stream
@@ -89,7 +103,6 @@ export class ApiGwKdsLambda extends cdk.Stack {
 
         //---------------------------------------------------------------------
         // Lambda function configuration
-
         const batchSize = new cdk.CfnParameter(this, 'BatchSize', {
             type: 'Number',
             default: 100,
@@ -132,7 +145,6 @@ export class ApiGwKdsLambda extends cdk.Stack {
 
         //---------------------------------------------------------------------
         // Monitoring (dashboard and alarms) configuration
-
         new DataStreamMonitoring(this, 'Monitoring', {
             streamName: kds.Stream.streamName,
             lambdaFunctionName: kdsToLambda.lambdaFunction.functionName
@@ -140,7 +152,6 @@ export class ApiGwKdsLambda extends cdk.Stack {
 
         //---------------------------------------------------------------------
         // Solution metrics
-
         new SolutionHelper(this, 'SolutionHelper', {
             solutionId: props.solutionId,
             pattern: ApiGwKdsLambda.name,
@@ -152,7 +163,6 @@ export class ApiGwKdsLambda extends cdk.Stack {
 
         //---------------------------------------------------------------------
         // Template metadata
-
         this.templateOptions.metadata = {
             'AWS::CloudFormation::Interface': {
                 ParameterGroups: [
@@ -202,6 +212,15 @@ export class ApiGwKdsLambda extends cdk.Stack {
 
         //---------------------------------------------------------------------
         // Stack outputs
+        new cdk.CfnOutput(this, 'UserPoolId', {
+            description: 'ID of the Amazon Cognito user pool',
+            value: userPool.userPoolId
+        });
+
+        new cdk.CfnOutput(this, 'UserPoolClientId', {
+            description: 'ID of the Amazon Cognito user pool client',
+            value: userPoolClient.userPoolClientId
+        });
 
         new cdk.CfnOutput(this, 'ProxyApiId', {
             description: 'ID of the proxy API',
@@ -222,5 +241,32 @@ export class ApiGwKdsLambda extends cdk.Stack {
             description: 'ARN of the AWS Lambda function',
             value: kdsToLambda.lambdaFunction.functionArn
         });
+    }
+
+    private createCognitoResources() {
+        const userPool = new cognito.UserPool(this, 'ApiUserPool', {
+            standardAttributes: {
+                givenName: { required: true, mutable: true },
+                email: { required: true, mutable: true }
+            },
+            passwordPolicy: {
+                minLength: 8,
+                requireDigits: true,
+                requireLowercase: true,
+                requireSymbols: true,
+                requireUppercase: true,
+                tempPasswordValidity: cdk.Duration.days(1)
+            },
+            removalPolicy: cdk.RemovalPolicy.RETAIN
+        });
+
+        // Set AdvancedSecurityMode in the Cfn resource until this issue is closed:
+        // https://github.com/aws/aws-cdk/issues/7405
+        (userPool.node.defaultChild as cognito.CfnUserPool).userPoolAddOns = {
+            advancedSecurityMode: 'ENFORCED'
+        };
+
+        const userPoolClient = new cognito.UserPoolClient(this, 'ApiUserPoolClient', { userPool });
+        return { userPool, userPoolClient };
     }
 }

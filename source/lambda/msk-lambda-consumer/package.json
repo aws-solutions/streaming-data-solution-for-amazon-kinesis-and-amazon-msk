@@ -1,6 +1,6 @@
 {
   "name": "msk-lambda-consumer",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "sample lambda consumer for MSK",
   "main": "index.js",
   "scripts": {
@@ -13,7 +13,7 @@
     "name": "aws-solutions-builder"
   },
   "devDependencies": {
-    "chai": "4.2.0",
+    "chai": "4.3.4",
     "jest": "^26.4.2"
   },
   "jest": {

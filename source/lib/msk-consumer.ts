@@ -20,6 +20,7 @@ import { CfnNagHelper } from './cfn-nag-helper';
 
 export interface KafkaConsumerProps {
     readonly clusterArn: string;
+    readonly scramSecretArn?: string;
 
     readonly batchSize: number;
     readonly startingPosition: lambda.StartingPosition;
@@ -33,15 +34,14 @@ export interface KafkaConsumerProps {
 
 export class KafkaConsumer extends cdk.Construct {
     public readonly Function: lambda.IFunction;
-    public readonly EventMapping: lambda.EventSourceMapping;
+
+    private readonly IsSecretEmpty: cdk.CfnCondition;
+    private readonly IsSecretNotEmpty: cdk.CfnCondition;
 
     private MIN_BATCH_SIZE: number = 1;
     private MAX_BATCH_SIZE: number = 10000;
     private MIN_TIMEOUT_SECONDS: number = 1;
-
-    // According to the Lambda docs (https://docs.aws.amazon.com/lambda/latest/dg/kafka-using-cluster.html#kafka-hosting-how-it-works):
-    // For Amazon MSK and self-managed Apache Kafka, the maximum amount of time that Lambda allows a function to run before stopping it is 14 minutes.
-    private MAX_TIMEOUT_SECONDS: number = 840;
+    private MAX_TIMEOUT_SECONDS: number = 900;
 
     constructor(scope: cdk.Construct, id: string, props: KafkaConsumerProps) {
         super(scope, id);
@@ -57,6 +57,57 @@ export class KafkaConsumer extends cdk.Construct {
             throw new Error(`timeout must be a value between ${this.MIN_TIMEOUT_SECONDS} and ${this.MAX_TIMEOUT_SECONDS} seconds (given ${timeoutSeconds})`);
         }
 
+        this.IsSecretEmpty = new cdk.CfnCondition(this, 'IsSecretEmptyCondition', {
+            expression: cdk.Fn.conditionEquals(props.scramSecretArn, '')
+        });
+
+        this.IsSecretNotEmpty = new cdk.CfnCondition(this, 'IsSecretNotEmptyCondition', {
+            expression: cdk.Fn.conditionNot(this.IsSecretEmpty)
+        });
+
+        this.Function = this.createFunction(props);
+    }
+
+    private createFunction(props: KafkaConsumerProps) {
+        const executionRole = this.createRole();
+        const secretPolicy = this.createPolicyForSecret(executionRole, props.scramSecretArn!);
+
+        const lambdaFn = new lambda.Function(this, 'Consumer', {
+            runtime: lambda.Runtime.NODEJS_14_X,
+            handler: 'index.handler',
+            role: executionRole,
+            code: props.code,
+            timeout: props.timeout,
+            environment: props.environmentVariables
+        });
+
+        const mappingProps: lambda.EventSourceMappingOptions = {
+            eventSourceArn: props.clusterArn,
+            startingPosition: props.startingPosition,
+            batchSize: props.batchSize,
+            kafkaTopic: props.topicName,
+            enabled: props.enabled
+        };
+
+        const mappingWithoutSecret = lambdaFn.addEventSourceMapping('Mapping', mappingProps);
+        const mappingWithSecret = lambdaFn.addEventSourceMapping('MappingWithSecret', {
+            ...mappingProps,
+            sourceAccessConfigurations: [{
+                type: lambda.SourceAccessConfigurationType.SASL_SCRAM_512_AUTH,
+                uri: props.scramSecretArn!
+            }]
+        });
+
+        (mappingWithoutSecret.node.defaultChild as lambda.CfnEventSourceMapping).cfnOptions.condition = this.IsSecretEmpty;
+
+        const cfnMapping = mappingWithSecret.node.defaultChild as lambda.CfnEventSourceMapping;
+        cfnMapping.cfnOptions.condition = this.IsSecretNotEmpty;
+        cfnMapping.addDependsOn(secretPolicy);
+
+        return lambdaFn;
+    }
+
+    private createRole() {
         const executionRole = new ExecutionRole(this, 'Role', {
             inlinePolicyName: 'MskPolicy',
             inlinePolicyDocument: new iam.PolicyDocument({
@@ -65,6 +116,7 @@ export class KafkaConsumer extends cdk.Construct {
                         actions: [
                             'kafka:DescribeCluster',
                             'kafka:GetBootstrapBrokers',
+                            'kafka:ListScramSecrets',
                             'ec2:CreateNetworkInterface',
                             'ec2:DescribeNetworkInterfaces',
                             'ec2:DescribeVpcs',
@@ -84,21 +136,68 @@ export class KafkaConsumer extends cdk.Construct {
             Reason: 'Actions do not support resource level permissions'
         });
 
-        this.Function = new lambda.Function(this, 'Consumer', {
-            runtime: lambda.Runtime.NODEJS_14_X,
-            handler: 'index.handler',
-            role: executionRole.Role,
-            code: props.code,
-            timeout: props.timeout,
-            environment: props.environmentVariables
+        return executionRole.Role;
+    }
+
+    private createPolicyForSecret(functionRole: iam.IRole, scramSecretArn: string) {
+        const kmsKeyArn = this.getKmsKeyForSecret(scramSecretArn);
+
+        const secretPolicy = new iam.Policy(this, 'SecretPolicy', {
+            document: new iam.PolicyDocument({
+                statements: [
+                    new iam.PolicyStatement({
+                        actions: ['kms:Decrypt'],
+                        resources: [kmsKeyArn],
+                        conditions: {
+                            StringEquals: {
+                                'kms:ViaService': `secretsmanager.${cdk.Aws.REGION}.${cdk.Aws.URL_SUFFIX}`
+                            }
+                        }
+                    }),
+                    new iam.PolicyStatement({
+                        actions: ['secretsmanager:GetSecretValue'],
+                        resources: [scramSecretArn]
+                    })
+                ]
+            }),
+            roles: [functionRole]
         });
 
-        this.EventMapping = this.Function.addEventSourceMapping('Mapping', {
-            eventSourceArn: props.clusterArn,
-            startingPosition: props.startingPosition,
-            batchSize: props.batchSize,
-            kafkaTopic: props.topicName,
-            enabled: props.enabled
+        const cfnPolicy = secretPolicy.node.defaultChild as iam.CfnPolicy;
+        cfnPolicy.cfnOptions.condition = this.IsSecretNotEmpty;
+
+        return cfnPolicy;
+    }
+
+    private getKmsKeyForSecret(secretArn: string) {
+        const customResouceRole = new ExecutionRole(this, 'CustomResourceRole', {
+            inlinePolicyName: 'SecretMetadataPolicy',
+            inlinePolicyDocument: new iam.PolicyDocument({
+                statements: [new iam.PolicyStatement({
+                    resources: [secretArn],
+                    actions: ['secretsmanager:DescribeSecret']
+                })]
+            })
         });
+
+        const customResourceFunction = new lambda.Function(this, 'CustomResource', {
+            runtime: lambda.Runtime.PYTHON_3_8,
+            handler: 'lambda_function.handler',
+            role: customResouceRole.Role,
+            code: lambda.Code.fromAsset('lambda/secrets-manager-metadata'),
+            timeout: cdk.Duration.seconds(30)
+        });
+
+        const secretMetadata = new cdk.CustomResource(this, 'SecretMetadata', {
+            serviceToken: customResourceFunction.functionArn,
+            properties: { SecretArn: secretArn },
+            resourceType: 'Custom::SecretMetadata'
+        });
+
+        (customResouceRole.Role.node.defaultChild as iam.CfnRole).cfnOptions.condition = this.IsSecretNotEmpty;
+        (customResourceFunction.node.defaultChild as lambda.CfnFunction).cfnOptions.condition = this.IsSecretNotEmpty;
+        (secretMetadata.node.defaultChild as cdk.CfnResource).cfnOptions.condition = this.IsSecretNotEmpty;
+
+        return secretMetadata.getAttString('KmsKeyId');
     }
 }

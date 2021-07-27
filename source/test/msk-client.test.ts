@@ -31,6 +31,7 @@ test('creates a Kafka client instance', () => {
         instanceType: 't3.small',
 
         clusterSecurityGroupId: 'cluster-sg',
+        clusterName: 'my-cluster',
         kafkaVersion: '2.6.0'
     });
 
@@ -46,6 +47,7 @@ test('adds cfn_nag suppressions', () => {
         instanceType: 't3.small',
 
         clusterSecurityGroupId: 'cluster-sg',
+        clusterName: 'my-cluster',
         kafkaVersion: '2.6.0'
     });
 

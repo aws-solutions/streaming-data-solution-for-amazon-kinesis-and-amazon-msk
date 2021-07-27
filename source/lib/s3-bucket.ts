@@ -13,8 +13,9 @@
 
 import * as cdk from '@aws-cdk/core';
 import * as s3 from '@aws-cdk/aws-s3';
+import * as iam from '@aws-cdk/aws-iam';
 
-import { CfnNagHelper, CfnNagSuppression } from './cfn-nag-helper';
+import { CfnNagHelper } from './cfn-nag-helper';
 
 export interface EncryptedBucketProps {
     readonly enableIntelligentTiering: boolean;
@@ -32,7 +33,10 @@ export class EncryptedBucket extends cdk.Construct {
         }
 
         const accessLogsBucket = new s3.Bucket(this, 'AccessLogsBucket', securitySettings);
-        this.addCfnNagSuppressions(accessLogsBucket, true);
+        CfnNagHelper.addSuppressions(accessLogsBucket.node.defaultChild as s3.CfnBucket, [
+            { Id: 'W35', Reason: 'This bucket is used to store access logs for another bucket' },
+            { Id: 'W51', Reason: 'This bucket does not need a bucket policy' }
+        ]);
 
         const rules: s3.LifecycleRule[] = [{
             id: 'multipart-upload-rule',
@@ -57,22 +61,18 @@ export class EncryptedBucket extends cdk.Construct {
             lifecycleRules: rules
         });
 
-        this.addCfnNagSuppressions(this.Bucket);
-    }
-
-    private addCfnNagSuppressions(bucket: s3.IBucket, includeW35?: boolean) {
-        const rules: CfnNagSuppression[] = [{
-            Id: 'W51',
-            Reason: 'This bucket does not need a bucket policy'
-        }];
-
-        if (includeW35) {
-            rules.push({
-                Id: 'W35',
-                Reason: 'This bucket is used to store access logs for another bucket'
-            });
-        }
-
-        CfnNagHelper.addSuppressions(bucket.node.defaultChild as s3.CfnBucket, rules);
+        this.Bucket.addToResourcePolicy(new iam.PolicyStatement({
+            sid: 'HttpsOnly',
+            effect: iam.Effect.DENY,
+            resources: [
+                this.Bucket.arnForObjects('*'),
+                this.Bucket.bucketArn
+            ],
+            actions: ['*'],
+            principals: [new iam.AnyPrincipal()],
+            conditions: {
+                Bool: { 'aws:SecureTransport': 'false' }
+            }
+        }));
     }
 }

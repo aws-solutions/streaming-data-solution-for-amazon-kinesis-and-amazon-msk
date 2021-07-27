@@ -2,7 +2,36 @@
 
 exports[`successful scenarios accepts CloudFormation parameters 1`] = `
 Object {
+  "Conditions": Object {
+    "TestMskIsSecretEmptyConditionD1E36ADB": Object {
+      "Fn::Equals": Array [
+        Object {
+          "Ref": "SecretArn",
+        },
+        "",
+      ],
+    },
+    "TestMskIsSecretNotEmptyCondition9929A158": Object {
+      "Fn::Not": Array [
+        Object {
+          "Condition": "TestMskIsSecretEmptyConditionD1E36ADB",
+        },
+      ],
+    },
+  },
   "Parameters": Object {
+    "AssetParameters46082e48b826df3817b5cfafd5bfc42d905840ad65d894855ec58966925e1292ArtifactHash8E89EA8E": Object {
+      "Description": "Artifact hash for asset \\"46082e48b826df3817b5cfafd5bfc42d905840ad65d894855ec58966925e1292\\"",
+      "Type": "String",
+    },
+    "AssetParameters46082e48b826df3817b5cfafd5bfc42d905840ad65d894855ec58966925e1292S3BucketD5D1EAB7": Object {
+      "Description": "S3 bucket for asset \\"46082e48b826df3817b5cfafd5bfc42d905840ad65d894855ec58966925e1292\\"",
+      "Type": "String",
+    },
+    "AssetParameters46082e48b826df3817b5cfafd5bfc42d905840ad65d894855ec58966925e1292S3VersionKey12D5174C": Object {
+      "Description": "S3 key for asset version \\"46082e48b826df3817b5cfafd5bfc42d905840ad65d894855ec58966925e1292\\"",
+      "Type": "String",
+    },
     "BatchSize": Object {
       "Type": "Number",
     },
@@ -13,6 +42,9 @@ Object {
       "Type": "String",
     },
     "LambdaCodeKey": Object {
+      "Type": "String",
+    },
+    "SecretArn": Object {
       "Type": "String",
     },
     "TopicName": Object {
@@ -46,6 +78,7 @@ Object {
       "Type": "AWS::Lambda::Function",
     },
     "TestMskConsumerMapping79C4A58A": Object {
+      "Condition": "TestMskIsSecretEmptyConditionD1E36ADB",
       "Properties": Object {
         "BatchSize": Object {
           "Ref": "BatchSize",
@@ -65,6 +98,166 @@ Object {
         ],
       },
       "Type": "AWS::Lambda::EventSourceMapping",
+    },
+    "TestMskConsumerMappingWithSecretBF6972F1": Object {
+      "Condition": "TestMskIsSecretNotEmptyCondition9929A158",
+      "DependsOn": Array [
+        "TestMskSecretPolicy272AB2E3",
+      ],
+      "Properties": Object {
+        "BatchSize": Object {
+          "Ref": "BatchSize",
+        },
+        "Enabled": true,
+        "EventSourceArn": Object {
+          "Ref": "ClusterArn",
+        },
+        "FunctionName": Object {
+          "Ref": "TestMskConsumer4592A744",
+        },
+        "SourceAccessConfigurations": Array [
+          Object {
+            "Type": "SASL_SCRAM_512_AUTH",
+            "URI": Object {
+              "Ref": "SecretArn",
+            },
+          },
+        ],
+        "StartingPosition": "LATEST",
+        "Topics": Array [
+          Object {
+            "Ref": "TopicName",
+          },
+        ],
+      },
+      "Type": "AWS::Lambda::EventSourceMapping",
+    },
+    "TestMskCustomResourceCD43A296": Object {
+      "Condition": "TestMskIsSecretNotEmptyCondition9929A158",
+      "DependsOn": Array [
+        "TestMskCustomResourceRoleDA0E0EAF",
+      ],
+      "Properties": Object {
+        "Code": Object {
+          "S3Bucket": Object {
+            "Ref": "AssetParameters46082e48b826df3817b5cfafd5bfc42d905840ad65d894855ec58966925e1292S3BucketD5D1EAB7",
+          },
+          "S3Key": Object {
+            "Fn::Join": Array [
+              "",
+              Array [
+                Object {
+                  "Fn::Select": Array [
+                    0,
+                    Object {
+                      "Fn::Split": Array [
+                        "||",
+                        Object {
+                          "Ref": "AssetParameters46082e48b826df3817b5cfafd5bfc42d905840ad65d894855ec58966925e1292S3VersionKey12D5174C",
+                        },
+                      ],
+                    },
+                  ],
+                },
+                Object {
+                  "Fn::Select": Array [
+                    1,
+                    Object {
+                      "Fn::Split": Array [
+                        "||",
+                        Object {
+                          "Ref": "AssetParameters46082e48b826df3817b5cfafd5bfc42d905840ad65d894855ec58966925e1292S3VersionKey12D5174C",
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            ],
+          },
+        },
+        "Handler": "lambda_function.handler",
+        "Role": Object {
+          "Fn::GetAtt": Array [
+            "TestMskCustomResourceRoleDA0E0EAF",
+            "Arn",
+          ],
+        },
+        "Runtime": "python3.8",
+        "Timeout": 30,
+      },
+      "Type": "AWS::Lambda::Function",
+    },
+    "TestMskCustomResourceRoleDA0E0EAF": Object {
+      "Condition": "TestMskIsSecretNotEmptyCondition9929A158",
+      "Properties": Object {
+        "AssumeRolePolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": Object {
+                "Service": "lambda.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "Policies": Array [
+          Object {
+            "PolicyDocument": Object {
+              "Statement": Array [
+                Object {
+                  "Action": Array [
+                    "logs:CreateLogGroup",
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents",
+                  ],
+                  "Effect": "Allow",
+                  "Resource": Object {
+                    "Fn::Join": Array [
+                      "",
+                      Array [
+                        "arn:",
+                        Object {
+                          "Ref": "AWS::Partition",
+                        },
+                        ":logs:",
+                        Object {
+                          "Ref": "AWS::Region",
+                        },
+                        ":",
+                        Object {
+                          "Ref": "AWS::AccountId",
+                        },
+                        ":log-group:/aws/lambda/*",
+                      ],
+                    ],
+                  },
+                },
+              ],
+              "Version": "2012-10-17",
+            },
+            "PolicyName": "CloudWatchLogsPolicy",
+          },
+          Object {
+            "PolicyDocument": Object {
+              "Statement": Array [
+                Object {
+                  "Action": "secretsmanager:DescribeSecret",
+                  "Effect": "Allow",
+                  "Resource": Object {
+                    "Ref": "SecretArn",
+                  },
+                },
+              ],
+              "Version": "2012-10-17",
+            },
+            "PolicyName": "SecretMetadataPolicy",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
     },
     "TestMskRole86578511": Object {
       "Metadata": Object {
@@ -134,6 +327,7 @@ Object {
                   "Action": Array [
                     "kafka:DescribeCluster",
                     "kafka:GetBootstrapBrokers",
+                    "kafka:ListScramSecrets",
                     "ec2:CreateNetworkInterface",
                     "ec2:DescribeNetworkInterfaces",
                     "ec2:DescribeVpcs",
@@ -153,13 +347,110 @@ Object {
       },
       "Type": "AWS::IAM::Role",
     },
+    "TestMskSecretMetadataF8DCB6CD": Object {
+      "Condition": "TestMskIsSecretNotEmptyCondition9929A158",
+      "DeletionPolicy": "Delete",
+      "Properties": Object {
+        "SecretArn": Object {
+          "Ref": "SecretArn",
+        },
+        "ServiceToken": Object {
+          "Fn::GetAtt": Array [
+            "TestMskCustomResourceCD43A296",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "Custom::SecretMetadata",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "TestMskSecretPolicy272AB2E3": Object {
+      "Condition": "TestMskIsSecretNotEmptyCondition9929A158",
+      "Properties": Object {
+        "PolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": "kms:Decrypt",
+              "Condition": Object {
+                "StringEquals": Object {
+                  "kms:ViaService": Object {
+                    "Fn::Join": Array [
+                      "",
+                      Array [
+                        "secretsmanager.",
+                        Object {
+                          "Ref": "AWS::Region",
+                        },
+                        ".",
+                        Object {
+                          "Ref": "AWS::URLSuffix",
+                        },
+                      ],
+                    ],
+                  },
+                },
+              },
+              "Effect": "Allow",
+              "Resource": Object {
+                "Fn::GetAtt": Array [
+                  "TestMskSecretMetadataF8DCB6CD",
+                  "KmsKeyId",
+                ],
+              },
+            },
+            Object {
+              "Action": "secretsmanager:GetSecretValue",
+              "Effect": "Allow",
+              "Resource": Object {
+                "Ref": "SecretArn",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "TestMskSecretPolicy272AB2E3",
+        "Roles": Array [
+          Object {
+            "Ref": "TestMskRole86578511",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
   },
 }
 `;
 
 exports[`successful scenarios creates a MSK Lambda consumer 1`] = `
 Object {
+  "Conditions": Object {
+    "TestMskIsSecretEmptyConditionD1E36ADB": Object {
+      "Fn::Equals": Array [
+        "my-secret-arn",
+        "",
+      ],
+    },
+    "TestMskIsSecretNotEmptyCondition9929A158": Object {
+      "Fn::Not": Array [
+        Object {
+          "Condition": "TestMskIsSecretEmptyConditionD1E36ADB",
+        },
+      ],
+    },
+  },
   "Parameters": Object {
+    "AssetParameters46082e48b826df3817b5cfafd5bfc42d905840ad65d894855ec58966925e1292ArtifactHash8E89EA8E": Object {
+      "Description": "Artifact hash for asset \\"46082e48b826df3817b5cfafd5bfc42d905840ad65d894855ec58966925e1292\\"",
+      "Type": "String",
+    },
+    "AssetParameters46082e48b826df3817b5cfafd5bfc42d905840ad65d894855ec58966925e1292S3BucketD5D1EAB7": Object {
+      "Description": "S3 bucket for asset \\"46082e48b826df3817b5cfafd5bfc42d905840ad65d894855ec58966925e1292\\"",
+      "Type": "String",
+    },
+    "AssetParameters46082e48b826df3817b5cfafd5bfc42d905840ad65d894855ec58966925e1292S3VersionKey12D5174C": Object {
+      "Description": "S3 key for asset version \\"46082e48b826df3817b5cfafd5bfc42d905840ad65d894855ec58966925e1292\\"",
+      "Type": "String",
+    },
     "LambdaCodeBucket": Object {
       "Type": "String",
     },
@@ -199,6 +490,7 @@ Object {
       "Type": "AWS::Lambda::Function",
     },
     "TestMskConsumerMapping79C4A58A": Object {
+      "Condition": "TestMskIsSecretEmptyConditionD1E36ADB",
       "Properties": Object {
         "BatchSize": 10,
         "Enabled": true,
@@ -212,6 +504,156 @@ Object {
         ],
       },
       "Type": "AWS::Lambda::EventSourceMapping",
+    },
+    "TestMskConsumerMappingWithSecretBF6972F1": Object {
+      "Condition": "TestMskIsSecretNotEmptyCondition9929A158",
+      "DependsOn": Array [
+        "TestMskSecretPolicy272AB2E3",
+      ],
+      "Properties": Object {
+        "BatchSize": 10,
+        "Enabled": true,
+        "EventSourceArn": "my-cluster-arn",
+        "FunctionName": Object {
+          "Ref": "TestMskConsumer4592A744",
+        },
+        "SourceAccessConfigurations": Array [
+          Object {
+            "Type": "SASL_SCRAM_512_AUTH",
+            "URI": "my-secret-arn",
+          },
+        ],
+        "StartingPosition": "LATEST",
+        "Topics": Array [
+          "my-topic",
+        ],
+      },
+      "Type": "AWS::Lambda::EventSourceMapping",
+    },
+    "TestMskCustomResourceCD43A296": Object {
+      "Condition": "TestMskIsSecretNotEmptyCondition9929A158",
+      "DependsOn": Array [
+        "TestMskCustomResourceRoleDA0E0EAF",
+      ],
+      "Properties": Object {
+        "Code": Object {
+          "S3Bucket": Object {
+            "Ref": "AssetParameters46082e48b826df3817b5cfafd5bfc42d905840ad65d894855ec58966925e1292S3BucketD5D1EAB7",
+          },
+          "S3Key": Object {
+            "Fn::Join": Array [
+              "",
+              Array [
+                Object {
+                  "Fn::Select": Array [
+                    0,
+                    Object {
+                      "Fn::Split": Array [
+                        "||",
+                        Object {
+                          "Ref": "AssetParameters46082e48b826df3817b5cfafd5bfc42d905840ad65d894855ec58966925e1292S3VersionKey12D5174C",
+                        },
+                      ],
+                    },
+                  ],
+                },
+                Object {
+                  "Fn::Select": Array [
+                    1,
+                    Object {
+                      "Fn::Split": Array [
+                        "||",
+                        Object {
+                          "Ref": "AssetParameters46082e48b826df3817b5cfafd5bfc42d905840ad65d894855ec58966925e1292S3VersionKey12D5174C",
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            ],
+          },
+        },
+        "Handler": "lambda_function.handler",
+        "Role": Object {
+          "Fn::GetAtt": Array [
+            "TestMskCustomResourceRoleDA0E0EAF",
+            "Arn",
+          ],
+        },
+        "Runtime": "python3.8",
+        "Timeout": 30,
+      },
+      "Type": "AWS::Lambda::Function",
+    },
+    "TestMskCustomResourceRoleDA0E0EAF": Object {
+      "Condition": "TestMskIsSecretNotEmptyCondition9929A158",
+      "Properties": Object {
+        "AssumeRolePolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": Object {
+                "Service": "lambda.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "Policies": Array [
+          Object {
+            "PolicyDocument": Object {
+              "Statement": Array [
+                Object {
+                  "Action": Array [
+                    "logs:CreateLogGroup",
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents",
+                  ],
+                  "Effect": "Allow",
+                  "Resource": Object {
+                    "Fn::Join": Array [
+                      "",
+                      Array [
+                        "arn:",
+                        Object {
+                          "Ref": "AWS::Partition",
+                        },
+                        ":logs:",
+                        Object {
+                          "Ref": "AWS::Region",
+                        },
+                        ":",
+                        Object {
+                          "Ref": "AWS::AccountId",
+                        },
+                        ":log-group:/aws/lambda/*",
+                      ],
+                    ],
+                  },
+                },
+              ],
+              "Version": "2012-10-17",
+            },
+            "PolicyName": "CloudWatchLogsPolicy",
+          },
+          Object {
+            "PolicyDocument": Object {
+              "Statement": Array [
+                Object {
+                  "Action": "secretsmanager:DescribeSecret",
+                  "Effect": "Allow",
+                  "Resource": "my-secret-arn",
+                },
+              ],
+              "Version": "2012-10-17",
+            },
+            "PolicyName": "SecretMetadataPolicy",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
     },
     "TestMskRole86578511": Object {
       "Metadata": Object {
@@ -281,6 +723,7 @@ Object {
                   "Action": Array [
                     "kafka:DescribeCluster",
                     "kafka:GetBootstrapBrokers",
+                    "kafka:ListScramSecrets",
                     "ec2:CreateNetworkInterface",
                     "ec2:DescribeNetworkInterfaces",
                     "ec2:DescribeVpcs",
@@ -299,6 +742,72 @@ Object {
         ],
       },
       "Type": "AWS::IAM::Role",
+    },
+    "TestMskSecretMetadataF8DCB6CD": Object {
+      "Condition": "TestMskIsSecretNotEmptyCondition9929A158",
+      "DeletionPolicy": "Delete",
+      "Properties": Object {
+        "SecretArn": "my-secret-arn",
+        "ServiceToken": Object {
+          "Fn::GetAtt": Array [
+            "TestMskCustomResourceCD43A296",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "Custom::SecretMetadata",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "TestMskSecretPolicy272AB2E3": Object {
+      "Condition": "TestMskIsSecretNotEmptyCondition9929A158",
+      "Properties": Object {
+        "PolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": "kms:Decrypt",
+              "Condition": Object {
+                "StringEquals": Object {
+                  "kms:ViaService": Object {
+                    "Fn::Join": Array [
+                      "",
+                      Array [
+                        "secretsmanager.",
+                        Object {
+                          "Ref": "AWS::Region",
+                        },
+                        ".",
+                        Object {
+                          "Ref": "AWS::URLSuffix",
+                        },
+                      ],
+                    ],
+                  },
+                },
+              },
+              "Effect": "Allow",
+              "Resource": Object {
+                "Fn::GetAtt": Array [
+                  "TestMskSecretMetadataF8DCB6CD",
+                  "KmsKeyId",
+                ],
+              },
+            },
+            Object {
+              "Action": "secretsmanager:GetSecretValue",
+              "Effect": "Allow",
+              "Resource": "my-secret-arn",
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "TestMskSecretPolicy272AB2E3",
+        "Roles": Array [
+          Object {
+            "Ref": "TestMskRole86578511",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
     },
   },
 }

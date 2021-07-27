@@ -3,7 +3,7 @@ The solution implements three patterns with more coming soon. All of them use Am
 
 ### Networking configuration
 We recommend launching the Amazon MSK cluster in private subnets (where the default route points to a NAT gateway), as this networking setup is required if you plan to use AWS Lambda or Amazon Kinesis Data Analytics to read data from the cluster.
-For more details, refer to [Adding an Amazon MSK cluster as an event source](https://docs.aws.amazon.com/lambda/latest/dg/services-msk-topic-add.html#services-msk-vpc-config) and [Internet and Service Access for a VPC-Connected Kinesis Data Analytics application](https://docs.aws.amazon.com/kinesisanalytics/latest/java/vpc-internet.html).
+For more details, refer to [Adding Amazon MSK as an event source](https://docs.aws.amazon.com/lambda/latest/dg/with-msk.html#services-msk-vpc-config) and [Internet and Service Access for a VPC-Connected Kinesis Data Analytics application](https://docs.aws.amazon.com/kinesisanalytics/latest/java/vpc-internet.html).
 
 If you don't have an Amazon VPC following this pattern, you can use the [Modular and Scalable VPC Architecture](https://aws.amazon.com/quickstart/architecture/vpc/), which provides a networking foundation based on AWS best practices and guidelines.
 
@@ -26,7 +26,7 @@ Run the _describe-cluster_ CLI command and save the value for the _ZookeeperConn
 aws kafka describe-cluster --cluster-arn <cluster-arn> --region <aws-region>
 ```
 
-Run the _get-bootstrap-brokers_ CLI command and save the value for the _BootstrapBrokerStringTls_ property:
+Run the _get-bootstrap-brokers_ CLI command and save the value for the _BootstrapBrokerString_ property:
 ```
 aws kafka get-bootstrap-brokers --cluster-arn <cluster-arn> --region <aws-region>
 ```
@@ -34,13 +34,15 @@ aws kafka get-bootstrap-brokers --cluster-arn <cluster-arn> --region <aws-region
 #### 2. Create topic and produce data
 > **Note**: If the command returns an _InvalidReplicationFactorException_, make sure the _replication-factor_ parameter is not larger than the number of available brokers.
 
+> **Note**: The client configuration depends on the access control method selected when launching the stack. For `None` (which is the default), use `client-ssl.properties`; for `IAM access control`, use `client-iam.properties`; and for `SASL/SCRAM`, use `client-sasl.properties`.
+
 ```
 sudo su
 cd /home/kafka/bin
 
 ./kafka-topics.sh --create --zookeeper <ZookeeperConnectString> --replication-factor 2 --partitions 1 --topic MyTopic
-./kafka-topics.sh --list --bootstrap-server <BootstrapBrokerStringTls> --command-config client.properties
-./kafka-verifiable-producer.sh --bootstrap-server <BootstrapBrokerStringTls> --producer.config client.properties --topic MyTopic --throughput 100 --max-messages 500
+./kafka-topics.sh --list --bootstrap-server <BootstrapBrokerString> --command-config <ConfigFile>
+./kafka-verifiable-producer.sh --bootstrap-server <BootstrapBrokerString> --producer.config <ConfigFile> --topic MyTopic --throughput 100 --max-messages 500
 ```
 
 > **Note**: For the following patterns, the topic must exist before the stack is launched. If it doesn't, Lambda and Kinesis will not be able to process any events.

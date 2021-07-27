@@ -22,9 +22,16 @@ export interface KafkaClusterProps {
     readonly brokerInstanceType: string;
     readonly monitoringLevel: string;
     readonly ebsVolumeSize: number;
+    readonly accessControl: string;
 
     readonly brokerVpcId: string;
     readonly brokerSubnets: string[];
+}
+
+export enum KafkaAccessControl {
+    None = 'None',
+    IAM = 'IAM access control',
+    SCRAM = 'SASL/SCRAM authentication'
 }
 
 export class KafkaCluster extends cdk.Construct {
@@ -47,7 +54,7 @@ export class KafkaCluster extends cdk.Construct {
     private MAX_SUBNETS: number = 3;
 
     public static get AllowedKafkaVersions(): string[] {
-        return ['2.8.0', '2.7.0', '2.6.2', '2.6.1', '2.6.0', '2.5.1', '2.4.1.1', '2.3.1', '2.2.1'];
+        return ['2.8.0', '2.7.1', '2.7.0', '2.6.2', '2.6.1', '2.6.0', '2.5.1', '2.4.1.1', '2.3.1', '2.2.1'];
     }
 
     public static get AllowedInstanceTypes(): string[] {
@@ -66,12 +73,18 @@ export class KafkaCluster extends cdk.Construct {
         return 16384;
     }
 
+    public static get AccessControlMethods(): string[] {
+        return Object.values(KafkaAccessControl);
+    }
+
     public static get RequiredRules() {
         return [
             { port: 2181, description: 'ZooKeeper Plaintext' },
             { port: 2182, description: 'ZooKeeper TLS' },
             { port: 9092, description: 'Bootstrap servers Plaintext' },
             { port: 9094, description: 'Bootstrap servers TLS' },
+            { port: 9096, description: 'SASL/SCRAM' },
+            { port: 9098, description: 'IAM' },
         ];
     }
 
@@ -111,8 +124,15 @@ export class KafkaCluster extends cdk.Construct {
             throw new Error(`ebsVolumeSize must be a value between ${KafkaCluster.MinStorageSizeGiB} and ${KafkaCluster.MaxStorageSizeGiB} GiB (given ${volumeSize})`);
         }
 
-        this.SecurityGroup = this.createSecurityGroup(props.brokerVpcId);
+        const iamCondition = new cdk.CfnCondition(this, 'EnableIAMCondition', {
+            expression: cdk.Fn.conditionEquals(props.accessControl, KafkaAccessControl.IAM)
+        });
 
+        const scramCondition = new cdk.CfnCondition(this, 'EnableSCRAMCondition', {
+            expression: cdk.Fn.conditionEquals(props.accessControl, KafkaAccessControl.SCRAM)
+        });
+
+        this.SecurityGroup = this.createSecurityGroup(props.brokerVpcId);
         const logGroup = new logs.LogGroup(this, 'LogGroup', { removalPolicy: cdk.RemovalPolicy.RETAIN });
 
         this.Cluster = new msk.CfnCluster(this, 'KafkaCluster', {
@@ -139,6 +159,16 @@ export class KafkaCluster extends cdk.Construct {
                 }
             },
             enhancedMonitoring: props.monitoringLevel,
+            clientAuthentication: {
+                sasl: {
+                    iam: {
+                        enabled: cdk.Fn.conditionIf(iamCondition.logicalId, true, false)
+                    },
+                    scram: {
+                        enabled: cdk.Fn.conditionIf(scramCondition.logicalId, true, false)
+                    }
+                }
+            },
             encryptionInfo: {
                 encryptionAtRest: {
                     dataVolumeKmsKeyId: 'alias/aws/kafka'

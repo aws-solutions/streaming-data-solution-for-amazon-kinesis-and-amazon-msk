@@ -15,6 +15,7 @@ import * as cdk from '@aws-cdk/core';
 import { SynthUtils } from '@aws-cdk/assert';
 
 import { SolutionHelper } from '../lib/solution-helper';
+import { KafkaAccessControl } from '../lib/msk-cluster';
 
 let stack: cdk.Stack;
 
@@ -47,7 +48,8 @@ test('creates solution helper with optional properties', () => {
 
         brokerInstanceType: 'kafka.m5.large',
         numberOfBrokerNodes: 2,
-        monitoringLevel: 'DEFAULT'
+        monitoringLevel: 'DEFAULT',
+        accessControlMethod: KafkaAccessControl.IAM
     });
 
     expect(SynthUtils.toCloudFormation(stack)).toMatchSnapshot();

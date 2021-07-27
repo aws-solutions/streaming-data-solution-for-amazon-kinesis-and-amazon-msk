@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2021-07-27
+### Added
+- Support for [IAM access control](https://aws.amazon.com/about-aws/whats-new/2021/05/introducing-iam-access-control-amazon-msk/) when creating the Amazon MSK cluster. By using IAM Access Control, customers no longer need to build and run one-off access management systems to control client authentication and authorization for Apache Kafka.
+- Support for [SASL/SCRAM authentication](https://aws.amazon.com/about-aws/whats-new/2020/09/amazon-msk-now-supports-sasl-scram-authentication-with-usernames-and-passwords-secured-by-aws-secrets-manager/) when creating the Amazon MSK cluster. Username and password credentials are stored in AWS Secrets Manager, you can reduce the overhead of maintaining a traditional Apache Kafka authentication system, including: auditing, updating, and rotating client credentials.
+- Support for [SASL/SCRAM authentication](https://aws.amazon.com/about-aws/whats-new/2020/12/aws-lambda-now-supports-sasl-scram-authentication-for-functions-triggered-from-amazon-msk/) when configuring an AWS Lambda function to read data from Amazon MSK.
+- Support for Apache Kafka version 2.7.1. For a complete list of improvements and bug fixes, see the Apache Kafka release notes for [2.7.1](https://downloads.apache.org/kafka/2.7.1/RELEASE_NOTES.html).
+
+### Changed
+- Authentication for Option 1 (Amazon API Gateway, Amazon Kinesis Data Streams, and AWS Lambda) to use [Amazon Cognito user pools](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-integrate-with-cognito.html). Previously, the only option to invoke the APIs was using AWS IAM credentials, which are usually not available in mobile clients.
+- AWS CDK and AWS Solutions Constructs to version 1.110.0
+
 ## [1.4.2] - 2021-07-20
 ### Fixed
 - Location of GitHub repository for MSK Labs assets.

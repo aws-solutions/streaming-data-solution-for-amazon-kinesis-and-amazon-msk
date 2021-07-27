@@ -34,6 +34,7 @@ export interface SolutionHelperProps {
     readonly numberOfBrokerNodes?: number;
     readonly brokerInstanceType?: string;
     readonly monitoringLevel?: string;
+    readonly accessControlMethod?: string;
 }
 
 export class SolutionHelper extends cdk.Construct {
@@ -91,7 +92,8 @@ export class SolutionHelper extends cdk.Construct {
 
                 'NumberOfBrokerNodes': props.numberOfBrokerNodes,
                 'BrokerInstanceType': props.brokerInstanceType,
-                'MonitoringLevel': props.monitoringLevel
+                'MonitoringLevel': props.monitoringLevel,
+                'AccessControlMethod': props.accessControlMethod
             },
             resourceType: 'Custom::AnonymousData'
         });

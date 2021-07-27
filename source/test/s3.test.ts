@@ -72,6 +72,32 @@ test('creates a bucket with intelligent tiering', () => {
         BucketEncryption: expectedEncryption,
         PublicAccessBlockConfiguration: expectedPublicConfig
     }));
+
+    expectCDK(stack).to(haveResource('AWS::S3::BucketPolicy', {
+        PolicyDocument: {
+            Statement: [{
+                Sid: 'HttpsOnly',
+                Effect: 'Deny',
+                Action: '*',
+                Principal: '*',
+                Condition: {
+                    Bool: { 'aws:SecureTransport': 'false' }
+                },
+                Resource: [
+                    {
+                        'Fn::Join': [
+                            '',
+                            [{ 'Fn::GetAtt': ['TestBucket9EEBCF70', 'Arn'] }, '/*']
+                        ]
+                    },
+                    {
+                        'Fn::GetAtt': ['TestBucket9EEBCF70', 'Arn']
+                    }
+                ]
+            }],
+            Version: '2012-10-17'
+        }
+    }));
 });
 
 test('creates a bucket without intelligent tiering', () => {
@@ -96,25 +122,14 @@ test('adds cfn_nag suppressions', () => {
             cfn_nag: {
                 rules_to_suppress: [
                     {
-                        id: 'W51',
-                        reason: 'This bucket does not need a bucket policy'
-                    },
-                    {
                         id: 'W35',
                         reason: 'This bucket is used to store access logs for another bucket'
+                    },
+                    {
+                        id: 'W51',
+                        reason: 'This bucket does not need a bucket policy'
                     }
                 ]
-            }
-        }
-    }, ResourcePart.CompleteDefinition));
-
-    expectCDK(stack).to(haveResource('AWS::S3::Bucket', {
-        Metadata: {
-            cfn_nag: {
-                rules_to_suppress: [{
-                    id: 'W51',
-                    reason: 'This bucket does not need a bucket policy'
-                }]
             }
         }
     }, ResourcePart.CompleteDefinition));

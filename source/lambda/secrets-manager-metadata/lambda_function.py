@@ -1,5 +1,5 @@
 ######################################################################################################################
-#  Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.                                      #
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                #
 #                                                                                                                    #
 #  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    #
 #  with the License. A copy of the License is located at                                                             #
@@ -16,41 +16,34 @@ from crhelper import CfnResource
 from botocore import config
 
 config = config.Config(**json.loads(os.environ['AWS_SDK_USER_AGENT']))
-client_kafka = boto3.client('kafka', config=config)
+client_secrets_manager = boto3.client('secretsmanager', config=config)
 
 helper = CfnResource(json_logging=True, log_level='INFO')
 
-def _get_networking_config(cluster_arn):
-    response = client_kafka.describe_cluster(ClusterArn=cluster_arn)
-    return (
-        response['ClusterInfo']['BrokerNodeGroupInfo']['ClientSubnets'],
-        response['ClusterInfo']['BrokerNodeGroupInfo']['SecurityGroups']
-    )
+def _get_key_arn_for_secret(secret_arn):
+    '''
+        There are some requirements when using SCRAM authentication with Amazon MSK:
+        https://docs.aws.amazon.com/msk/latest/developerguide/msk-password.html#msk-password-limitations
 
-def _get_bootstrap_brokers(cluster_arn):
-    response = client_kafka.get_bootstrap_brokers(ClusterArn=cluster_arn)
+        This custom resource checks for those limitations, and returns the KmsKeyId
+        (which will be used on the Lambda role policy).
+    '''
 
-    if 'BootstrapBrokerStringTls' in response:
-        return response['BootstrapBrokerStringTls']
+    describe_response = client_secrets_manager.describe_secret(SecretId=secret_arn)
+    if not describe_response['Name'].startswith('AmazonMSK_'):
+        raise Exception('The name of secrets associated with an Amazon MSK cluster must have the prefix AmazonMSK_')
 
-    if 'BootstrapBrokerString' in response:
-        return response['BootstrapBrokerString']
+    if not 'KmsKeyId' in describe_response:
+        raise Exception('You cannot use a Secret that uses the default Secrets Manager encryption key with Amazon MSK')
 
-    raise Exception('The demo application does not support any access control method other than None')
+    return describe_response['KmsKeyId']
 
 @helper.create
 @helper.update
-def get_cluster_details(event, _):
-    cluster_arn = event['ResourceProperties']['ClusterArn']
-
-    (subnets, security_groups) = _get_networking_config(cluster_arn)
-    bootstrap_servers = _get_bootstrap_brokers(cluster_arn)
-
-    helper.Data.update(
-        Subnets=subnets,
-        SecurityGroups=security_groups,
-        BootstrapServers=bootstrap_servers
-    )
+def get_secret_details(event, _):
+    secret_arn = event['ResourceProperties']['SecretArn']
+    kms_key_id = _get_key_arn_for_secret(secret_arn)
+    helper.Data.update(KmsKeyId=kms_key_id)
 
 @helper.delete
 def no_op(_, __):

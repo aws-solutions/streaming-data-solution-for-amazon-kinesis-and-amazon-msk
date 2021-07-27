@@ -34,6 +34,7 @@ describe('successful scenarios', () => {
     test('creates a MSK Lambda consumer', () => {
         new KafkaConsumer(stack, 'TestMsk', {
             clusterArn: 'my-cluster-arn',
+            scramSecretArn: 'my-secret-arn',
             batchSize: 10,
             enabled: true,
             startingPosition: lambda.StartingPosition.LATEST,
@@ -61,11 +62,13 @@ describe('successful scenarios', () => {
 
     test('accepts CloudFormation parameters', () => {
         const clusterArn = new cdk.CfnParameter(stack, 'ClusterArn', { type: 'String' });
+        const secretArn = new cdk.CfnParameter(stack, 'SecretArn', { type: 'String' });
         const batchSize = new cdk.CfnParameter(stack, 'BatchSize', { type: 'Number' });
         const topicName = new cdk.CfnParameter(stack, 'TopicName', { type: 'String' });
 
         new KafkaConsumer(stack, 'TestMsk', {
             clusterArn: clusterArn.valueAsString,
+            scramSecretArn: secretArn.valueAsString,
             batchSize: batchSize.valueAsNumber,
             enabled: true,
             startingPosition: lambda.StartingPosition.LATEST,
@@ -78,7 +81,11 @@ describe('successful scenarios', () => {
         expectCDK(stack).to(haveResourceLike('AWS::Lambda::EventSourceMapping', {
             EventSourceArn: { Ref: 'ClusterArn' },
             BatchSize: { Ref: 'BatchSize' },
-            Topics: [{ Ref: 'TopicName' }]
+            Topics: [{ Ref: 'TopicName' }],
+            SourceAccessConfigurations: [{
+                Type: 'SASL_SCRAM_512_AUTH',
+                URI: { Ref: 'SecretArn' }
+            }]
         }));
     });
 });
@@ -97,7 +104,7 @@ describe('validation tests', () => {
         };
     });
 
-    test.each([0, 841])('timeout must be between allowed values', (invalidTimeoutSeconds) => {
+    test.each([0, 901])('timeout must be between allowed values', (invalidTimeoutSeconds) => {
         expect(() => new KafkaConsumer(stack, 'TestMsk', {
             clusterArn: 'my-cluster-arn',
             batchSize: 10,
@@ -106,7 +113,7 @@ describe('validation tests', () => {
             timeout: cdk.Duration.seconds(invalidTimeoutSeconds),
             code: lambda.Code.fromCfnParameters(lambdaCodeParams),
             topicName: 'my-topic'
-        })).toThrowError(`timeout must be a value between 1 and 840 seconds (given ${invalidTimeoutSeconds})`);
+        })).toThrowError(`timeout must be a value between 1 and 900 seconds (given ${invalidTimeoutSeconds})`);
     });
 
     test.each([-1, 0, 10001])('batch size must be between allowed values', (invalidBatchSize) => {

@@ -27,7 +27,6 @@ export class MskLambdaKdf extends cdk.Stack {
 
         //---------------------------------------------------------------------
         // Kinesis Data Firehose configuration
-
         const bufferingSize = new cdk.CfnParameter(this, 'BufferingSize', {
             type: 'Number',
             default: 5,
@@ -73,7 +72,6 @@ export class MskLambdaKdf extends cdk.Stack {
 
         //---------------------------------------------------------------------
         // Lambda function configuration
-
         const clusterArn = new cdk.CfnParameter(this, 'ClusterArn', {
             type: 'String',
             allowedPattern: 'arn:(aws[a-zA-Z0-9-]*):([a-zA-Z0-9\\-])+:([a-z]{2}(-gov)?-[a-z]+-\\d{1})?:(\\d{12})?:(.*)',
@@ -93,8 +91,14 @@ export class MskLambdaKdf extends cdk.Stack {
             constraintDescription: 'Topic name must not be empty'
         });
 
+        const secretArn = new cdk.CfnParameter(this, 'SecretArn', {
+            type: 'String',
+            maxLength: 200
+        });
+
         const lambdaConsumer = new KafkaConsumer(this, 'LambdaFn', {
             clusterArn: clusterArn.valueAsString,
+            scramSecretArn: secretArn.valueAsString,
             batchSize: batchSize.valueAsNumber,
             startingPosition: lambda.StartingPosition.LATEST,
             topicName: topicName.valueAsString,
@@ -106,10 +110,13 @@ export class MskLambdaKdf extends cdk.Stack {
             }
         });
 
-        lambdaConsumer.Function.role?.addToPrincipalPolicy(new iam.PolicyStatement({
+        const firehosePolicy = new iam.PolicyStatement({
             actions: ['firehose:PutRecord', 'firehose:PutRecordBatch'],
             resources: [kdfToS3.kinesisFirehose.getAtt('Arn').toString()],
-        }));
+        });
+
+        // This is a valid TypeScript expression, the role property will not be null.
+        lambdaConsumer.Function.role?.addToPrincipalPolicy(firehosePolicy); // NOSONAR (typescript:S905)
 
         //---------------------------------------------------------------------
         // Solution metrics
@@ -124,13 +131,12 @@ export class MskLambdaKdf extends cdk.Stack {
 
         //---------------------------------------------------------------------
         // Template metadata
-
         this.templateOptions.metadata = {
             'AWS::CloudFormation::Interface': {
                 ParameterGroups: [
                     {
                         Label: { default: 'AWS Lambda consumer configuration' },
-                        Parameters: [clusterArn.logicalId, batchSize.logicalId, topicName.logicalId]
+                        Parameters: [clusterArn.logicalId, batchSize.logicalId, topicName.logicalId, secretArn.logicalId]
                     },
                     {
                         Label: { default: 'Amazon Kinesis Data Firehose configuration' },
@@ -146,6 +152,9 @@ export class MskLambdaKdf extends cdk.Stack {
                     },
                     [topicName.logicalId]: {
                         default: 'Name of a Kafka topic to consume (topic must already exist before the stack is launched)'
+                    },
+                    [secretArn.logicalId]: {
+                        default: '(Optional) Secret ARN used for SASL/SCRAM authentication of the brokers in your MSK cluster'
                     },
 
                     [bufferingSize.logicalId]: {
@@ -166,11 +175,6 @@ export class MskLambdaKdf extends cdk.Stack {
         new cdk.CfnOutput(this, 'LambdaFunctionName', {
             description: 'Name of the AWS Lambda function',
             value: lambdaConsumer.Function.functionName
-        });
-
-        new cdk.CfnOutput(this, 'LambdaMskMapping', {
-            description: 'Identifier for AWS Lambda event source mapping',
-            value: lambdaConsumer.EventMapping.eventSourceMappingId
         });
 
         new cdk.CfnOutput(this, 'DeliveryStreamName', {

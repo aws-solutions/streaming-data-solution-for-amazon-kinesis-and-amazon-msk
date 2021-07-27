@@ -15,7 +15,7 @@ import * as cdk from '@aws-cdk/core';
 
 import { SolutionHelper } from '../lib/solution-helper';
 import { SolutionStackProps } from '../bin/solution-props';
-import { KafkaCluster } from '../lib/msk-cluster';
+import { KafkaCluster, KafkaAccessControl } from '../lib/msk-cluster';
 import { KafkaClient } from '../lib/msk-client';
 import { KafkaMonitoring } from '../lib/msk-monitoring';
 
@@ -25,7 +25,6 @@ export class MskStandalone extends cdk.Stack {
 
         //---------------------------------------------------------------------
         // Broker configuration
-
         const kafkaVersion = new cdk.CfnParameter(this, 'KafkaVersion', {
             type: 'String',
             default: '2.8.0',
@@ -57,9 +56,14 @@ export class MskStandalone extends cdk.Stack {
             maxValue: KafkaCluster.MaxStorageSizeGiB
         });
 
+        const accessControl = new cdk.CfnParameter(this, 'AccessControlMethod', {
+            type: 'String',
+            default: KafkaAccessControl.IAM,
+            allowedValues: Object.values(KafkaAccessControl)
+        });
+
         //---------------------------------------------------------------------
         // Networking configuration
-
         const brokerVpc = new cdk.CfnParameter(this, 'BrokerVpcId', {
             type: 'AWS::EC2::VPC::Id'
         });
@@ -74,6 +78,7 @@ export class MskStandalone extends cdk.Stack {
             brokerInstanceType: brokerInstanceType.valueAsString,
             monitoringLevel: monitoringLevel.valueAsString,
             ebsVolumeSize: ebsVolumeSize.valueAsNumber,
+            accessControl: accessControl.valueAsString,
 
             brokerVpcId: brokerVpc.valueAsString,
             brokerSubnets: brokerSubnets.valueAsList
@@ -100,19 +105,20 @@ export class MskStandalone extends cdk.Stack {
             instanceType: clientInstanceType.valueAsString,
 
             kafkaVersion: kafkaVersion.valueAsString,
+            clusterName: cluster.ClusterName,
             clusterSecurityGroupId: cluster.SecurityGroupId
         });
 
         //---------------------------------------------------------------------
         // Solution metrics
-
         new SolutionHelper(this, 'SolutionHelper', {
             solutionId: props.solutionId,
             pattern: MskStandalone.name,
 
             numberOfBrokerNodes: brokerNodes.valueAsNumber,
             brokerInstanceType: brokerInstanceType.valueAsString,
-            monitoringLevel: monitoringLevel.valueAsString
+            monitoringLevel: monitoringLevel.valueAsString,
+            accessControlMethod: accessControl.valueAsString
         });
 
         //---------------------------------------------------------------------
@@ -126,7 +132,6 @@ export class MskStandalone extends cdk.Stack {
 
         //---------------------------------------------------------------------
         // Template metadata
-
         this.templateOptions.metadata = {
             'AWS::CloudFormation::Interface': {
                 ParameterGroups: [
@@ -139,6 +144,10 @@ export class MskStandalone extends cdk.Stack {
                             monitoringLevel.logicalId,
                             ebsVolumeSize.logicalId
                         ]
+                    },
+                    {
+                        Label: { default: 'Access control configuration' },
+                        Parameters: [accessControl.logicalId]
                     },
                     {
                         Label: { default: 'Networking configuration' },
@@ -166,6 +175,10 @@ export class MskStandalone extends cdk.Stack {
                         default: 'EBS storage volume per broker (in GiB)'
                     },
 
+                    [accessControl.logicalId]: {
+                        default: 'Method Amazon MSK uses to authenticate clients and allow or deny actions'
+                    },
+
                     [brokerVpc.logicalId]: {
                         default: 'VPC where the cluster should be launched'
                     },
@@ -185,7 +198,6 @@ export class MskStandalone extends cdk.Stack {
 
         //---------------------------------------------------------------------
         // Stack outputs
-
         new cdk.CfnOutput(this, 'MskClusterArn', {
             description: 'ARN of the Amazon MSK cluster',
             value: cluster.ClusterArn

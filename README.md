@@ -12,6 +12,7 @@ The [AWS Streaming Data Solution for Amazon Kinesis](https://aws.amazon.com/solu
 - [Project structure](#project-structure)
 - [Deployment](#deployment)
 - [Creating a custom build](#creating-a-custom-build)
+- [Collection of operational metrics](#collection-of-operational-metrics)
 - [Known issues](#known-issues)
 - [Additional Resources](#additional-resources)
 
@@ -86,21 +87,21 @@ chmod +x ./build-s3-dist.sh
 > In addition to that, there are also some extra components (such as the demo applications for the KPL and Kinesis Data Analytics) that are implemented in Java, and the _build-s3_ script takes care of packaging them.
 
 ### 4. Upload deployment assets to your Amazon S3 buckets
-Create the CloudFormation bucket defined above, as well as a regional bucket in the region you wish to deploy. The CloudFormation templates are configured to pull the Lambda deployment packages from Amazon S3 bucket in the region the template is being launched in.
+> **Note**: We recommend [configuring block public access settings for your account](https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html) before creating the artifacts bucket.
 
 ```
-aws s3 mb s3://$ARTIFACT_BUCKET --region us-east-1
 aws s3 mb s3://$ARTIFACT_BUCKET-us-east-1 --region us-east-1
-```
-
-```
-aws s3 sync ./global-s3-assets s3://$ARTIFACT_BUCKET/$SOLUTION_NAME/$VERSION --acl bucket-owner-full-control
+aws s3 sync ./global-s3-assets s3://$ARTIFACT_BUCKET-us-east-1/$SOLUTION_NAME/$VERSION --acl bucket-owner-full-control
 aws s3 sync ./regional-s3-assets s3://$ARTIFACT_BUCKET-us-east-1/$SOLUTION_NAME/$VERSION --acl bucket-owner-full-control
 ```
 
 ### 5. Launch the CloudFormation template
 * Get the link of the template uploaded to your Amazon S3 bucket (created as $ARTIFACT_BUCKET in the previous step)
 * Deploy the solution to your account by launching a new AWS CloudFormation stack
+
+## Collection of operational metrics
+This solution collects anonymous operational metrics to help AWS improve the quality of features of the solution.
+For more information, including how to disable this capability, please see the [implementation guide for the AWS Streaming Data Solution for Amazon Kinesis](https://docs.aws.amazon.com/solutions/latest/aws-streaming-data-solution-for-amazon-kinesis/operational-metrics.html) and the [implementation guide for the AWS Streaming Data Solution for Amazon MSK](https://docs.aws.amazon.com/solutions/latest/aws-streaming-data-solution-for-amazon-msk/operational-metrics.html).
 
 ## Known issues
 * For the options that use Amazon Kinesis Data Analytics, we recommend stopping the application before you delete the stack.
@@ -127,7 +128,7 @@ If the application is running during the stack deletion, its status will change 
 
 ***
 
-Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
