@@ -79,10 +79,10 @@ test('creates a bucket with intelligent tiering', () => {
                 Sid: 'HttpsOnly',
                 Effect: 'Deny',
                 Action: '*',
-                Principal: '*',
                 Condition: {
                     Bool: { 'aws:SecureTransport': 'false' }
                 },
+                Principal: { 'AWS': '*' },
                 Resource: [
                     {
                         'Fn::Join': [

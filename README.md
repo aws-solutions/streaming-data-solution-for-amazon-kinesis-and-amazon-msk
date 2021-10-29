@@ -87,10 +87,14 @@ chmod +x ./build-s3-dist.sh
 > In addition to that, there are also some extra components (such as the demo applications for the KPL and Kinesis Data Analytics) that are implemented in Java, and the _build-s3_ script takes care of packaging them.
 
 ### 4. Upload deployment assets to your Amazon S3 buckets
-> **Note**: We recommend [configuring block public access settings for your account](https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html) before creating the artifacts bucket.
+When creating the bucket for solution assets it is recommeded to:
+- Use randomized names as part of your bucket naming strategy.
+- Ensure buckets are not public.
+- Verify bucket ownership prior to uploading templates or code artifacts.
+
+> **Note**: The created bucket name must have the region where the solution is being deployed as a suffix (for example, _mybucket-name-**us-east-1**_).
 
 ```
-aws s3 mb s3://$ARTIFACT_BUCKET-us-east-1 --region us-east-1
 aws s3 sync ./global-s3-assets s3://$ARTIFACT_BUCKET-us-east-1/$SOLUTION_NAME/$VERSION --acl bucket-owner-full-control
 aws s3 sync ./regional-s3-assets s3://$ARTIFACT_BUCKET-us-east-1/$SOLUTION_NAME/$VERSION --acl bucket-owner-full-control
 ```
@@ -104,8 +108,8 @@ This solution collects anonymous operational metrics to help AWS improve the qua
 For more information, including how to disable this capability, please see the [implementation guide for the AWS Streaming Data Solution for Amazon Kinesis](https://docs.aws.amazon.com/solutions/latest/aws-streaming-data-solution-for-amazon-kinesis/operational-metrics.html) and the [implementation guide for the AWS Streaming Data Solution for Amazon MSK](https://docs.aws.amazon.com/solutions/latest/aws-streaming-data-solution-for-amazon-msk/operational-metrics.html).
 
 ## Known issues
-* For the options that use Amazon Kinesis Data Analytics, we recommend stopping the application before you delete the stack.
-If the application is running during the stack deletion, its status will change to `Updating`, and you might see some errors when CloudFormation tries to delete resources such as `AWS::KinesisAnalyticsV2::ApplicationCloudWatchLoggingOption` and `Custom::VpcConfiguration` (a custom resource that configures the application to connect to a virtual private cloud).
+* For the options that use Amazon Kinesis Data Analytics, we recommend stopping the application or studio notebook before you delete the stack.
+If it is running during the stack deletion, its status will change to `Updating`, and you might see some errors when CloudFormation tries to delete resources such as `AWS::KinesisAnalyticsV2::ApplicationCloudWatchLoggingOption` and `Custom::VpcConfiguration` (a custom resource that configures the application to connect to a virtual private cloud).
 
 ## Additional Resources
 
@@ -123,8 +127,10 @@ If the application is running during the stack deletion, its status will change 
 - [Flink: Hands-on Training](https://ci.apache.org/projects/flink/flink-docs-master/learn-flink/)
 - [Streaming Analytics Workshop](https://streaming-analytics.workshop.aws/flink-on-kda)
 - [Kinesis Scaling Utility](https://github.com/awslabs/amazon-kinesis-scaling-utils)
+- [Amazon MSK Data Generator](https://github.com/awslabs/amazon-msk-data-generator)
 - [Amazon MSK Labs](https://amazonmsk-labs.workshop.aws/en)
 - [Using Amazon MSK as an event source for AWS Lambda](https://aws.amazon.com/blogs/compute/using-amazon-msk-as-an-event-source-for-aws-lambda/)
+- [Query your Amazon MSK topics interactively using Amazon Kinesis Data Analytics Studio](https://aws.amazon.com/blogs/big-data/query-your-amazon-msk-topics-interactively-using-amazon-kinesis-data-analytics-studio/)
 
 ***
 

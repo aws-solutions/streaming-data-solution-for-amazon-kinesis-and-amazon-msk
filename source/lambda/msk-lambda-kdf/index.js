@@ -26,7 +26,7 @@ const _putRecords = async (records) => {
     const options = JSON.parse(process.env.AWS_SDK_USER_AGENT);
     const firehose = new AWS.Firehose(options);
 
-    return await firehose.putRecordBatch({
+    return firehose.putRecordBatch({
         DeliveryStreamName: process.env.DELIVERY_STREAM_NAME,
         Records: records
     }).promise();

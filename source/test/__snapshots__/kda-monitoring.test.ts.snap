@@ -179,7 +179,7 @@ Object {
               Object {
                 "Ref": "AWS::AccountId",
               },
-              ":application/test-application/\\\\n| filter @message like /switched from RUNNING to FAILED/\\\\n| sort @timestamp desc\\\\n| limit 20\\"}}]}",
+              ":application/test-application/\\\\n| filter @message like /switched from RUNNING to RESTARTING/\\\\n| sort @timestamp desc\\\\n| limit 20\\"}}]}",
             ],
           ],
         },
@@ -505,7 +505,7 @@ Object {
               Object {
                 "Ref": "AWS::AccountId",
               },
-              ":application/test-application/\\\\n| filter @message like /switched from RUNNING to FAILED/\\\\n| sort @timestamp desc\\\\n| limit 20\\"}}]}",
+              ":application/test-application/\\\\n| filter @message like /switched from RUNNING to RESTARTING/\\\\n| sort @timestamp desc\\\\n| limit 20\\"}}]}",
             ],
           ],
         },

@@ -20,7 +20,8 @@ from unittest.mock import patch
 class LambdaTest(unittest.TestCase):
     BOOTSTRAP_SERVER_PLAINTEXT = 'bootstrap-url1-plaintext:9092,bootstrap-url2-plaintext:9092'
     BOOTSTRAP_SERVER_TLS = 'bootstrap-url1-tls:9094,bootstrap-url2-tls:9094'
-    BOOTSTRAP_SERVER_IAM = 'bootstrap-url1-iam:9096,bootstrap-url2-iam:9096'
+    BOOTSTRAP_SERVER_SCRAM = 'bootstrap-url1-iam:9096,bootstrap-url2-iam:9096'
+    BOOTSTRAP_SERVER_IAM = 'bootstrap-url1-iam:9098,bootstrap-url2-iam:9098'
 
     CLIENT_SUBNETS = ['subnet-a', 'subnet-b']
     SECURITY_GROUPS = ['sg-abc123']
@@ -43,24 +44,38 @@ class LambdaTest(unittest.TestCase):
             }
         })
 
-        # Cluster configured for "Only plaintext traffic allowed"
+        # Cluster with "Only plaintext traffic allowed" and "Unauthenticated access"
         stubber.add_response('get_bootstrap_brokers', {
             'BootstrapBrokerString': cls.BOOTSTRAP_SERVER_PLAINTEXT
         })
 
-        # Cluster configured for "Only TLS encrypted traffic allowed"
+        # Cluster with "Only TLS encrypted traffic allowed" and "Unauthenticated access"
         stubber.add_response('get_bootstrap_brokers', {
             'BootstrapBrokerStringTls': cls.BOOTSTRAP_SERVER_TLS
         })
 
-        # Cluster configured for "Both TLS encrypted and plaintext traffic allowed"
+        # Cluster with "Both TLS encrypted and plaintext traffic allowed" and "Unauthenticated access"
         stubber.add_response('get_bootstrap_brokers', {
             'BootstrapBrokerString': cls.BOOTSTRAP_SERVER_PLAINTEXT,
             'BootstrapBrokerStringTls': cls.BOOTSTRAP_SERVER_TLS
         })
 
-        # Cluster configured for "IAM access control"
+        # Cluster with "IAM access control"
         stubber.add_response('get_bootstrap_brokers', {
+            'BootstrapBrokerStringSaslIam': cls.BOOTSTRAP_SERVER_IAM
+        })
+
+        # Cluster with "IAM access control" and "Unauthenticated access"
+        stubber.add_response('get_bootstrap_brokers', {
+            'BootstrapBrokerString': cls.BOOTSTRAP_SERVER_PLAINTEXT,
+            'BootstrapBrokerStringTls': cls.BOOTSTRAP_SERVER_TLS,
+            'BootstrapBrokerStringSaslIam': cls.BOOTSTRAP_SERVER_IAM
+        })
+
+        # Cluster with "IAM access control" and "SASL/SCRAM authentication"
+        stubber.add_response('get_bootstrap_brokers', {
+            'BootstrapBrokerString': cls.BOOTSTRAP_SERVER_PLAINTEXT,
+            'BootstrapBrokerStringSaslScram': cls.BOOTSTRAP_SERVER_SCRAM,
             'BootstrapBrokerStringSaslIam': cls.BOOTSTRAP_SERVER_IAM
         })
 
@@ -112,9 +127,29 @@ class LambdaTest(unittest.TestCase):
     def test_05_get_bootstrap_servers_iam(self, mock_client):
         mock_client.return_value = self._kafka
 
-        try:
-            from lambda_function import _get_bootstrap_brokers
-            _get_bootstrap_brokers('my-cluster-arn')
-            self.fail('Custom resource should fail when cluster is using IAM')
-        except:
-            pass
+        from lambda_function import _get_bootstrap_brokers
+        bootstrap_servers = _get_bootstrap_brokers('my-cluster-arn')
+
+        self.assertEqual(self.BOOTSTRAP_SERVER_IAM, bootstrap_servers)
+
+    @patch.object(boto3, 'client')
+    def test_06_get_bootstrap_servers_iam_and_unauthenticated(self, mock_client):
+        mock_client.return_value = self._kafka
+
+        from lambda_function import _get_bootstrap_brokers
+        bootstrap_servers = _get_bootstrap_brokers('my-cluster-arn')
+
+        self.assertEqual(self.BOOTSTRAP_SERVER_IAM, bootstrap_servers)
+        self.assertNotEqual(self.BOOTSTRAP_SERVER_TLS, bootstrap_servers)
+        self.assertNotEqual(self.BOOTSTRAP_SERVER_PLAINTEXT, bootstrap_servers)
+
+    @patch.object(boto3, 'client')
+    def test_07_get_bootstrap_servers_iam_and_scram(self, mock_client):
+        mock_client.return_value = self._kafka
+
+        from lambda_function import _get_bootstrap_brokers
+        bootstrap_servers = _get_bootstrap_brokers('my-cluster-arn')
+
+        self.assertEqual(self.BOOTSTRAP_SERVER_SCRAM, bootstrap_servers)
+        self.assertNotEqual(self.BOOTSTRAP_SERVER_IAM, bootstrap_servers)
+        self.assertNotEqual(self.BOOTSTRAP_SERVER_PLAINTEXT, bootstrap_servers)

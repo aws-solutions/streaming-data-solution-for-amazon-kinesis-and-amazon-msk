@@ -1,5 +1,5 @@
 /*********************************************************************************************************************
- *  Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.                                      *
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
  *                                                                                                                    *
  *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
  *  with the License. A copy of the License is located at                                                             *
@@ -14,7 +14,13 @@
 import * as cdk from '@aws-cdk/core';
 import { expect as expectCDK, SynthUtils, haveResourceLike } from '@aws-cdk/assert';
 
-import { KafkaCluster, KafkaAccessControl } from '../lib/msk-cluster';
+import {
+    KafkaCluster,
+    KafkaAccessControl,
+    KafkaActiveVersion,
+    KafkaInstanceType,
+    KafkaMonitoringLevel
+} from '../lib/msk-cluster';
 
 const twoSubnets = ['subnet-a', 'subnet-b'];
 
@@ -28,12 +34,12 @@ describe('successful scenarios', () => {
 
     test.each([2, 4, 6])('creates a MSK cluster', (validNodeCount) => {
         const cluster = new KafkaCluster(stack, 'TestMsk', {
-            kafkaVersion: '2.8.0',
+            kafkaVersion: KafkaActiveVersion.V2_8_1,
             numberOfBrokerNodes: validNodeCount,
-            brokerInstanceType: 'kafka.m5.large',
-            monitoringLevel: 'DEFAULT',
+            brokerInstanceType: KafkaInstanceType.m5_large,
+            monitoringLevel: KafkaMonitoringLevel.DEFAULT,
             ebsVolumeSize: 1000,
-            accessControl: KafkaAccessControl.None,
+            accessControl: KafkaAccessControl.Unauthenticated,
 
             brokerVpcId: 'my-vpc-id',
             brokerSubnets: twoSubnets
@@ -55,10 +61,10 @@ describe('successful scenarios', () => {
 
     test('uses IAM for access control', () => {
         new KafkaCluster(stack, 'TestMsk', {
-            kafkaVersion: '2.8.0',
+            kafkaVersion: KafkaActiveVersion.V2_8_1,
             numberOfBrokerNodes: 2,
-            brokerInstanceType: 'kafka.m5.large',
-            monitoringLevel: 'DEFAULT',
+            brokerInstanceType: KafkaInstanceType.m5_large,
+            monitoringLevel: KafkaMonitoringLevel.DEFAULT,
             ebsVolumeSize: 1000,
             accessControl: KafkaAccessControl.IAM,
 
@@ -71,10 +77,10 @@ describe('successful scenarios', () => {
 
     test('uses SCRAM for access control', () => {
         new KafkaCluster(stack, 'TestMsk', {
-            kafkaVersion: '2.8.0',
+            kafkaVersion: KafkaActiveVersion.V2_8_1,
             numberOfBrokerNodes: 2,
-            brokerInstanceType: 'kafka.m5.large',
-            monitoringLevel: 'DEFAULT',
+            brokerInstanceType: KafkaInstanceType.m5_large,
+            monitoringLevel: KafkaMonitoringLevel.DEFAULT,
             ebsVolumeSize: 1000,
             accessControl: KafkaAccessControl.SCRAM,
 
@@ -88,9 +94,9 @@ describe('successful scenarios', () => {
     test('accepts CloudFormation parameters', () => {
         const numberOfBrokerNodes = new cdk.CfnParameter(stack, 'NumberOfBrokerNodes', { type: 'Number' });
         const clientSubnets = new cdk.CfnParameter(stack, 'ClientSubnets', { type: 'List<AWS::EC2::Subnet::Id>' });
-        const kafkaVersion = new cdk.CfnParameter(stack, 'KafkaVersion', { allowedValues: KafkaCluster.AllowedKafkaVersions });
-        const instanceType = new cdk.CfnParameter(stack, 'InstanceType', { allowedValues: KafkaCluster.AllowedInstanceTypes });
-        const monitoringLevel = new cdk.CfnParameter(stack, 'MonitoringLevel', { allowedValues: KafkaCluster.AllowedMonitoringLevels });
+        const kafkaVersion = new cdk.CfnParameter(stack, 'KafkaVersion', { allowedValues: Object.values(KafkaActiveVersion) });
+        const instanceType = new cdk.CfnParameter(stack, 'InstanceType', { allowedValues: Object.values(KafkaInstanceType) });
+        const monitoringLevel = new cdk.CfnParameter(stack, 'MonitoringLevel', { allowedValues: Object.values(KafkaMonitoringLevel) });
         const volumeSize = new cdk.CfnParameter(stack, 'EbsVolumeSize', { type: 'Number' });
 
         new KafkaCluster(stack, 'TestMsk', {
@@ -99,7 +105,7 @@ describe('successful scenarios', () => {
             brokerInstanceType: instanceType.valueAsString,
             monitoringLevel: monitoringLevel.valueAsString,
             ebsVolumeSize: volumeSize.valueAsNumber,
-            accessControl: KafkaAccessControl.None,
+            accessControl: KafkaAccessControl.Unauthenticated,
 
             brokerVpcId: 'my-vpc-id',
             brokerSubnets: clientSubnets.valueAsList
@@ -130,12 +136,12 @@ describe('validation tests', () => {
         }
 
         expect(() => new KafkaCluster(stack, 'TestMsk', {
-            kafkaVersion: '2.8.0',
+            kafkaVersion: KafkaActiveVersion.V2_8_1,
             numberOfBrokerNodes: 2,
-            brokerInstanceType: 'kafka.m5.large',
-            monitoringLevel: 'DEFAULT',
+            brokerInstanceType: KafkaInstanceType.m5_large,
+            monitoringLevel: KafkaMonitoringLevel.DEFAULT,
             ebsVolumeSize: 1000,
-            accessControl: KafkaAccessControl.None,
+            accessControl: KafkaAccessControl.Unauthenticated,
 
             brokerVpcId: 'my-vpc-id',
             brokerSubnets: subnets
@@ -144,12 +150,12 @@ describe('validation tests', () => {
 
     test.each([0, -1])('number of broker nodes must be positive', (invalidNodeCount) => {
         expect(() => new KafkaCluster(stack, 'TestMsk', {
-            kafkaVersion: '2.8.0',
+            kafkaVersion: KafkaActiveVersion.V2_8_1,
             numberOfBrokerNodes: invalidNodeCount,
-            brokerInstanceType: 'kafka.m5.large',
-            monitoringLevel: 'DEFAULT',
+            brokerInstanceType: KafkaInstanceType.m5_large,
+            monitoringLevel: KafkaMonitoringLevel.DEFAULT,
             ebsVolumeSize: 1000,
-            accessControl: KafkaAccessControl.None,
+            accessControl: KafkaAccessControl.Unauthenticated,
 
             brokerVpcId: 'my-vpc-id',
             brokerSubnets: twoSubnets
@@ -158,12 +164,12 @@ describe('validation tests', () => {
 
     test.each([1, 3, 5])('number of broker nodes must be multiple of subnet count', (invalidNodeCount) => {
         expect(() => new KafkaCluster(stack, 'TestMsk', {
-            kafkaVersion: '2.8.0',
+            kafkaVersion: KafkaActiveVersion.V2_8_1,
             numberOfBrokerNodes: invalidNodeCount,
-            brokerInstanceType: 'kafka.m5.large',
-            monitoringLevel: 'DEFAULT',
+            brokerInstanceType: KafkaInstanceType.m5_large,
+            monitoringLevel: KafkaMonitoringLevel.DEFAULT,
             ebsVolumeSize: 1000,
-            accessControl: KafkaAccessControl.None,
+            accessControl: KafkaAccessControl.Unauthenticated,
 
             brokerVpcId: 'my-vpc-id',
             brokerSubnets: twoSubnets
@@ -172,57 +178,15 @@ describe('validation tests', () => {
 
     test.each([0, 16385])('volume size must be between allowed values', (invalidSize) => {
         expect(() => new KafkaCluster(stack, 'TestMsk', {
-            kafkaVersion: '2.8.0',
+            kafkaVersion: KafkaActiveVersion.V2_8_1,
             numberOfBrokerNodes: 2,
-            brokerInstanceType: 'kafka.m5.large',
-            monitoringLevel: 'DEFAULT',
+            brokerInstanceType: KafkaInstanceType.m5_large,
+            monitoringLevel: KafkaMonitoringLevel.DEFAULT,
             ebsVolumeSize: invalidSize,
-            accessControl: KafkaAccessControl.None,
+            accessControl: KafkaAccessControl.Unauthenticated,
 
             brokerVpcId: 'my-vpc-id',
             brokerSubnets: twoSubnets
         })).toThrowError(`ebsVolumeSize must be a value between 1 and 16384 GiB (given ${invalidSize})`);
-    });
-
-    test('invalid kafka version', () => {
-        expect(() => new KafkaCluster(stack, 'TestMsk', {
-            kafkaVersion: 'FOO',
-            numberOfBrokerNodes: 2,
-            brokerInstanceType: 'kafka.m5.large',
-            monitoringLevel: 'DEFAULT',
-            ebsVolumeSize: 1000,
-            accessControl: KafkaAccessControl.None,
-
-            brokerVpcId: 'my-vpc-id',
-            brokerSubnets: twoSubnets
-        })).toThrowError(/Unknown Kafka version: FOO/);
-    });
-
-    test('invalid instance type', () => {
-        expect(() => new KafkaCluster(stack, 'TestMsk', {
-            kafkaVersion: '2.8.0',
-            numberOfBrokerNodes: 2,
-            brokerInstanceType: 'FOO',
-            monitoringLevel: 'DEFAULT',
-            ebsVolumeSize: 1000,
-            accessControl: KafkaAccessControl.None,
-
-            brokerVpcId: 'my-vpc-id',
-            brokerSubnets: twoSubnets
-        })).toThrowError(/Unknown instance type: FOO/);
-    });
-
-    test('invalid monitoring level', () => {
-        expect(() => new KafkaCluster(stack, 'TestMsk', {
-            kafkaVersion: '2.8.0',
-            numberOfBrokerNodes: 2,
-            brokerInstanceType: 'kafka.m5.large',
-            monitoringLevel: 'FOO',
-            ebsVolumeSize: 1000,
-            accessControl: KafkaAccessControl.None,
-
-            brokerVpcId: 'my-vpc-id',
-            brokerSubnets: twoSubnets
-        })).toThrowError(/Unknown monitoring level: FOO/);
     });
 });

@@ -27,6 +27,7 @@ import { SolutionHelper } from '../lib/solution-helper';
 import { SolutionStackProps } from '../bin/solution-props';
 import { ApplicationMonitoring } from '../lib/kda-monitoring';
 import { ExecutionRole } from '../lib/lambda-role-cloudwatch';
+import { FlinkLogLevels, FlinkMetricLevels } from '../lib/kda-base';
 
 export class KdsKdaApiGw extends cdk.Stack {
     private readonly BinaryOptions = ['true', 'false'];
@@ -36,7 +37,6 @@ export class KdsKdaApiGw extends cdk.Stack {
 
         //---------------------------------------------------------------------
         // Kinesis Data Stream configuration
-
         const shardCount = new cdk.CfnParameter(this, 'ShardCount', {
             type: 'Number',
             default: 2,
@@ -65,7 +65,6 @@ export class KdsKdaApiGw extends cdk.Stack {
 
         //---------------------------------------------------------------------
         // Kinesis Replay configuration
-
         const producerVpc = new cdk.CfnParameter(this, 'ProducerVpcId', {
             type: 'AWS::EC2::VPC::Id'
         });
@@ -93,17 +92,16 @@ export class KdsKdaApiGw extends cdk.Stack {
 
         //---------------------------------------------------------------------
         // Kinesis Data Analytics configuration
-
         const logLevel = new cdk.CfnParameter(this, 'LogLevel', {
             type: 'String',
-            default: 'INFO',
-            allowedValues: FlinkApplication.AllowedLogLevels
+            default: FlinkLogLevels.INFO,
+            allowedValues: Object.values(FlinkLogLevels)
         });
 
         const metricsLevel = new cdk.CfnParameter(this, 'MetricsLevel', {
             type: 'String',
-            default: 'TASK',
-            allowedValues: FlinkApplication.AllowedMetricLevels
+            default: FlinkMetricLevels.TASK,
+            allowedValues: Object.values(FlinkMetricLevels)
         });
 
         const snapshots = new cdk.CfnParameter(this, 'EnableSnapshots', {
@@ -159,7 +157,6 @@ export class KdsKdaApiGw extends cdk.Stack {
 
         //---------------------------------------------------------------------
         // Solution metrics
-
         new SolutionHelper(this, 'SolutionHelper', {
             solutionId: props.solutionId,
             pattern: KdsKdaApiGw.name,
@@ -171,7 +168,6 @@ export class KdsKdaApiGw extends cdk.Stack {
 
         //---------------------------------------------------------------------
         // Monitoring (dashboard and alarms) configuration
-
         new ApplicationMonitoring(this, 'Monitoring', {
             applicationName: kda.ApplicationName,
             logGroupName: kda.LogGroupName,
@@ -180,7 +176,6 @@ export class KdsKdaApiGw extends cdk.Stack {
 
         //---------------------------------------------------------------------
         // Template metadata
-
         this.templateOptions.metadata = {
             'AWS::CloudFormation::Interface': {
                 ParameterGroups: [
@@ -249,7 +244,6 @@ export class KdsKdaApiGw extends cdk.Stack {
 
         //---------------------------------------------------------------------
         // Stack outputs
-
         new cdk.CfnOutput(this, 'ProducerInstance', {
             description: 'ID of the KPL Amazon EC2 instance',
             value: kpl.InstanceId

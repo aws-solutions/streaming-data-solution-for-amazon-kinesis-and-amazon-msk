@@ -102,7 +102,7 @@ stub_application_without_vpc = {
         'ApplicationConfigurationDescription': {},
         'ApplicationARN': 'some-arn',
         'ApplicationName': 'test-application',
-        'RuntimeEnvironment': 'FLINK-1_11',
+        'RuntimeEnvironment': 'FLINK-1_13',
         'ApplicationStatus': 'READY',
         'ApplicationVersionId': 99
     }
@@ -138,7 +138,7 @@ stub_application_with_vpc = {
         },
         'ApplicationARN': 'some-arn',
         'ApplicationName': 'test-application',
-        'RuntimeEnvironment': 'FLINK-1_11',
+        'RuntimeEnvironment': 'FLINK-1_13',
         'ApplicationStatus': 'READY',
         'ApplicationVersionId': 50
     }

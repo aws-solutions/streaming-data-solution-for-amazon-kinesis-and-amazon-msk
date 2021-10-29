@@ -1,5 +1,5 @@
 ## Architecture for AWS Streaming Data Solution for Amazon MSK
-The solution implements three patterns with more coming soon. All of them use Amazon MSK for streaming storage, and you can combine and extend the different components (which are built using the AWS CDK) to meet your needs.
+The solution implements four patterns with more coming soon. All of them use Amazon MSK for streaming storage, and you can combine and extend the different components (which are built using the AWS CDK) to meet your needs.
 
 ### Networking configuration
 We recommend launching the Amazon MSK cluster in private subnets (where the default route points to a NAT gateway), as this networking setup is required if you plan to use AWS Lambda or Amazon Kinesis Data Analytics to read data from the cluster.
@@ -34,7 +34,7 @@ aws kafka get-bootstrap-brokers --cluster-arn <cluster-arn> --region <aws-region
 #### 2. Create topic and produce data
 > **Note**: If the command returns an _InvalidReplicationFactorException_, make sure the _replication-factor_ parameter is not larger than the number of available brokers.
 
-> **Note**: The client configuration depends on the access control method selected when launching the stack. For `None` (which is the default), use `client-ssl.properties`; for `IAM access control`, use `client-iam.properties`; and for `SASL/SCRAM`, use `client-sasl.properties`.
+> **Note**: The client configuration depends on the access control method selected when launching the stack. For `Unauthenticated access`, use `client-ssl.properties`; for `IAM role-based authentication`, use `client-iam.properties`; and for `SASL/SCRAM`, use `client-sasl.properties`.
 
 ```
 sudo su
@@ -45,7 +45,7 @@ cd /home/kafka/bin
 ./kafka-verifiable-producer.sh --bootstrap-server <BootstrapBrokerString> --producer.config <ConfigFile> --topic MyTopic --throughput 100 --max-messages 500
 ```
 
-> **Note**: For the following patterns, the topic must exist before the stack is launched. If it doesn't, Lambda and Kinesis will not be able to process any events.
+> **Note**: For the patterns that use AWS Lambda, the topic must exist before the stack is launched. If it doesn't, no events will be processed.
 
 ### 2nd pattern
 ![pattern-02](msk-lambda.png)
@@ -60,22 +60,107 @@ The third pattern includes an AWS Lambda function that consumes data from an Apa
 ### 4th pattern
 ![pattern-04](msk-kda-s3.png)
 
-The fourth pattern includes an Amazon Kinesis Data Analytics application that reads data from an existing topic in Amazon MSK (using Apache Flink, which guarantees exactly-once processing) and saves the results to an Amazon S3 bucket.
+The fourth pattern includes an Amazon Kinesis Data Analytics Studio notebook can be used to process the incoming records from an existing topic in Amazon MSK (using Apache Flink, which guarantees exactly-once processing) and save them to an Amazon S3 bucket.
 
-The solution provides a [demo consumer application](/source/kinesis/kda-flink-kafka), in order to demonstrate how to use the Apache Flink Table API. The schema used is the same one provided in [Getting Started with Amazon Kinesis Data Analytics for Apache Flink (Table API)](https://docs.aws.amazon.com/kinesisanalytics/latest/java/gs-table.html):
+By default, the notebook will not run after the stack is launched. To start it, run the command below:
 
-```json
-{
-    "event_time": "2020-08-01 12:00:00",
-    "ticker": "AMZN",
-    "price": 50
-}
-```
-
-By default, the demo consumer application will not run after the stack is launched. To start it, run the command below:
-
-> **Note**: Application name is an output of the CloudFormation stack.
+> **Note**: Studio notebook name is an output of the CloudFormation stack.
 
 ```
-aws kinesisanalyticsv2 start-application --application-name <application-name> --run-configuration {}
+aws kinesisanalyticsv2 start-application --application-name <studio-notebook-name>
+```
+
+To generate sample records, you can run the following Python script from a client that can connect to the Amazon MSK cluster containing the source topic. The Python client for the Apache Kafka is used, and it must be installed as well (`pip3 install kafka-python`).
+
+> **Note**: Make sure to replace the `<BOOTSTRAP_SERVERS_LIST>`, `<TOPIC_NAME>`, and `<BUCKET_NAME>` placeholders.
+
+```python
+from kafka import KafkaProducer
+import json, time, random
+from datetime import datetime
+
+BOOTSTRAP_SERVERS = '<BOOTSTRAP_SERVERS_LIST>'
+producer = KafkaProducer(
+    bootstrap_servers=BOOTSTRAP_SERVERS,
+    value_serializer=lambda v: json.dumps(v).encode('utf-8'),
+    key_serializer=str.encode,
+    retry_backoff_ms=500,
+    request_timeout_ms=20000,
+    security_protocol='SSL')
+
+def get_stock():
+    return {
+        'event_time': datetime.now().isoformat(),
+        'ticker': random.choice(['AAPL', 'AMZN', 'MSFT', 'INTC', 'TBV']),
+        'price': round(random.random() * 100, 2)
+    }
+
+while True:
+    data = get_stock()
+    print(data)
+    try:
+        future = producer.send('<TOPIC_NAME>', value=data, key=data['ticker'])
+        producer.flush()
+
+        record_metadata = future.get(timeout=10)
+        print('sent event to Kafka! topic {} partition {} offset {}\n'.format(record_metadata.topic, record_metadata.partition, record_metadata.offset))
+    except Exception as e:
+        print(e.with_traceback())
+    time.sleep(0.25)
+```
+
+Once records are being produced, you can run queries in the Studio notebook, such as:
+
+```sql
+%flink.ssql
+CREATE TABLE stock_table (
+    ticker VARCHAR(6),
+    price DOUBLE,
+    event_time TIMESTAMP(3),
+    WATERMARK FOR event_time AS event_time - INTERVAL '5' SECOND
+) WITH (
+    'connector' = 'kafka',
+    'topic' = '<TOPIC_NAME>',
+    'properties.bootstrap.servers' = '<BOOTSTRAP_SERVERS_LIST>',
+    'properties.group.id' = 'KdaStudioGroup',
+    'scan.startup.mode' = 'earliest-offset',
+    'format' = 'json',
+    'json.timestamp-format.standard' = 'ISO-8601',
+
+    'properties.security.protocol' = 'SSL',
+    'properties.ssl.truststore.location' = '/usr/lib/jvm/java-11-amazon-corretto/lib/security/cacerts',
+    'properties.ssl.truststore.password' = 'changeit'
+);
+```
+
+> **Note**: In order to write records to S3, you need to [enable checkpointing](https://docs.aws.amazon.com/kinesisanalytics/latest/java/how-zeppelin-checkpoint.html).
+
+```python
+%flink.pyflink
+st_env.get_config().get_configuration().set_string(
+    "execution.checkpointing.interval", "1min"
+)
+
+st_env.get_config().get_configuration().set_string(
+    "execution.checkpointing.mode", "EXACTLY_ONCE"
+)
+```
+
+> **Note**: This pattern creates an Amazon S3 bucket, and its name is an output of the CloudFormation stack.
+
+```sql
+%flink.ssql(type=update)
+CREATE TABLE sink_table_s3 (event_time TIMESTAMP, ticker STRING, price DOUBLE, dt STRING, hr STRING)
+PARTITIONED BY (ticker, dt, hr)
+WITH ('connector' = 'filesystem', 'path' = 's3a://<BUCKET_NAME>/', 'format' = 'json');
+
+INSERT INTO sink_table_s3
+SELECT
+    event_time,
+    ticker,
+    price,
+    DATE_FORMAT(event_time, 'yyyy-MM-dd') as dt,
+    DATE_FORMAT(event_time, 'HH') as hh
+FROM stock_table
+WHERE price > 50;
 ```

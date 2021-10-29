@@ -33,7 +33,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
-import java.time.Instant;
+import java.sql.Timestamp;
 
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -189,15 +189,15 @@ public class SampleProducer {
     public static ByteBuffer generateData() {
         int index = RANDOM.nextInt(TICKERS.length);
 
-        String record = new JSONObject()
-            .put("EVENT_TIME", Instant.now().toString())
-            .put("TICKER", TICKERS[index])
-            .put("PRICE", RANDOM.nextDouble() * 100)
+        String item = new JSONObject()
+            .put("event_time", new Timestamp(System.currentTimeMillis()))
+            .put("ticker", TICKERS[index])
+            .put("price", RANDOM.nextDouble() * 100)
             .toString();
 
-        LOG.debug(record);
+        LOG.debug(item);
 
-        byte[] sendData = record.getBytes(StandardCharsets.UTF_8);
+        byte[] sendData = item.getBytes(StandardCharsets.UTF_8);
         return ByteBuffer.wrap(sendData);
     }
 }

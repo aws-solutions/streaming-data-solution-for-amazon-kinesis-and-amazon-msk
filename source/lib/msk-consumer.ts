@@ -69,7 +69,7 @@ export class KafkaConsumer extends cdk.Construct {
     }
 
     private createFunction(props: KafkaConsumerProps) {
-        const executionRole = this.createRole();
+        const executionRole = this.createRole(props.clusterArn, props.topicName);
         const secretPolicy = this.createPolicyForSecret(executionRole, props.scramSecretArn!);
 
         const lambdaFn = new lambda.Function(this, 'Consumer', {
@@ -107,12 +107,18 @@ export class KafkaConsumer extends cdk.Construct {
         return lambdaFn;
     }
 
-    private createRole() {
+    private createRole(clusterArn: string, topicName: string) {
+        const components = cdk.Arn.split(clusterArn, cdk.ArnFormat.SLASH_RESOURCE_NAME);
+        const clusterName = components.resourceName!;
+
+        // The permissions that Lambda requires to interact with MSK are described on this page:
+        // https://docs.aws.amazon.com/lambda/latest/dg/with-msk.html#msk-permissions
         const executionRole = new ExecutionRole(this, 'Role', {
             inlinePolicyName: 'MskPolicy',
             inlinePolicyDocument: new iam.PolicyDocument({
                 statements: [
                     new iam.PolicyStatement({
+                        sid: 'NetworkingPolicy',
                         actions: [
                             'kafka:DescribeCluster',
                             'kafka:GetBootstrapBrokers',
@@ -125,6 +131,23 @@ export class KafkaConsumer extends cdk.Construct {
                             'ec2:DescribeSecurityGroups'
                         ],
                         resources: ['*']
+                    }),
+                    new iam.PolicyStatement({
+                        sid: 'IamPolicy',
+                        actions: [
+                            'kafka-cluster:Connect',
+                            'kafka-cluster:DescribeGroup',
+                            'kafka-cluster:AlterGroup',
+                            'kafka-cluster:DescribeTopic',
+                            'kafka-cluster:ReadData',
+                            'kafka-cluster:DescribeClusterDynamicConfiguration'
+                        ],
+                        resources: [
+                            clusterArn,
+                            // TODO: Remove `*` once issue with Arn.Split has been resolved.
+                            `arn:${cdk.Aws.PARTITION}:kafka:${cdk.Aws.REGION}:${cdk.Aws.ACCOUNT_ID}:topic/${clusterName}/*/${topicName}`,
+                            `arn:${cdk.Aws.PARTITION}:kafka:${cdk.Aws.REGION}:${cdk.Aws.ACCOUNT_ID}:group/${clusterName}/*/*`
+                        ]
                     })
                 ]
             })

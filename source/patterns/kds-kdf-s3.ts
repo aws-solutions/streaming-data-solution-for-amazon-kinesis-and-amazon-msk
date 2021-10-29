@@ -1,5 +1,5 @@
 /*********************************************************************************************************************
- *  Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.                                      *
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
  *                                                                                                                    *
  *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
  *  with the License. A copy of the License is located at                                                             *
@@ -12,11 +12,9 @@
  *********************************************************************************************************************/
 
 import * as cdk from '@aws-cdk/core';
-import * as iam from '@aws-cdk/aws-iam';
-import * as firehose from '@aws-cdk/aws-kinesisfirehose';
 
 import { DataStream } from '../lib/kds-data-stream';
-import { EncryptedBucket } from '../lib/s3-bucket';
+import { DeliveryStream, CompressionFormat, FeatureStatus } from '../lib/kdf-delivery-stream';
 import { SolutionHelper } from '../lib/solution-helper';
 import { SolutionStackProps } from '../bin/solution-props';
 import { DeliveryStreamMonitoring } from '../lib/kdf-monitoring';
@@ -27,7 +25,6 @@ export class KdsKdfS3 extends cdk.Stack {
 
         //---------------------------------------------------------------------
         // Kinesis Data Stream configuration
-
         const shardCount = new cdk.CfnParameter(this, 'ShardCount', {
             type: 'Number',
             default: 2,
@@ -56,7 +53,6 @@ export class KdsKdfS3 extends cdk.Stack {
 
         //---------------------------------------------------------------------
         // Kinesis Data Firehose configuration
-
         const bufferingSize = new cdk.CfnParameter(this, 'BufferingSize', {
             type: 'Number',
             default: 5,
@@ -73,65 +69,76 @@ export class KdsKdfS3 extends cdk.Stack {
 
         const compressionFormat = new cdk.CfnParameter(this, 'CompressionFormat', {
             type: 'String',
-            default: 'GZIP',
-            allowedValues: ['GZIP', 'HADOOP_SNAPPY', 'Snappy', 'UNCOMPRESSED', 'ZIP']
+            default: CompressionFormat.GZIP,
+            allowedValues: Object.values(CompressionFormat)
         });
 
-        const outputBucket = new EncryptedBucket(this, 'Output', {
-            enableIntelligentTiering: true
+        const dataPrefix = new cdk.CfnParameter(this, 'DataPrefix', {
+            type: 'String',
+            minLength: 0,
+            maxLength: 1024,
+            default: 'data/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/hour=!{timestamp:HH}/'
         });
 
-        // TODO: Replace this section with aws-kinesisstreams-kinesisfirehose-s3 construct once available
-        const firehoseRole = new iam.Role(this, 'Role', {
-            assumedBy: new iam.ServicePrincipal('firehose.amazonaws.com'),
-            inlinePolicies: {
-                ReadSource: new iam.PolicyDocument({
-                    statements: [new iam.PolicyStatement({
-                        resources: [kds.Stream.streamArn],
-                        actions: [
-                            'kinesis:DescribeStream',
-                            'kinesis:GetShardIterator',
-                            'kinesis:GetRecords',
-                            'kinesis:ListShards'
-                        ]
-                    })]
-                })
-            }
+        const errorsPrefix = new cdk.CfnParameter(this, 'ErrorsPrefix', {
+            type: 'String',
+            minLength: 0,
+            maxLength: 1024,
+            default: 'errors/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/hour=!{timestamp:HH}/!{firehose:error-output-type}'
         });
 
-        outputBucket.Bucket.grantWrite(firehoseRole);
+        //---------------------------------------------------------------------
+        // Dynamic partitioning configuration
+        const dynamicPartitioning = new cdk.CfnParameter(this, 'DynamicPartitioning', {
+            type: 'String',
+            default: FeatureStatus.Disabled,
+            allowedValues: Object.values(FeatureStatus)
+        });
 
-        const deliveryStream = new firehose.CfnDeliveryStream(this, 'DeliveryStream', {
-            deliveryStreamType: 'KinesisStreamAsSource',
-            kinesisStreamSourceConfiguration: {
-                kinesisStreamArn: kds.Stream.streamArn,
-                roleArn: firehoseRole.roleArn
-            },
-            extendedS3DestinationConfiguration: {
-                bucketArn: outputBucket.Bucket.bucketArn,
-                roleArn: firehoseRole.roleArn,
-                bufferingHints: {
-                    intervalInSeconds: bufferingInterval.valueAsNumber,
-                    sizeInMBs: bufferingSize.valueAsNumber
-                },
-                compressionFormat: compressionFormat.valueAsString,
-                prefix: 'data/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/hour=!{timestamp:HH}/',
-                errorOutputPrefix: 'errors/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/hour=!{timestamp:HH}/!{firehose:error-output-type}'
-            }
+        const newLineDelimiter = new cdk.CfnParameter(this, 'NewLineDelimiter', {
+            type: 'String',
+            default: FeatureStatus.Disabled,
+            allowedValues: Object.values(FeatureStatus)
+        });
+
+        const jqExpression = new cdk.CfnParameter(this, 'JqExpression', {
+            type: 'String',
+            maxLength: 4096
+        });
+
+        const retryDuration = new cdk.CfnParameter(this, 'RetryDurationSec', {
+            type: 'Number',
+            default: 300,
+            minValue: 0,
+            maxValue: 7200
+        });
+
+        const kdf = new DeliveryStream(this, 'Kdf', {
+            inputDataStream: kds.Stream,
+
+            bufferingInterval: bufferingInterval.valueAsNumber,
+            bufferingSize: bufferingSize.valueAsNumber,
+            compressionFormat: compressionFormat.valueAsString,
+
+            dataPrefix: dataPrefix.valueAsString,
+            errorsPrefix: errorsPrefix.valueAsString,
+
+            dynamicPartitioning: dynamicPartitioning.valueAsString,
+            newLineDelimiter: newLineDelimiter.valueAsString,
+            jqExpression: jqExpression.valueAsString,
+            retryDuration: retryDuration.valueAsNumber
         });
 
         //---------------------------------------------------------------------
         // Monitoring (dashboard and alarms) configuration
-
         new DeliveryStreamMonitoring(this, 'Monitoring', {
             dataStreamName: kds.Stream.streamName,
-            deliveryStreamName: deliveryStream.ref,
+            deliveryStreamName: kdf.DeliveryStreamArn,
             createLimitAlarms: false
         });
 
         //---------------------------------------------------------------------
         // Solution metrics
-
         new SolutionHelper(this, 'SolutionHelper', {
             solutionId: props.solutionId,
             pattern: KdsKdfS3.name,
@@ -147,7 +154,6 @@ export class KdsKdfS3 extends cdk.Stack {
 
         //---------------------------------------------------------------------
         // Template metadata
-
         this.templateOptions.metadata = {
             'AWS::CloudFormation::Interface': {
                 ParameterGroups: [
@@ -157,7 +163,22 @@ export class KdsKdfS3 extends cdk.Stack {
                     },
                     {
                         Label: { default: 'Amazon Kinesis Data Firehose configuration' },
-                        Parameters: [bufferingSize.logicalId, bufferingInterval.logicalId, compressionFormat.logicalId]
+                        Parameters: [
+                            bufferingSize.logicalId,
+                            bufferingInterval.logicalId,
+                            compressionFormat.logicalId,
+                            dataPrefix.logicalId,
+                            errorsPrefix.logicalId
+                        ]
+                    },
+                    {
+                        Label: { default: 'Dynamic partitioning configuration' },
+                        Parameters: [
+                            dynamicPartitioning.logicalId,
+                            newLineDelimiter.logicalId,
+                            jqExpression.logicalId,
+                            retryDuration.logicalId
+                        ]
                     }
                 ],
                 ParameterLabels: {
@@ -172,13 +193,32 @@ export class KdsKdfS3 extends cdk.Stack {
                     },
 
                     [bufferingSize.logicalId]: {
-                        default: 'Size of the buffer (in MBs) that incoming data is buffered before delivery'
+                        default: 'Size of the buffer (in MBs) that incoming data is buffered before delivery (if dynamic partitioning is enabled, this value must be between 64 MiB and 128 MiB)'
                     },
                     [bufferingInterval.logicalId]: {
                         default: 'Length of time (in seconds) that incoming data is buffered before delivery'
                     },
                     [compressionFormat.logicalId]: {
                         default: 'Compression format for delivered data in Amazon S3'
+                    },
+                    [dataPrefix.logicalId]: {
+                        default: 'Prefix to be appended to the data delivered to Amazon S3 (if dynamic partitioning is enabled, you can specify the "partitionKeyFromQuery" namespace as well)'
+                    },
+                    [errorsPrefix.logicalId]: {
+                        default: 'Prefix to be used for errors when delivering data (if dynamic partitioning is enabled, this parameter is required)'
+                    },
+
+                    [dynamicPartitioning.logicalId]: {
+                        default: 'Whether data on Amazon S3 will be partitioned (once enabled, dynamic partitioning cannot be disabled)'
+                    },
+                    [newLineDelimiter.logicalId]: {
+                        default: 'Whether to add a new line delimiter between records'
+                    },
+                    [jqExpression.logicalId]: {
+                        default: 'JQ expression (for example, "{ ticker: .ticker }")'
+                    },
+                    [retryDuration.logicalId]: {
+                        default: 'Total amount of time (in seconds) that should be spent on retries'
                     }
                 }
             }
@@ -186,7 +226,6 @@ export class KdsKdfS3 extends cdk.Stack {
 
         //---------------------------------------------------------------------
         // Stack outputs
-
         new cdk.CfnOutput(this, 'DataStreamName', {
             description: 'Name of the Amazon Kinesis Data stream',
             value: kds.Stream.streamName
@@ -194,12 +233,12 @@ export class KdsKdfS3 extends cdk.Stack {
 
         new cdk.CfnOutput(this, 'DeliveryStreamName', {
             description: 'Name of the Amazon Kinesis Data Firehose delivery stream',
-            value: deliveryStream.ref
+            value: kdf.DeliveryStreamName
         });
 
         new cdk.CfnOutput(this, 'OutputBucketName', {
             description: 'Name of the Amazon S3 destination bucket',
-            value: outputBucket.Bucket.bucketName
+            value: kdf.OutputBucket.bucketName
         });
     }
 }
