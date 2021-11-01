@@ -14,32 +14,23 @@
 import * as cdk from '@aws-cdk/core';
 import * as cwlogs from '@aws-cdk/aws-logs';
 
-import { FlinkApplication } from '../lib/kda-flink-application';
-import { EncryptedBucket } from '../lib/s3-bucket';
+import { FlinkStudio } from '../lib/kda-flink-studio';
+import { FlinkLogLevels } from '../lib/kda-base';
 import { KafkaMetadata } from '../lib/msk-custom-resource';
+import { EncryptedBucket } from '../lib/s3-bucket';
 import { SolutionHelper } from '../lib/solution-helper';
 import { SolutionStackProps } from '../bin/solution-props';
-import { ApplicationMonitoring } from '../lib/kda-monitoring';
 
 export class MskKdaS3 extends cdk.Stack {
-    private readonly BinaryOptions = ['true', 'false'];
-
     constructor(scope: cdk.Construct, id: string, props: SolutionStackProps) {
         super(scope, id, props);
 
         //---------------------------------------------------------------------
         // Amazon MSK configuration
-
         const clusterArn = new cdk.CfnParameter(this, 'ClusterArn', {
             type: 'String',
             allowedPattern: 'arn:(aws[a-zA-Z0-9-]*):([a-zA-Z0-9\\-])+:([a-z]{2}(-gov)?-[a-z]+-\\d{1})?:(\\d{12})?:(.*)',
             constraintDescription: 'Cluster ARN must be in the following format: arn:${Partition}:kafka:${Region}:${Account}:cluster/${ClusterName}/${UUID}'
-        });
-
-        const topicName = new cdk.CfnParameter(this, 'TopicName', {
-            type: 'String',
-            allowedPattern: '.+',
-            constraintDescription: 'Topic name must not be empty'
         });
 
         const kafkaHelper = new KafkaMetadata(this, 'Msk', {
@@ -48,54 +39,19 @@ export class MskKdaS3 extends cdk.Stack {
 
         //---------------------------------------------------------------------
         // Kinesis Data Analytics configuration
-
         const outputBucket = new EncryptedBucket(this, 'Output', {
             enableIntelligentTiering: true
         });
 
         const logLevel = new cdk.CfnParameter(this, 'LogLevel', {
             type: 'String',
-            default: 'INFO',
-            allowedValues: FlinkApplication.AllowedLogLevels
+            default: FlinkLogLevels.INFO,
+            allowedValues: Object.values(FlinkLogLevels)
         });
 
-        const metricsLevel = new cdk.CfnParameter(this, 'MetricsLevel', {
-            type: 'String',
-            default: 'TASK',
-            allowedValues: FlinkApplication.AllowedMetricLevels
-        });
-
-        const snapshots = new cdk.CfnParameter(this, 'EnableSnapshots', {
-            type: 'String',
-            default: 'true',
-            allowedValues: this.BinaryOptions
-        });
-
-        const autoScaling = new cdk.CfnParameter(this, 'EnableAutoScaling', {
-            type: 'String',
-            default: 'true',
-            allowedValues: this.BinaryOptions
-        });
-
-        const kda = new FlinkApplication(this, 'Kda', {
-            environmentProperties: {
-                propertyGroupId: 'FlinkApplicationProperties',
-                propertyMap: {
-                    'TopicName': topicName.valueAsString,
-                    'BootstrapServers': kafkaHelper.BootstrapServers,
-                    'OutputBucketName': outputBucket.Bucket.bucketName,
-                }
-            },
-
+        const kda = new FlinkStudio(this, 'Kda', {
             logsRetentionDays: cwlogs.RetentionDays.ONE_YEAR,
             logLevel: logLevel.valueAsString,
-            metricsLevel: metricsLevel.valueAsString,
-
-            enableSnapshots: snapshots.valueAsString,
-            enableAutoScaling: autoScaling.valueAsString,
-
-            codeBucketArn: `arn:${cdk.Aws.PARTITION}:s3:::%%BUCKET_NAME%%-${cdk.Aws.REGION}`,
-            codeFileKey: cdk.Fn.join('/', ['%%SOLUTION_NAME%%/%%VERSION%%', 'kda-flink-kafka.zip']),
 
             subnetIds: cdk.Token.asList(kafkaHelper.Subnets),
             securityGroupIds: cdk.Token.asList(kafkaHelper.SecurityGroups)
@@ -105,60 +61,31 @@ export class MskKdaS3 extends cdk.Stack {
 
         //---------------------------------------------------------------------
         // Solution metrics
-
         new SolutionHelper(this, 'SolutionHelper', {
             solutionId: props.solutionId,
             pattern: MskKdaS3.name
         });
 
         //---------------------------------------------------------------------
-        // Monitoring (dashboard and alarms) configuration
-
-        new ApplicationMonitoring(this, 'Monitoring', {
-            applicationName: kda.ApplicationName,
-            logGroupName: kda.LogGroupName,
-            kafkaTopicName: topicName.valueAsString
-        });
-
-        //---------------------------------------------------------------------
         // Template metadata
-
         this.templateOptions.metadata = {
             'AWS::CloudFormation::Interface': {
                 ParameterGroups: [
                     {
                         Label: { default: 'Amazon MSK configuration' },
-                        Parameters: [clusterArn.logicalId, topicName.logicalId]
+                        Parameters: [clusterArn.logicalId]
                     },
                     {
                         Label: { default: 'Amazon Kinesis Data Analytics configuration' },
-                        Parameters: [
-                            logLevel.logicalId,
-                            metricsLevel.logicalId,
-                            snapshots.logicalId,
-                            autoScaling.logicalId,
-                        ]
+                        Parameters: [logLevel.logicalId]
                     }
                 ],
                 ParameterLabels: {
                     [clusterArn.logicalId]: {
                         default: 'ARN of the MSK cluster'
                     },
-                    [topicName.logicalId]: {
-                        default: 'Name of a Kafka topic to consume (topic must already exist before the stack is launched)'
-                    },
-
                     [logLevel.logicalId]: {
-                        default: 'Monitoring log level'
-                    },
-                    [metricsLevel.logicalId]: {
-                        default: 'Monitoring metrics level'
-                    },
-                    [snapshots.logicalId]: {
-                        default: 'Enable service-triggered snapshots'
-                    },
-                    [autoScaling.logicalId]: {
-                        default: 'Enable automatic scaling'
+                        default: 'Verbosity of the CloudWatch Logs for the studio'
                     }
                 }
             }
@@ -166,9 +93,8 @@ export class MskKdaS3 extends cdk.Stack {
 
         //---------------------------------------------------------------------
         // Stack outputs
-
-        new cdk.CfnOutput(this, 'ApplicationName', {
-            description: 'Name of the Amazon Kinesis Data Analytics application',
+        new cdk.CfnOutput(this, 'StudioNotebookName', {
+            description: 'Name of the Amazon Kinesis Data Analytics Studio notebook',
             value: kda.ApplicationName
         });
 

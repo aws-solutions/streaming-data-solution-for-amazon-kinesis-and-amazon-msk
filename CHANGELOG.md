@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.0] - 2021-11-01
+### Added
+- Support for [dynamic partitioning](https://aws.amazon.com/about-aws/whats-new/2021/08/introducing-dynamic-partitioning-amazon-kinesis-data-firehose/) in option 3 (Amazon Kinesis Data Streams, Amazon Kinesis Data Firehose, and Amazon S3). When enabled, dynamic partitioning allows for easy extraction of keys (for example, _customer_id_ or _transaction_id_) from incoming records and delivery of data grouped by these keys into corresponding S3 prefixes. Partitioning minimizes the amount of data scanned, optimizing performance and reducing costs of your analytics queries (using services such as Amazon Athena, Amazon EMR, or Amazon Redshift Spectrum).
+- Support for Apache Kafka version 2.8.1. For a complete list of improvements and bug fixes, see the Apache Kafka release notes for [2.8.1](https://downloads.apache.org/kafka/2.8.1/RELEASE_NOTES.html).
+- Support for clusters secured by IAM Access Control in option 2 (Amazon MSK and AWS Lambda) and option 3 (Amazon MSK, AWS Lambda, and Amazon Kinesis Data Firehose).
+
+### Changed
+- Option 2 (Kinesis Producer Library, Amazon Kinesis Data Streams, and Amazon Kinesis Data Analytics) and option 4 (Amazon MSK, Amazon Kinesis Data Analytics, and Amazon S3) to use Amazon Kinesis Data Analytics Studio, which offers a serverless notebook to perform live data exploration and get results in seconds (using SQL, Python, or Scala). The notebooks are powered by [Apache Zeppelin](https://zeppelin.apache.org/) and use [Apache Flink](https://flink.apache.org/) as the processing engine.
+- Amazon Kinesis Data Analytics resources to use [Apache Flink version 1.13](https://flink.apache.org/news/2021/05/03/release-1.13.0.html). Some capabilities in this release are: enhancements to the Table/SQL API, improved interoperability between the Table and DataStream APIs, and stateful operations using the Python Datastream API.
+- AWS CDK and AWS Solutions Constructs to version 1.126.0
+
 ## [1.5.0] - 2021-07-27
 ### Added
 - Support for [IAM access control](https://aws.amazon.com/about-aws/whats-new/2021/05/introducing-iam-access-control-amazon-msk/) when creating the Amazon MSK cluster. By using IAM Access Control, customers no longer need to build and run one-off access management systems to control client authentication and authorization for Apache Kafka.

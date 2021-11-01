@@ -11,27 +11,25 @@ The first pattern includes an API Gateway REST API that acts as proxy to Kinesis
 ### 2nd pattern
 ![pattern-02](kpl-kds-kda.png)
 
-The second pattern includes an EC2 instance that generates data using the Kinesis Producer Library; an Amazon Kinesis Data Stream that stores the data records; an Amazon Kinesis Data Analytics application that process the incoming records and saves data to an Amazon S3 bucket. Also included are [Amazon CloudWatch alarms](https://docs.aws.amazon.com/kinesisanalytics/latest/java/monitoring-metrics-alarms.html#monitoring-metrics-alarms-recommended) and a dashboard to monitor the application health / progress, resource utilization, and specific events / errors.
+The second pattern includes an EC2 instance that generates data using the Kinesis Producer Library; an Amazon Kinesis Data Stream that stores the data records; an Amazon Kinesis Data Analytics Studio notebook that can be used to process the incoming records and save them to an Amazon S3 bucket.
 
-![cw-dashboard](kda-cw-dashboard.png)
-
-The solution provides a [demo producer application](/source/kinesis/kpl-demo), which is configured to write 100 records per second to the data stream. There's also a [demo Java application for Kinesis Data Analytics](/source/kinesis/kda-flink-demo), in order to demonstrate how to use Apache Flink sources, sinks, and operators. The schema used is the same one provided in [Getting Started with Amazon Kinesis Data Analytics for Apache Flink (DataStream API)](https://docs.aws.amazon.com/kinesisanalytics/latest/java/getting-started.html):
+The solution provides a [demo producer application](/source/kinesis/kpl-demo), which is configured to write 100 records per second to the data stream. The schema used is the same one provided in [Getting Started with Amazon Kinesis Data Analytics for Apache Flink (DataStream API)](https://docs.aws.amazon.com/kinesisanalytics/latest/java/getting-started.html):
 
 ```json
 {
-    "EVENT_TIME": "2020-08-01T12:00:00.000Z",
-    "TICKER": "AMZN",
-    "PRICE": 50
+    "event_time": "2020-08-01 12:00:00.000",
+    "ticker": "AMZN",
+    "price": 50
 }
 ```
 
-By default, the demo producer and consumer applications will not run after the stacks are created. To enable them, follow the steps below:
+By default, the demo producer application will not run after the stacks are created. To enable it, follow the steps below:
 
-#### 1. Start the Kinesis Data Analytics application
-> **Note**: Application name is an output of the CloudFormation stack.
+#### 1. Start the Kinesis Data Analytics Studio notebook
+> **Note**: Studio notebook name is an output of the CloudFormation stack.
 
 ```
-aws kinesisanalyticsv2 start-application --application-name <application-name> --run-configuration {}
+aws kinesisanalyticsv2 start-application --application-name <studio-notebook-name>
 ```
 
 #### 2. Start the KPL producer
@@ -41,6 +39,55 @@ aws kinesisanalyticsv2 start-application --application-name <application-name> -
 
 ```
 sudo java -jar /tmp/aws-kpl-demo.jar <stream-name> <aws-region> <seconds-to-run>
+```
+
+#### 3. Run SQL queries
+```sql
+%flink.ssql
+CREATE TABLE stock_table (
+    ticker VARCHAR(6),
+    price DOUBLE,
+    event_time TIMESTAMP(3),
+    WATERMARK FOR event_time AS event_time - INTERVAL '5' SECOND
+) WITH (
+    'connector' = 'kinesis',
+    'stream' = '<STREAM-NAME>',
+    'aws.region' = '<AWS-REGION>',
+    'scan.stream.initpos' = 'LATEST',
+    'format' = 'json'
+);
+```
+
+> **Note**: In order to write records to S3, you need to [enable checkpointing](https://docs.aws.amazon.com/kinesisanalytics/latest/java/how-zeppelin-checkpoint.html).
+
+```python
+%flink.pyflink
+st_env.get_config().get_configuration().set_string(
+    "execution.checkpointing.interval", "1min"
+)
+
+st_env.get_config().get_configuration().set_string(
+    "execution.checkpointing.mode", "EXACTLY_ONCE"
+)
+```
+
+> **Note**: This pattern creates an Amazon S3 bucket, and its name is an output of the CloudFormation stack.
+
+```sql
+%flink.ssql(type=update)
+CREATE TABLE sink_table_s3 (event_time TIMESTAMP, ticker STRING, price DOUBLE, dt STRING, hr STRING)
+PARTITIONED BY (ticker, dt, hr)
+WITH ('connector' = 'filesystem', 'path' = 's3a://<BUCKET_NAME>/', 'format' = 'json');
+
+INSERT INTO sink_table_s3
+SELECT
+    event_time,
+    ticker,
+    price,
+    DATE_FORMAT(event_time, 'yyyy-MM-dd') as dt,
+    DATE_FORMAT(event_time, 'HH') as hh
+FROM stock_table
+WHERE price > 50;
 ```
 
 ### 3rd pattern

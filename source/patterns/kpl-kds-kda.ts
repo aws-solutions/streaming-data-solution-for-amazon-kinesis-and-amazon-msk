@@ -16,11 +16,11 @@ import * as cwlogs from '@aws-cdk/aws-logs';
 
 import { DataStream } from '../lib/kds-data-stream';
 import { KinesisProducer } from '../lib/kpl-producer';
-import { FlinkApplication } from '../lib/kda-flink-application';
+import { FlinkStudio } from '../lib/kda-flink-studio';
+import { FlinkLogLevels } from '../lib/kda-base';
 import { EncryptedBucket } from '../lib/s3-bucket';
 import { SolutionHelper } from '../lib/solution-helper';
 import { SolutionStackProps } from '../bin/solution-props';
-import { ApplicationMonitoring } from '../lib/kda-monitoring';
 
 export class KplKdsKda extends cdk.Stack {
     private readonly BinaryOptions = ['true', 'false'];
@@ -30,7 +30,6 @@ export class KplKdsKda extends cdk.Stack {
 
         //---------------------------------------------------------------------
         // Kinesis Data Stream configuration
-
         const shardCount = new cdk.CfnParameter(this, 'ShardCount', {
             type: 'Number',
             default: 2,
@@ -59,7 +58,6 @@ export class KplKdsKda extends cdk.Stack {
 
         //---------------------------------------------------------------------
         // Kinesis Producer Library configuration
-
         const producerVpc = new cdk.CfnParameter(this, 'ProducerVpcId', {
             type: 'AWS::EC2::VPC::Id'
         });
@@ -84,33 +82,14 @@ export class KplKdsKda extends cdk.Stack {
 
         //---------------------------------------------------------------------
         // Kinesis Data Analytics configuration
-
         const outputBucket = new EncryptedBucket(this, 'Output', {
             enableIntelligentTiering: true
         });
 
         const logLevel = new cdk.CfnParameter(this, 'LogLevel', {
             type: 'String',
-            default: 'INFO',
-            allowedValues: FlinkApplication.AllowedLogLevels
-        });
-
-        const metricsLevel = new cdk.CfnParameter(this, 'MetricsLevel', {
-            type: 'String',
-            default: 'TASK',
-            allowedValues: FlinkApplication.AllowedMetricLevels
-        });
-
-        const snapshots = new cdk.CfnParameter(this, 'EnableSnapshots', {
-            type: 'String',
-            default: 'true',
-            allowedValues: this.BinaryOptions
-        });
-
-        const autoScaling = new cdk.CfnParameter(this, 'EnableAutoScaling', {
-            type: 'String',
-            default: 'true',
-            allowedValues: this.BinaryOptions
+            default: FlinkLogLevels.INFO,
+            allowedValues: Object.values(FlinkLogLevels)
         });
 
         const subnets = new cdk.CfnParameter(this, 'ApplicationSubnetIds', {
@@ -121,25 +100,9 @@ export class KplKdsKda extends cdk.Stack {
             type: 'CommaDelimitedList'
         });
 
-        const kda = new FlinkApplication(this, 'Kda', {
-            environmentProperties: {
-                propertyGroupId: 'FlinkApplicationProperties',
-                propertyMap: {
-                    'InputStreamName': kds.Stream.streamName,
-                    'OutputBucketName': outputBucket.Bucket.bucketName,
-                    'Region': cdk.Aws.REGION
-                }
-            },
-
+        const kda = new FlinkStudio(this, 'Kda', {
             logsRetentionDays: cwlogs.RetentionDays.ONE_YEAR,
             logLevel: logLevel.valueAsString,
-            metricsLevel: metricsLevel.valueAsString,
-
-            enableSnapshots: snapshots.valueAsString,
-            enableAutoScaling: autoScaling.valueAsString,
-
-            codeBucketArn: `arn:${cdk.Aws.PARTITION}:s3:::%%BUCKET_NAME%%-${cdk.Aws.REGION}`,
-            codeFileKey: cdk.Fn.join('/', ['%%SOLUTION_NAME%%/%%VERSION%%', 'kda-flink-demo.zip']),
 
             subnetIds: subnets.valueAsList,
             securityGroupIds: securityGroups.valueAsList
@@ -150,7 +113,6 @@ export class KplKdsKda extends cdk.Stack {
 
         //---------------------------------------------------------------------
         // Solution metrics
-
         new SolutionHelper(this, 'SolutionHelper', {
             solutionId: props.solutionId,
             pattern: KplKdsKda.name,
@@ -161,17 +123,7 @@ export class KplKdsKda extends cdk.Stack {
         });
 
         //---------------------------------------------------------------------
-        // Monitoring (dashboard and alarms) configuration
-
-        new ApplicationMonitoring(this, 'Monitoring', {
-            applicationName: kda.ApplicationName,
-            logGroupName: kda.LogGroupName,
-            inputStreamName: kds.Stream.streamName
-        });
-
-        //---------------------------------------------------------------------
         // Template metadata
-
         this.templateOptions.metadata = {
             'AWS::CloudFormation::Interface': {
                 ParameterGroups: [
@@ -187,9 +139,6 @@ export class KplKdsKda extends cdk.Stack {
                         Label: { default: 'Amazon Kinesis Data Analytics configuration' },
                         Parameters: [
                             logLevel.logicalId,
-                            metricsLevel.logicalId,
-                            snapshots.logicalId,
-                            autoScaling.logicalId,
                             subnets.logicalId,
                             securityGroups.logicalId
                         ]
@@ -217,16 +166,7 @@ export class KplKdsKda extends cdk.Stack {
                     },
 
                     [logLevel.logicalId]: {
-                        default: 'Monitoring log level'
-                    },
-                    [metricsLevel.logicalId]: {
-                        default: 'Monitoring metrics level'
-                    },
-                    [snapshots.logicalId]: {
-                        default: 'Enable service-triggered snapshots'
-                    },
-                    [autoScaling.logicalId]: {
-                        default: 'Enable automatic scaling'
+                        default: 'Verbosity of the CloudWatch Logs for the studio'
                     },
                     [subnets.logicalId]: {
                         default: '(Optional) Comma-separated list of subnet ids for VPC connectivity (if informed, requires security groups to be included as well)'
@@ -240,7 +180,6 @@ export class KplKdsKda extends cdk.Stack {
 
         //---------------------------------------------------------------------
         // Stack outputs
-
         new cdk.CfnOutput(this, 'ProducerInstance', {
             description: 'ID of the KPL Amazon EC2 instance',
             value: kpl.InstanceId
@@ -251,9 +190,14 @@ export class KplKdsKda extends cdk.Stack {
             value: kds.Stream.streamName
         });
 
-        new cdk.CfnOutput(this, 'ApplicationName', {
-            description: 'Name of the Amazon Kinesis Data Analytics application',
+        new cdk.CfnOutput(this, 'StudioNotebookName', {
+            description: 'Name of the Amazon Kinesis Data Analytics Studio notebook',
             value: kda.ApplicationName
+        });
+
+        new cdk.CfnOutput(this, 'OutputBucketName', {
+            description: 'Name of the Amazon S3 destination bucket',
+            value: outputBucket.Bucket.bucketName
         });
     }
 }

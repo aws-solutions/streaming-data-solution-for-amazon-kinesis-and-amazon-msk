@@ -30,13 +30,16 @@ def _get_networking_config(cluster_arn):
 def _get_bootstrap_brokers(cluster_arn):
     response = client_kafka.get_bootstrap_brokers(ClusterArn=cluster_arn)
 
+    if 'BootstrapBrokerStringSaslScram' in response:
+        return response['BootstrapBrokerStringSaslScram']
+
+    if 'BootstrapBrokerStringSaslIam' in response:
+        return response['BootstrapBrokerStringSaslIam']
+
     if 'BootstrapBrokerStringTls' in response:
         return response['BootstrapBrokerStringTls']
 
-    if 'BootstrapBrokerString' in response:
-        return response['BootstrapBrokerString']
-
-    raise Exception('The demo application does not support any access control method other than None')
+    return response['BootstrapBrokerString']
 
 @helper.create
 @helper.update

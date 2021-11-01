@@ -20,16 +20,16 @@ Object {
     },
   },
   "Parameters": Object {
-    "AssetParameters46082e48b826df3817b5cfafd5bfc42d905840ad65d894855ec58966925e1292ArtifactHash8E89EA8E": Object {
-      "Description": "Artifact hash for asset \\"46082e48b826df3817b5cfafd5bfc42d905840ad65d894855ec58966925e1292\\"",
+    "AssetParameters57256fe34044067b4134f445b04a0139ca485cba00c19ab23b9ae3f4b02c86ecArtifactHash43004C74": Object {
+      "Description": "Artifact hash for asset \\"57256fe34044067b4134f445b04a0139ca485cba00c19ab23b9ae3f4b02c86ec\\"",
       "Type": "String",
     },
-    "AssetParameters46082e48b826df3817b5cfafd5bfc42d905840ad65d894855ec58966925e1292S3BucketD5D1EAB7": Object {
-      "Description": "S3 bucket for asset \\"46082e48b826df3817b5cfafd5bfc42d905840ad65d894855ec58966925e1292\\"",
+    "AssetParameters57256fe34044067b4134f445b04a0139ca485cba00c19ab23b9ae3f4b02c86ecS3Bucket8159F9CF": Object {
+      "Description": "S3 bucket for asset \\"57256fe34044067b4134f445b04a0139ca485cba00c19ab23b9ae3f4b02c86ec\\"",
       "Type": "String",
     },
-    "AssetParameters46082e48b826df3817b5cfafd5bfc42d905840ad65d894855ec58966925e1292S3VersionKey12D5174C": Object {
-      "Description": "S3 key for asset version \\"46082e48b826df3817b5cfafd5bfc42d905840ad65d894855ec58966925e1292\\"",
+    "AssetParameters57256fe34044067b4134f445b04a0139ca485cba00c19ab23b9ae3f4b02c86ecS3VersionKey9BE395C5": Object {
+      "Description": "S3 key for asset version \\"57256fe34044067b4134f445b04a0139ca485cba00c19ab23b9ae3f4b02c86ec\\"",
       "Type": "String",
     },
     "BatchSize": Object {
@@ -140,7 +140,7 @@ Object {
       "Properties": Object {
         "Code": Object {
           "S3Bucket": Object {
-            "Ref": "AssetParameters46082e48b826df3817b5cfafd5bfc42d905840ad65d894855ec58966925e1292S3BucketD5D1EAB7",
+            "Ref": "AssetParameters57256fe34044067b4134f445b04a0139ca485cba00c19ab23b9ae3f4b02c86ecS3Bucket8159F9CF",
           },
           "S3Key": Object {
             "Fn::Join": Array [
@@ -153,7 +153,7 @@ Object {
                       "Fn::Split": Array [
                         "||",
                         Object {
-                          "Ref": "AssetParameters46082e48b826df3817b5cfafd5bfc42d905840ad65d894855ec58966925e1292S3VersionKey12D5174C",
+                          "Ref": "AssetParameters57256fe34044067b4134f445b04a0139ca485cba00c19ab23b9ae3f4b02c86ecS3VersionKey9BE395C5",
                         },
                       ],
                     },
@@ -166,7 +166,7 @@ Object {
                       "Fn::Split": Array [
                         "||",
                         Object {
-                          "Ref": "AssetParameters46082e48b826df3817b5cfafd5bfc42d905840ad65d894855ec58966925e1292S3VersionKey12D5174C",
+                          "Ref": "AssetParameters57256fe34044067b4134f445b04a0139ca485cba00c19ab23b9ae3f4b02c86ecS3VersionKey9BE395C5",
                         },
                       ],
                     },
@@ -337,6 +337,115 @@ Object {
                   ],
                   "Effect": "Allow",
                   "Resource": "*",
+                  "Sid": "NetworkingPolicy",
+                },
+                Object {
+                  "Action": Array [
+                    "kafka-cluster:Connect",
+                    "kafka-cluster:DescribeGroup",
+                    "kafka-cluster:AlterGroup",
+                    "kafka-cluster:DescribeTopic",
+                    "kafka-cluster:ReadData",
+                    "kafka-cluster:DescribeClusterDynamicConfiguration",
+                  ],
+                  "Effect": "Allow",
+                  "Resource": Array [
+                    Object {
+                      "Ref": "ClusterArn",
+                    },
+                    Object {
+                      "Fn::Join": Array [
+                        "",
+                        Array [
+                          "arn:",
+                          Object {
+                            "Ref": "AWS::Partition",
+                          },
+                          ":kafka:",
+                          Object {
+                            "Ref": "AWS::Region",
+                          },
+                          ":",
+                          Object {
+                            "Ref": "AWS::AccountId",
+                          },
+                          ":topic/",
+                          Object {
+                            "Fn::Select": Array [
+                              1,
+                              Object {
+                                "Fn::Split": Array [
+                                  "/",
+                                  Object {
+                                    "Fn::Select": Array [
+                                      5,
+                                      Object {
+                                        "Fn::Split": Array [
+                                          ":",
+                                          Object {
+                                            "Ref": "ClusterArn",
+                                          },
+                                        ],
+                                      },
+                                    ],
+                                  },
+                                ],
+                              },
+                            ],
+                          },
+                          "/*/",
+                          Object {
+                            "Ref": "TopicName",
+                          },
+                        ],
+                      ],
+                    },
+                    Object {
+                      "Fn::Join": Array [
+                        "",
+                        Array [
+                          "arn:",
+                          Object {
+                            "Ref": "AWS::Partition",
+                          },
+                          ":kafka:",
+                          Object {
+                            "Ref": "AWS::Region",
+                          },
+                          ":",
+                          Object {
+                            "Ref": "AWS::AccountId",
+                          },
+                          ":group/",
+                          Object {
+                            "Fn::Select": Array [
+                              1,
+                              Object {
+                                "Fn::Split": Array [
+                                  "/",
+                                  Object {
+                                    "Fn::Select": Array [
+                                      5,
+                                      Object {
+                                        "Fn::Split": Array [
+                                          ":",
+                                          Object {
+                                            "Ref": "ClusterArn",
+                                          },
+                                        ],
+                                      },
+                                    ],
+                                  },
+                                ],
+                              },
+                            ],
+                          },
+                          "/*/*",
+                        ],
+                      ],
+                    },
+                  ],
+                  "Sid": "IamPolicy",
                 },
               ],
               "Version": "2012-10-17",
@@ -439,16 +548,16 @@ Object {
     },
   },
   "Parameters": Object {
-    "AssetParameters46082e48b826df3817b5cfafd5bfc42d905840ad65d894855ec58966925e1292ArtifactHash8E89EA8E": Object {
-      "Description": "Artifact hash for asset \\"46082e48b826df3817b5cfafd5bfc42d905840ad65d894855ec58966925e1292\\"",
+    "AssetParameters57256fe34044067b4134f445b04a0139ca485cba00c19ab23b9ae3f4b02c86ecArtifactHash43004C74": Object {
+      "Description": "Artifact hash for asset \\"57256fe34044067b4134f445b04a0139ca485cba00c19ab23b9ae3f4b02c86ec\\"",
       "Type": "String",
     },
-    "AssetParameters46082e48b826df3817b5cfafd5bfc42d905840ad65d894855ec58966925e1292S3BucketD5D1EAB7": Object {
-      "Description": "S3 bucket for asset \\"46082e48b826df3817b5cfafd5bfc42d905840ad65d894855ec58966925e1292\\"",
+    "AssetParameters57256fe34044067b4134f445b04a0139ca485cba00c19ab23b9ae3f4b02c86ecS3Bucket8159F9CF": Object {
+      "Description": "S3 bucket for asset \\"57256fe34044067b4134f445b04a0139ca485cba00c19ab23b9ae3f4b02c86ec\\"",
       "Type": "String",
     },
-    "AssetParameters46082e48b826df3817b5cfafd5bfc42d905840ad65d894855ec58966925e1292S3VersionKey12D5174C": Object {
-      "Description": "S3 key for asset version \\"46082e48b826df3817b5cfafd5bfc42d905840ad65d894855ec58966925e1292\\"",
+    "AssetParameters57256fe34044067b4134f445b04a0139ca485cba00c19ab23b9ae3f4b02c86ecS3VersionKey9BE395C5": Object {
+      "Description": "S3 key for asset version \\"57256fe34044067b4134f445b04a0139ca485cba00c19ab23b9ae3f4b02c86ec\\"",
       "Type": "String",
     },
     "LambdaCodeBucket": Object {
@@ -494,7 +603,7 @@ Object {
       "Properties": Object {
         "BatchSize": 10,
         "Enabled": true,
-        "EventSourceArn": "my-cluster-arn",
+        "EventSourceArn": "arn:aws:kafka:region:account:cluster/cluster-name/cluster-uuid",
         "FunctionName": Object {
           "Ref": "TestMskConsumer4592A744",
         },
@@ -513,7 +622,7 @@ Object {
       "Properties": Object {
         "BatchSize": 10,
         "Enabled": true,
-        "EventSourceArn": "my-cluster-arn",
+        "EventSourceArn": "arn:aws:kafka:region:account:cluster/cluster-name/cluster-uuid",
         "FunctionName": Object {
           "Ref": "TestMskConsumer4592A744",
         },
@@ -538,7 +647,7 @@ Object {
       "Properties": Object {
         "Code": Object {
           "S3Bucket": Object {
-            "Ref": "AssetParameters46082e48b826df3817b5cfafd5bfc42d905840ad65d894855ec58966925e1292S3BucketD5D1EAB7",
+            "Ref": "AssetParameters57256fe34044067b4134f445b04a0139ca485cba00c19ab23b9ae3f4b02c86ecS3Bucket8159F9CF",
           },
           "S3Key": Object {
             "Fn::Join": Array [
@@ -551,7 +660,7 @@ Object {
                       "Fn::Split": Array [
                         "||",
                         Object {
-                          "Ref": "AssetParameters46082e48b826df3817b5cfafd5bfc42d905840ad65d894855ec58966925e1292S3VersionKey12D5174C",
+                          "Ref": "AssetParameters57256fe34044067b4134f445b04a0139ca485cba00c19ab23b9ae3f4b02c86ecS3VersionKey9BE395C5",
                         },
                       ],
                     },
@@ -564,7 +673,7 @@ Object {
                       "Fn::Split": Array [
                         "||",
                         Object {
-                          "Ref": "AssetParameters46082e48b826df3817b5cfafd5bfc42d905840ad65d894855ec58966925e1292S3VersionKey12D5174C",
+                          "Ref": "AssetParameters57256fe34044067b4134f445b04a0139ca485cba00c19ab23b9ae3f4b02c86ecS3VersionKey9BE395C5",
                         },
                       ],
                     },
@@ -733,6 +842,62 @@ Object {
                   ],
                   "Effect": "Allow",
                   "Resource": "*",
+                  "Sid": "NetworkingPolicy",
+                },
+                Object {
+                  "Action": Array [
+                    "kafka-cluster:Connect",
+                    "kafka-cluster:DescribeGroup",
+                    "kafka-cluster:AlterGroup",
+                    "kafka-cluster:DescribeTopic",
+                    "kafka-cluster:ReadData",
+                    "kafka-cluster:DescribeClusterDynamicConfiguration",
+                  ],
+                  "Effect": "Allow",
+                  "Resource": Array [
+                    "arn:aws:kafka:region:account:cluster/cluster-name/cluster-uuid",
+                    Object {
+                      "Fn::Join": Array [
+                        "",
+                        Array [
+                          "arn:",
+                          Object {
+                            "Ref": "AWS::Partition",
+                          },
+                          ":kafka:",
+                          Object {
+                            "Ref": "AWS::Region",
+                          },
+                          ":",
+                          Object {
+                            "Ref": "AWS::AccountId",
+                          },
+                          ":topic/cluster-name/cluster-uuid/*/my-topic",
+                        ],
+                      ],
+                    },
+                    Object {
+                      "Fn::Join": Array [
+                        "",
+                        Array [
+                          "arn:",
+                          Object {
+                            "Ref": "AWS::Partition",
+                          },
+                          ":kafka:",
+                          Object {
+                            "Ref": "AWS::Region",
+                          },
+                          ":",
+                          Object {
+                            "Ref": "AWS::AccountId",
+                          },
+                          ":group/cluster-name/cluster-uuid/*/*",
+                        ],
+                      ],
+                    },
+                  ],
+                  "Sid": "IamPolicy",
                 },
               ],
               "Version": "2012-10-17",

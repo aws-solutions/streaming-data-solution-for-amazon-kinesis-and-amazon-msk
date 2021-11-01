@@ -2,7 +2,7 @@
 *.dist-info/
 bin
 certifi/
-chardet/
+charset_normalizer/
 crhelper/
 idna/
 requests/

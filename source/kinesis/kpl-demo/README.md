@@ -16,19 +16,19 @@ To customize the sample application, follow the steps below:
 The sample application will generate  records in this format:
 ```json
 {
-    "EVENT_TIME": "2020-08-01T12:00:00.000Z",
-    "TICKER": "AMZN",
-    "PRICE": 50
+    "event_time": "2020-08-01 12:00:00.000",
+    "ticker": "AMZN",
+    "price": 50
 }
 ```
 
 To change this behavior (for instance, adding or removing columns from the output), you should update the _generateData_ method:
 ```diff
-String record = new JSONObject()
-    .put("EVENT_TIME", Instant.now().toString())
-    .put("TICKER", TICKERS[index])
-    .put("PRICE", RANDOM.nextDouble() * 100)
-+   .put("PREVIOUS_CLOSE", RANDOM.nextDouble() * 100)
+String item = new JSONObject()
+    .put("event_time", new Timestamp(System.currentTimeMillis()))
+    .put("ticker", TICKERS[index])
+    .put("price", RANDOM.nextDouble() * 100)
++   .put("previous_close", RANDOM.nextDouble() * 100)
     .toString();
 ```
 

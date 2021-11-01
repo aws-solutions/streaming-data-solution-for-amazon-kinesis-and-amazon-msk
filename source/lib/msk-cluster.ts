@@ -1,5 +1,5 @@
 /*********************************************************************************************************************
- *  Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.                                      *
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                                *
  *                                                                                                                    *
  *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
  *  with the License. A copy of the License is located at                                                             *
@@ -29,9 +29,42 @@ export interface KafkaClusterProps {
 }
 
 export enum KafkaAccessControl {
-    None = 'None',
-    IAM = 'IAM access control',
+    Unauthenticated = 'Unauthenticated access',
+    IAM = 'IAM role-based authentication',
     SCRAM = 'SASL/SCRAM authentication'
+}
+
+export enum KafkaInstanceType {
+    m5_large = 'kafka.m5.large',
+    m5_xlarge = 'kafka.m5.xlarge',
+    m5_2xlarge = 'kafka.m5.2xlarge',
+    m5_4xlarge = 'kafka.m5.4xlarge',
+    m5_8xlarge = 'kafka.m5.8xlarge',
+    m5_12xlarge = 'kafka.m5.12xlarge',
+    m5_16xlarge = 'kafka.m5.16xlarge',
+    m5_24xlarge = 'kafka.m5.24xlarge',
+    t3_small = 'kafka.t3.small'
+}
+
+export enum KafkaActiveVersion {
+    V2_8_1 = '2.8.1',
+    V2_8_0 = '2.8.0',
+    V2_7_1 = '2.7.1',
+    V2_7_0 = '2.7.0',
+    V2_6_2 = '2.6.2',
+    V2_6_1 = '2.6.1',
+    V2_6_0 = '2.6.0',
+    V2_5_1 = '2.5.1',
+    V2_4_1_1 = '2.4.1.1',
+    V2_3_1 = '2.3.1',
+    V2_2_1 = '2.2.1'
+}
+
+export enum KafkaMonitoringLevel {
+    DEFAULT = 'DEFAULT',
+    PER_BROKER = 'PER_BROKER',
+    PER_TOPIC_PER_BROKER = 'PER_TOPIC_PER_BROKER',
+    PER_TOPIC_PER_PARTITION = 'PER_TOPIC_PER_PARTITION'
 }
 
 export class KafkaCluster extends cdk.Construct {
@@ -53,28 +86,12 @@ export class KafkaCluster extends cdk.Construct {
     private MIN_SUBNETS: number = 2;
     private MAX_SUBNETS: number = 3;
 
-    public static get AllowedKafkaVersions(): string[] {
-        return ['2.8.0', '2.7.1', '2.7.0', '2.6.2', '2.6.1', '2.6.0', '2.5.1', '2.4.1.1', '2.3.1', '2.2.1'];
-    }
-
-    public static get AllowedInstanceTypes(): string[] {
-        return ['kafka.m5.large', 'kafka.m5.xlarge', 'kafka.m5.2xlarge', 'kafka.m5.4xlarge', 'kafka.m5.8xlarge', 'kafka.m5.12xlarge', 'kafka.m5.16xlarge', 'kafka.m5.24xlarge', 'kafka.t3.small'];
-    }
-
-    public static get AllowedMonitoringLevels(): string[] {
-        return ['DEFAULT', 'PER_BROKER', 'PER_TOPIC_PER_BROKER', 'PER_TOPIC_PER_PARTITION'];
-    }
-
     public static get MinStorageSizeGiB(): number {
         return 1;
     }
 
     public static get MaxStorageSizeGiB(): number {
         return 16384;
-    }
-
-    public static get AccessControlMethods(): string[] {
-        return Object.values(KafkaAccessControl);
     }
 
     public static get RequiredRules() {
@@ -91,38 +108,11 @@ export class KafkaCluster extends cdk.Construct {
     constructor(scope: cdk.Construct, id: string, props: KafkaClusterProps) {
         super(scope, id);
 
-        if (!cdk.Token.isUnresolved(props.kafkaVersion) && !KafkaCluster.AllowedKafkaVersions.includes(props.kafkaVersion)) {
-            throw new Error(`Unknown Kafka version: ${props.kafkaVersion}`);
-        }
+        this.validateProps(props);
 
-        if (!cdk.Token.isUnresolved(props.brokerInstanceType) && !KafkaCluster.AllowedInstanceTypes.includes(props.brokerInstanceType)) {
-            throw new Error(`Unknown instance type: ${props.brokerInstanceType}`);
-        }
-
-        if (!cdk.Token.isUnresolved(props.monitoringLevel) && !KafkaCluster.AllowedMonitoringLevels.includes(props.monitoringLevel)) {
-            throw new Error(`Unknown monitoring level: ${props.monitoringLevel}`);
-        }
-
-        if (!cdk.Token.isUnresolved(props.brokerSubnets)) {
-            if (props.brokerSubnets.length < this.MIN_SUBNETS || props.brokerSubnets.length > this.MAX_SUBNETS) {
-                throw new Error(`brokerSubnets must contain between ${this.MIN_SUBNETS} and ${this.MAX_SUBNETS} items`);
-            }
-        }
-
-        if (!cdk.Token.isUnresolved(props.numberOfBrokerNodes) && props.numberOfBrokerNodes <= 0) {
-            throw new Error('numberOfBrokerNodes must be a positive number');
-        }
-
-        if (!cdk.Token.isUnresolved(props.brokerSubnets) && !cdk.Token.isUnresolved(props.numberOfBrokerNodes)) {
-            if (props.numberOfBrokerNodes % props.brokerSubnets.length !== 0) {
-                throw new Error('numberOfBrokerNodes must be a multiple of brokerSubnets');
-            }
-        }
-
-        const volumeSize = props.ebsVolumeSize;
-        if (!cdk.Token.isUnresolved(volumeSize) && (volumeSize < KafkaCluster.MinStorageSizeGiB || volumeSize > KafkaCluster.MaxStorageSizeGiB)) {
-            throw new Error(`ebsVolumeSize must be a value between ${KafkaCluster.MinStorageSizeGiB} and ${KafkaCluster.MaxStorageSizeGiB} GiB (given ${volumeSize})`);
-        }
+        const unauthenticatedCondition = new cdk.CfnCondition(this, 'EnableUnauthenticatedCondition', {
+            expression: cdk.Fn.conditionEquals(props.accessControl, KafkaAccessControl.Unauthenticated)
+        });
 
         const iamCondition = new cdk.CfnCondition(this, 'EnableIAMCondition', {
             expression: cdk.Fn.conditionEquals(props.accessControl, KafkaAccessControl.IAM)
@@ -146,7 +136,7 @@ export class KafkaCluster extends cdk.Construct {
                 securityGroups: [this.SecurityGroupId],
                 storageInfo: {
                     ebsStorageInfo: {
-                        volumeSize: volumeSize
+                        volumeSize: props.ebsVolumeSize
                     }
                 }
             },
@@ -167,6 +157,9 @@ export class KafkaCluster extends cdk.Construct {
                     scram: {
                         enabled: cdk.Fn.conditionIf(scramCondition.logicalId, true, false)
                     }
+                },
+                unauthenticated: {
+                    enabled: cdk.Fn.conditionIf(unauthenticatedCondition.logicalId, true, false)
                 }
             },
             encryptionInfo: {
@@ -185,6 +178,29 @@ export class KafkaCluster extends cdk.Construct {
                 }
             }
         });
+    }
+
+    private validateProps(props: KafkaClusterProps) {
+        if (!cdk.Token.isUnresolved(props.brokerSubnets)) {
+            if (props.brokerSubnets.length < this.MIN_SUBNETS || props.brokerSubnets.length > this.MAX_SUBNETS) {
+                throw new Error(`brokerSubnets must contain between ${this.MIN_SUBNETS} and ${this.MAX_SUBNETS} items`);
+            }
+        }
+
+        if (!cdk.Token.isUnresolved(props.numberOfBrokerNodes) && props.numberOfBrokerNodes <= 0) {
+            throw new Error('numberOfBrokerNodes must be a positive number');
+        }
+
+        if (!cdk.Token.isUnresolved(props.brokerSubnets) && !cdk.Token.isUnresolved(props.numberOfBrokerNodes)) {
+            if (props.numberOfBrokerNodes % props.brokerSubnets.length !== 0) {
+                throw new Error('numberOfBrokerNodes must be a multiple of brokerSubnets');
+            }
+        }
+
+        const volumeSize = props.ebsVolumeSize;
+        if (!cdk.Token.isUnresolved(volumeSize) && (volumeSize < KafkaCluster.MinStorageSizeGiB || volumeSize > KafkaCluster.MaxStorageSizeGiB)) {
+            throw new Error(`ebsVolumeSize must be a value between ${KafkaCluster.MinStorageSizeGiB} and ${KafkaCluster.MaxStorageSizeGiB} GiB (given ${volumeSize})`);
+        }
     }
 
     private createSecurityGroup(vpcId: string): ec2.CfnSecurityGroup {

@@ -5,14 +5,20 @@ Object {
   "Conditions": Object {
     "TestMskEnableIAMConditionF946AB65": Object {
       "Fn::Equals": Array [
-        "None",
-        "IAM access control",
+        "Unauthenticated access",
+        "IAM role-based authentication",
       ],
     },
     "TestMskEnableSCRAMConditionA8CE99C1": Object {
       "Fn::Equals": Array [
-        "None",
+        "Unauthenticated access",
         "SASL/SCRAM authentication",
+      ],
+    },
+    "TestMskEnableUnauthenticatedCondition954FA493": Object {
+      "Fn::Equals": Array [
+        "Unauthenticated access",
+        "Unauthenticated access",
       ],
     },
   },
@@ -39,6 +45,7 @@ Object {
     },
     "KafkaVersion": Object {
       "AllowedValues": Array [
+        "2.8.1",
         "2.8.0",
         "2.7.1",
         "2.7.0",
@@ -213,6 +220,15 @@ Object {
               },
             },
           },
+          "Unauthenticated": Object {
+            "Enabled": Object {
+              "Fn::If": Array [
+                "TestMskEnableUnauthenticatedCondition954FA493",
+                true,
+                false,
+              ],
+            },
+          },
         },
         "ClusterName": Object {
           "Fn::Join": Array [
@@ -283,14 +299,20 @@ Object {
   "Conditions": Object {
     "TestMskEnableIAMConditionF946AB65": Object {
       "Fn::Equals": Array [
-        "None",
-        "IAM access control",
+        "Unauthenticated access",
+        "IAM role-based authentication",
       ],
     },
     "TestMskEnableSCRAMConditionA8CE99C1": Object {
       "Fn::Equals": Array [
-        "None",
+        "Unauthenticated access",
         "SASL/SCRAM authentication",
+      ],
+    },
+    "TestMskEnableUnauthenticatedCondition954FA493": Object {
+      "Fn::Equals": Array [
+        "Unauthenticated access",
+        "Unauthenticated access",
       ],
     },
   },
@@ -439,6 +461,15 @@ Object {
               },
             },
           },
+          "Unauthenticated": Object {
+            "Enabled": Object {
+              "Fn::If": Array [
+                "TestMskEnableUnauthenticatedCondition954FA493",
+                true,
+                false,
+              ],
+            },
+          },
         },
         "ClusterName": Object {
           "Fn::Join": Array [
@@ -461,7 +492,7 @@ Object {
           },
         },
         "EnhancedMonitoring": "DEFAULT",
-        "KafkaVersion": "2.8.0",
+        "KafkaVersion": "2.8.1",
         "LoggingInfo": Object {
           "BrokerLogs": Object {
             "CloudWatchLogs": Object {
@@ -503,14 +534,20 @@ Object {
   "Conditions": Object {
     "TestMskEnableIAMConditionF946AB65": Object {
       "Fn::Equals": Array [
-        "None",
-        "IAM access control",
+        "Unauthenticated access",
+        "IAM role-based authentication",
       ],
     },
     "TestMskEnableSCRAMConditionA8CE99C1": Object {
       "Fn::Equals": Array [
-        "None",
+        "Unauthenticated access",
         "SASL/SCRAM authentication",
+      ],
+    },
+    "TestMskEnableUnauthenticatedCondition954FA493": Object {
+      "Fn::Equals": Array [
+        "Unauthenticated access",
+        "Unauthenticated access",
       ],
     },
   },
@@ -659,6 +696,15 @@ Object {
               },
             },
           },
+          "Unauthenticated": Object {
+            "Enabled": Object {
+              "Fn::If": Array [
+                "TestMskEnableUnauthenticatedCondition954FA493",
+                true,
+                false,
+              ],
+            },
+          },
         },
         "ClusterName": Object {
           "Fn::Join": Array [
@@ -681,7 +727,7 @@ Object {
           },
         },
         "EnhancedMonitoring": "DEFAULT",
-        "KafkaVersion": "2.8.0",
+        "KafkaVersion": "2.8.1",
         "LoggingInfo": Object {
           "BrokerLogs": Object {
             "CloudWatchLogs": Object {
@@ -723,14 +769,20 @@ Object {
   "Conditions": Object {
     "TestMskEnableIAMConditionF946AB65": Object {
       "Fn::Equals": Array [
-        "None",
-        "IAM access control",
+        "Unauthenticated access",
+        "IAM role-based authentication",
       ],
     },
     "TestMskEnableSCRAMConditionA8CE99C1": Object {
       "Fn::Equals": Array [
-        "None",
+        "Unauthenticated access",
         "SASL/SCRAM authentication",
+      ],
+    },
+    "TestMskEnableUnauthenticatedCondition954FA493": Object {
+      "Fn::Equals": Array [
+        "Unauthenticated access",
+        "Unauthenticated access",
       ],
     },
   },
@@ -879,6 +931,15 @@ Object {
               },
             },
           },
+          "Unauthenticated": Object {
+            "Enabled": Object {
+              "Fn::If": Array [
+                "TestMskEnableUnauthenticatedCondition954FA493",
+                true,
+                false,
+              ],
+            },
+          },
         },
         "ClusterName": Object {
           "Fn::Join": Array [
@@ -901,7 +962,7 @@ Object {
           },
         },
         "EnhancedMonitoring": "DEFAULT",
-        "KafkaVersion": "2.8.0",
+        "KafkaVersion": "2.8.1",
         "LoggingInfo": Object {
           "BrokerLogs": Object {
             "CloudWatchLogs": Object {
@@ -943,14 +1004,20 @@ Object {
   "Conditions": Object {
     "TestMskEnableIAMConditionF946AB65": Object {
       "Fn::Equals": Array [
-        "IAM access control",
-        "IAM access control",
+        "IAM role-based authentication",
+        "IAM role-based authentication",
       ],
     },
     "TestMskEnableSCRAMConditionA8CE99C1": Object {
       "Fn::Equals": Array [
-        "IAM access control",
+        "IAM role-based authentication",
         "SASL/SCRAM authentication",
+      ],
+    },
+    "TestMskEnableUnauthenticatedCondition954FA493": Object {
+      "Fn::Equals": Array [
+        "IAM role-based authentication",
+        "Unauthenticated access",
       ],
     },
   },
@@ -1099,6 +1166,15 @@ Object {
               },
             },
           },
+          "Unauthenticated": Object {
+            "Enabled": Object {
+              "Fn::If": Array [
+                "TestMskEnableUnauthenticatedCondition954FA493",
+                true,
+                false,
+              ],
+            },
+          },
         },
         "ClusterName": Object {
           "Fn::Join": Array [
@@ -1121,7 +1197,7 @@ Object {
           },
         },
         "EnhancedMonitoring": "DEFAULT",
-        "KafkaVersion": "2.8.0",
+        "KafkaVersion": "2.8.1",
         "LoggingInfo": Object {
           "BrokerLogs": Object {
             "CloudWatchLogs": Object {
@@ -1164,13 +1240,19 @@ Object {
     "TestMskEnableIAMConditionF946AB65": Object {
       "Fn::Equals": Array [
         "SASL/SCRAM authentication",
-        "IAM access control",
+        "IAM role-based authentication",
       ],
     },
     "TestMskEnableSCRAMConditionA8CE99C1": Object {
       "Fn::Equals": Array [
         "SASL/SCRAM authentication",
         "SASL/SCRAM authentication",
+      ],
+    },
+    "TestMskEnableUnauthenticatedCondition954FA493": Object {
+      "Fn::Equals": Array [
+        "SASL/SCRAM authentication",
+        "Unauthenticated access",
       ],
     },
   },
@@ -1319,6 +1401,15 @@ Object {
               },
             },
           },
+          "Unauthenticated": Object {
+            "Enabled": Object {
+              "Fn::If": Array [
+                "TestMskEnableUnauthenticatedCondition954FA493",
+                true,
+                false,
+              ],
+            },
+          },
         },
         "ClusterName": Object {
           "Fn::Join": Array [
@@ -1341,7 +1432,7 @@ Object {
           },
         },
         "EnhancedMonitoring": "DEFAULT",
-        "KafkaVersion": "2.8.0",
+        "KafkaVersion": "2.8.1",
         "LoggingInfo": Object {
           "BrokerLogs": Object {
             "CloudWatchLogs": Object {

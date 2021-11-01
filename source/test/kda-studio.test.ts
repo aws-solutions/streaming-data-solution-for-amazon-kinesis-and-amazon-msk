@@ -15,8 +15,8 @@ import * as cdk from '@aws-cdk/core';
 import * as logs from '@aws-cdk/aws-logs';
 import { expect as expectCDK, haveResource, ResourcePart, SynthUtils } from '@aws-cdk/assert';
 
-import { FlinkApplication } from '../lib/kda-flink-application';
-import { FlinkLogLevels, FlinkMetricLevels } from '../lib/kda-base';
+import { FlinkStudio } from '../lib/kda-flink-studio';
+import { FlinkLogLevels } from '../lib/kda-base';
 
 let stack: cdk.Stack;
 
@@ -24,33 +24,20 @@ beforeAll(() => {
     const app = new cdk.App();
     stack = new cdk.Stack(app, 'TestStack');
 
-    new FlinkApplication(stack, 'TestApplication', {
-        environmentProperties: {
-            propertyGroupId: 'some-group-id',
-            propertyMap: {
-                'some-property': 'foo'
-            }
-        },
+    new FlinkStudio(stack, 'TestApplication', {
         logsRetentionDays: logs.RetentionDays.ONE_WEEK,
         logLevel: FlinkLogLevels.INFO,
-        metricsLevel: FlinkMetricLevels.APPLICATION,
-
-        codeBucketArn: 'arn:aws:s3:::some-bucket',
-        codeFileKey: 'some-key.zip',
-
-        enableAutoScaling: 'true',
-        enableSnapshots: 'true',
 
         subnetIds: ['subnet-a', 'subnet-b'],
         securityGroupIds: ['sg-123']
     });
 });
 
-test('creates a KDA flink application', () => {
+test('creates a KDA flink studio', () => {
     expect(SynthUtils.toCloudFormation(stack)).toMatchSnapshot();
 });
 
-test('configures logging for the KDA application', () => {
+test('configures logging for the KDA studio', () => {
     expectCDK(stack).to(haveResource('AWS::Logs::LogGroup', {
         RetentionInDays: 7
     }));
@@ -80,7 +67,7 @@ test('adds cfn_nag suppressions', () => {
             cfn_nag: {
                 rules_to_suppress: [{
                     id: 'W11',
-                    reason: 'EC2 actions in VPC policy do not support resource level permissions'
+                    reason: 'EC2 actions do not support resource level permissions / Studio uses default Glue database'
                 }]
             }
         }
