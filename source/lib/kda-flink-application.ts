@@ -14,17 +14,12 @@
 import * as cdk from '@aws-cdk/core';
 import * as analytics from '@aws-cdk/aws-kinesisanalytics';
 import * as iam from '@aws-cdk/aws-iam';
-import * as logs from '@aws-cdk/aws-logs';
-import * as lambda from '@aws-cdk/aws-lambda';
 
-import { ExecutionRole } from './lambda-role-cloudwatch';
 import { CfnNagHelper } from './cfn-nag-helper';
+import { FlinkBase, FlinkBaseProps } from './kda-base';
 
-export interface FlinkApplicationProps {
+export interface FlinkApplicationProps extends FlinkBaseProps {
     readonly environmentProperties: analytics.CfnApplicationV2.PropertyGroupProperty;
-
-    readonly logsRetentionDays: logs.RetentionDays;
-    readonly logLevel: string;
     readonly metricsLevel: string;
 
     readonly codeBucketArn: string;
@@ -32,59 +27,15 @@ export interface FlinkApplicationProps {
 
     readonly enableSnapshots: string;
     readonly enableAutoScaling: string;
-
-    readonly subnetIds?: string[];
-    readonly securityGroupIds?: string[];
 }
 
-export class FlinkApplication extends cdk.Construct {
-    private readonly Application: analytics.CfnApplicationV2;
-    private readonly LogGroup: logs.LogGroup;
-    private readonly Role: iam.IRole;
-
-    public get ApplicationName(): string {
-        return this.Application.ref;
-    }
-
-    public get LogGroupName(): string {
-        return this.LogGroup.logGroupName;
-    }
-
-    public get ApplicationRole(): iam.IRole {
-        return this.Role;
-    }
-
-    public static get AllowedLogLevels(): string[] {
-        return ['DEBUG', 'ERROR', 'INFO', 'WARN'];
-    }
-
-    public static get AllowedMetricLevels(): string[] {
-        return ['APPLICATION', 'OPERATOR', 'PARALLELISM', 'TASK'];
-    }
-
+export class FlinkApplication extends FlinkBase {
     constructor(scope: cdk.Construct, id: string, props: FlinkApplicationProps) {
-        super(scope, id);
+        super(scope, id, props);
+        this.addCfnNagSuppressions();
+    }
 
-        if (!cdk.Token.isUnresolved(props.logLevel) && !FlinkApplication.AllowedLogLevels.includes(props.logLevel)) {
-            throw new Error(`Unknown log level: ${props.logLevel}`);
-        }
-
-        if (!cdk.Token.isUnresolved(props.metricsLevel) && !FlinkApplication.AllowedMetricLevels.includes(props.metricsLevel)) {
-            throw new Error(`Unknown metrics level: ${props.metricsLevel}`);
-        }
-
-        this.LogGroup = new logs.LogGroup(this, 'LogGroup', {
-            retention: props.logsRetentionDays,
-            removalPolicy: cdk.RemovalPolicy.RETAIN
-        });
-
-        const logStream = new logs.LogStream(this, 'LogStream', {
-            logGroup: this.LogGroup,
-            removalPolicy: cdk.RemovalPolicy.RETAIN
-        });
-
-        this.Role = this.createRole(props.codeBucketArn, props.codeFileKey);
-
+    protected createApplication(props: FlinkApplicationProps): analytics.CfnApplicationV2 {
         const autoScalingCondition = new cdk.CfnCondition(this, 'EnableAutoScaling', {
             expression: cdk.Fn.conditionEquals(props.enableAutoScaling, 'true')
         });
@@ -93,8 +44,8 @@ export class FlinkApplication extends cdk.Construct {
             expression: cdk.Fn.conditionEquals(props.enableSnapshots, 'true')
         });
 
-        this.Application = new analytics.CfnApplicationV2(this, 'Application', {
-            runtimeEnvironment: 'FLINK-1_11',
+        return new analytics.CfnApplicationV2(this, 'Application', {
+            runtimeEnvironment: 'FLINK-1_13',
             serviceExecutionRole: this.Role.roleArn,
             applicationConfiguration: {
                 applicationCodeConfiguration: {
@@ -128,17 +79,12 @@ export class FlinkApplication extends cdk.Construct {
                 }
             }
         });
-
-        this.createCustomResource(props.subnetIds, props.securityGroupIds);
-        this.configureLogging(logStream.logStreamName);
-
-        this.addCfnNagSuppressions();
     }
 
-    private createRole(bucketArn: string, fileKey: string): iam.IRole {
+    protected createRole(props: FlinkApplicationProps): iam.IRole {
         const s3CodePolicy = new iam.PolicyDocument({
             statements: [new iam.PolicyStatement({
-                resources: [`${bucketArn}/${fileKey}`],
+                resources: [`${props.codeBucketArn}/${props.codeFileKey}`],
                 actions: ['s3:GetObjectVersion', 's3:GetObject']
             })]
         });
@@ -177,24 +123,13 @@ export class FlinkApplication extends cdk.Construct {
             ]
         });
 
-        const role = new iam.Role(this, 'AppRole', {
+        return new iam.Role(this, 'AppRole', {
             assumedBy: new iam.ServicePrincipal('kinesisanalytics.amazonaws.com'),
             inlinePolicies: {
                 S3Policy: s3CodePolicy,
                 LogsPolicy: logsPolicy,
                 VpcPolicy: vpcPolicy
             }
-        });
-
-        return role;
-    }
-
-    private configureLogging(logStreamName: string) {
-        const logStreamArn = `arn:${cdk.Aws.PARTITION}:logs:${cdk.Aws.REGION}:${cdk.Aws.ACCOUNT_ID}:log-group:${this.LogGroupName}:log-stream:${logStreamName}`;
-
-        new analytics.CfnApplicationCloudWatchLoggingOptionV2(this, 'Logging', {
-            applicationName: this.ApplicationName,
-            cloudWatchLoggingOption: { logStreamArn }
         });
     }
 
@@ -203,44 +138,6 @@ export class FlinkApplication extends cdk.Construct {
         CfnNagHelper.addSuppressions(cfnRole, {
             Id: 'W11',
             Reason: 'EC2 actions in VPC policy do not support resource level permissions'
-        });
-    }
-
-    private createCustomResource(subnets?: string[], securityGroups?: string[]) {
-        const vpcConfigDocument = new iam.PolicyDocument({
-            statements: [new iam.PolicyStatement({
-                resources: [
-                    `arn:${cdk.Aws.PARTITION}:kinesisanalytics:${cdk.Aws.REGION}:${cdk.Aws.ACCOUNT_ID}:application/${this.ApplicationName}`
-                ],
-                actions: [
-                    'kinesisanalytics:AddApplicationVpcConfiguration',
-                    'kinesisanalytics:DeleteApplicationVpcConfiguration',
-                    'kinesisanalytics:DescribeApplication'
-                ]
-            })]
-        });
-
-        const customResouceRole = new ExecutionRole(this, 'CustomResourceRole', {
-            inlinePolicyName: 'VpcConfigPolicy',
-            inlinePolicyDocument: vpcConfigDocument
-        });
-
-        const customResourceFunction = new lambda.Function(this, 'CustomResource', {
-            runtime: lambda.Runtime.PYTHON_3_8,
-            handler: 'lambda_function.handler',
-            role: customResouceRole.Role,
-            code: lambda.Code.fromAsset('lambda/kda-vpc-config'),
-            timeout: cdk.Duration.seconds(30)
-        });
-
-        new cdk.CustomResource(this, 'VpcConfiguration', {
-            serviceToken: customResourceFunction.functionArn,
-            properties: {
-                ApplicationName: this.ApplicationName,
-                SubnetIds: subnets ?? [],
-                SecurityGroupIds: securityGroups ?? []
-            },
-            resourceType: 'Custom::VpcConfiguration'
         });
     }
 }

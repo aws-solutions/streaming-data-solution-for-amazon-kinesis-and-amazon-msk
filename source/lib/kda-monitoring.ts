@@ -362,7 +362,7 @@ export class ApplicationMonitoring extends MonitoringBase {
         const appFailuresQuery = [
             'fields @timestamp, @message',
             `| filter applicationARN like /${applicationArn}/`,
-            '| filter @message like /switched from RUNNING to FAILED/',
+            '| filter @message like /switched from RUNNING to RESTARTING/',
             '| sort @timestamp desc',
             `| limit ${this.LOG_QUERY_LIMIT}`
         ].join('\n');

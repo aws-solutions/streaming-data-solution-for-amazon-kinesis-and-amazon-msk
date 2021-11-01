@@ -24,8 +24,8 @@ export class MskClusterStack extends cdk.Stack {
 
         const kafkaVersion = new cdk.CfnParameter(this, 'MSKKafkaVersion', {
             type: 'String',
-            default: '2.8.0',
-            allowedValues: ['2.8.0', '2.7.1', '2.7.0', '2.6.2', '2.6.1', '2.6.0', '2.5.1', '2.4.1.1', '2.3.1', '2.2.1']
+            default: '2.8.1',
+            allowedValues: ['2.8.1', '2.8.0', '2.7.1', '2.7.0', '2.6.2', '2.6.1', '2.6.0', '2.5.1', '2.4.1.1', '2.3.1', '2.2.1']
         });
 
         const tlsMutualAuth = new cdk.CfnParameter(this, 'TLSMutualAuthentication', {

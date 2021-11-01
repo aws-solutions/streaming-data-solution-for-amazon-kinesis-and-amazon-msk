@@ -33,7 +33,7 @@ describe('successful scenarios', () => {
 
     test('creates a MSK Lambda consumer', () => {
         new KafkaConsumer(stack, 'TestMsk', {
-            clusterArn: 'my-cluster-arn',
+            clusterArn: 'arn:aws:kafka:region:account:cluster/cluster-name/cluster-uuid',
             scramSecretArn: 'my-secret-arn',
             batchSize: 10,
             enabled: true,
@@ -106,7 +106,7 @@ describe('validation tests', () => {
 
     test.each([0, 901])('timeout must be between allowed values', (invalidTimeoutSeconds) => {
         expect(() => new KafkaConsumer(stack, 'TestMsk', {
-            clusterArn: 'my-cluster-arn',
+            clusterArn: 'arn:aws:kafka:region:account:cluster/cluster-name/cluster-uuid',
             batchSize: 10,
             enabled: true,
             startingPosition: lambda.StartingPosition.LATEST,
@@ -118,7 +118,7 @@ describe('validation tests', () => {
 
     test.each([-1, 0, 10001])('batch size must be between allowed values', (invalidBatchSize) => {
         expect(() => new KafkaConsumer(stack, 'TestMsk', {
-            clusterArn: 'my-cluster-arn',
+            clusterArn: 'arn:aws:kafka:region:account:cluster/cluster-name/cluster-uuid',
             batchSize: invalidBatchSize,
             enabled: true,
             startingPosition: lambda.StartingPosition.LATEST,

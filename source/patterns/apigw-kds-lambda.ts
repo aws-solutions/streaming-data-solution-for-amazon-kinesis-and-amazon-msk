@@ -260,7 +260,7 @@ export class ApiGwKdsLambda extends cdk.Stack {
             removalPolicy: cdk.RemovalPolicy.RETAIN
         });
 
-        // Set AdvancedSecurityMode in the Cfn resource until this issue is closed:
+        // TODO: Set AdvancedSecurityMode in the Cfn resource until this issue is closed:
         // https://github.com/aws/aws-cdk/issues/7405
         (userPool.node.defaultChild as cognito.CfnUserPool).userPoolAddOns = {
             advancedSecurityMode: 'ENFORCED'

@@ -15,9 +15,15 @@ import * as cdk from '@aws-cdk/core';
 
 import { SolutionHelper } from '../lib/solution-helper';
 import { SolutionStackProps } from '../bin/solution-props';
-import { KafkaCluster, KafkaAccessControl } from '../lib/msk-cluster';
 import { KafkaClient } from '../lib/msk-client';
 import { KafkaMonitoring } from '../lib/msk-monitoring';
+import {
+    KafkaCluster,
+    KafkaAccessControl,
+    KafkaActiveVersion,
+    KafkaInstanceType,
+    KafkaMonitoringLevel
+} from '../lib/msk-cluster';
 
 export class MskStandalone extends cdk.Stack {
     constructor(scope: cdk.Construct, id: string, props: SolutionStackProps) {
@@ -27,8 +33,8 @@ export class MskStandalone extends cdk.Stack {
         // Broker configuration
         const kafkaVersion = new cdk.CfnParameter(this, 'KafkaVersion', {
             type: 'String',
-            default: '2.8.0',
-            allowedValues: KafkaCluster.AllowedKafkaVersions
+            default: KafkaActiveVersion.V2_8_1,
+            allowedValues: Object.values(KafkaActiveVersion)
         });
 
         const brokerNodes = new cdk.CfnParameter(this, 'NumberBrokerNodes', {
@@ -39,14 +45,14 @@ export class MskStandalone extends cdk.Stack {
 
         const brokerInstanceType = new cdk.CfnParameter(this, 'BrokerInstanceType', {
             type: 'String',
-            default: 'kafka.m5.large',
-            allowedValues: KafkaCluster.AllowedInstanceTypes
+            default: KafkaInstanceType.m5_large,
+            allowedValues: Object.values(KafkaInstanceType)
         });
 
         const monitoringLevel = new cdk.CfnParameter(this, 'MonitoringLevel', {
             type: 'String',
-            default: 'DEFAULT',
-            allowedValues: KafkaCluster.AllowedMonitoringLevels
+            default: KafkaMonitoringLevel.DEFAULT,
+            allowedValues: Object.values(KafkaMonitoringLevel)
         });
 
         const ebsVolumeSize = new cdk.CfnParameter(this, 'EbsVolumeSize', {
@@ -201,6 +207,11 @@ export class MskStandalone extends cdk.Stack {
         new cdk.CfnOutput(this, 'MskClusterArn', {
             description: 'ARN of the Amazon MSK cluster',
             value: cluster.ClusterArn
+        });
+
+        new cdk.CfnOutput(this, 'MskClusterSecurityGroupId', {
+            description: 'ID of the security group for the Amazon MSK cluster',
+            value: cluster.SecurityGroupId
         });
 
         new cdk.CfnOutput(this, 'ClientInstanceId', {

@@ -1,21 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`creates a KDA flink application 1`] = `
+exports[`creates a KDA flink studio 1`] = `
 Object {
-  "Conditions": Object {
-    "TestApplicationEnableAutoScaling3998F3DF": Object {
-      "Fn::Equals": Array [
-        "true",
-        "true",
-      ],
-    },
-    "TestApplicationEnableSnapshotsB729B643": Object {
-      "Fn::Equals": Array [
-        "true",
-        "true",
-      ],
-    },
-  },
   "Parameters": Object {
     "AssetParameters43e89a9f0f960297cab0588c0d0367bae47b0bc278bf9a0dd3f736ba6c00208eArtifactHashF30F9D88": Object {
       "Description": "Artifact hash for asset \\"43e89a9f0f960297cab0588c0d0367bae47b0bc278bf9a0dd3f736ba6c00208e\\"",
@@ -37,7 +23,7 @@ Object {
           "rules_to_suppress": Array [
             Object {
               "id": "W11",
-              "reason": "EC2 actions in VPC policy do not support resource level permissions",
+              "reason": "EC2 actions do not support resource level permissions / Studio uses default Glue database",
             },
           ],
         },
@@ -56,22 +42,6 @@ Object {
           "Version": "2012-10-17",
         },
         "Policies": Array [
-          Object {
-            "PolicyDocument": Object {
-              "Statement": Array [
-                Object {
-                  "Action": Array [
-                    "s3:GetObjectVersion",
-                    "s3:GetObject",
-                  ],
-                  "Effect": "Allow",
-                  "Resource": "arn:aws:s3:::some-bucket/some-key.zip",
-                },
-              ],
-              "Version": "2012-10-17",
-            },
-            "PolicyName": "S3Policy",
-          },
           Object {
             "PolicyDocument": Object {
               "Statement": Array [
@@ -161,6 +131,160 @@ Object {
               "Version": "2012-10-17",
             },
             "PolicyName": "VpcPolicy",
+          },
+          Object {
+            "PolicyDocument": Object {
+              "Statement": Array [
+                Object {
+                  "Action": Array [
+                    "glue:GetConnection",
+                    "glue:GetTable",
+                    "glue:GetTables",
+                    "glue:GetDatabase",
+                    "glue:CreateTable",
+                    "glue:UpdateTable",
+                    "glue:GetUserDefinedFunction",
+                  ],
+                  "Effect": "Allow",
+                  "Resource": Array [
+                    Object {
+                      "Fn::Join": Array [
+                        "",
+                        Array [
+                          "arn:",
+                          Object {
+                            "Ref": "AWS::Partition",
+                          },
+                          ":glue:",
+                          Object {
+                            "Ref": "AWS::Region",
+                          },
+                          ":",
+                          Object {
+                            "Ref": "AWS::AccountId",
+                          },
+                          ":connection/*",
+                        ],
+                      ],
+                    },
+                    Object {
+                      "Fn::Join": Array [
+                        "",
+                        Array [
+                          "arn:",
+                          Object {
+                            "Ref": "AWS::Partition",
+                          },
+                          ":glue:",
+                          Object {
+                            "Ref": "AWS::Region",
+                          },
+                          ":",
+                          Object {
+                            "Ref": "AWS::AccountId",
+                          },
+                          ":table/",
+                          Object {
+                            "Ref": "TestApplicationDatabase2DD251BE",
+                          },
+                          "/*",
+                        ],
+                      ],
+                    },
+                    Object {
+                      "Fn::Join": Array [
+                        "",
+                        Array [
+                          "arn:",
+                          Object {
+                            "Ref": "AWS::Partition",
+                          },
+                          ":glue:",
+                          Object {
+                            "Ref": "AWS::Region",
+                          },
+                          ":",
+                          Object {
+                            "Ref": "AWS::AccountId",
+                          },
+                          ":database/",
+                          Object {
+                            "Ref": "TestApplicationDatabase2DD251BE",
+                          },
+                        ],
+                      ],
+                    },
+                    Object {
+                      "Fn::Join": Array [
+                        "",
+                        Array [
+                          "arn:",
+                          Object {
+                            "Ref": "AWS::Partition",
+                          },
+                          ":glue:",
+                          Object {
+                            "Ref": "AWS::Region",
+                          },
+                          ":",
+                          Object {
+                            "Ref": "AWS::AccountId",
+                          },
+                          ":database/hive",
+                        ],
+                      ],
+                    },
+                    Object {
+                      "Fn::Join": Array [
+                        "",
+                        Array [
+                          "arn:",
+                          Object {
+                            "Ref": "AWS::Partition",
+                          },
+                          ":glue:",
+                          Object {
+                            "Ref": "AWS::Region",
+                          },
+                          ":",
+                          Object {
+                            "Ref": "AWS::AccountId",
+                          },
+                          ":catalog",
+                        ],
+                      ],
+                    },
+                    Object {
+                      "Fn::Join": Array [
+                        "",
+                        Array [
+                          "arn:",
+                          Object {
+                            "Ref": "AWS::Partition",
+                          },
+                          ":glue:",
+                          Object {
+                            "Ref": "AWS::Region",
+                          },
+                          ":",
+                          Object {
+                            "Ref": "AWS::AccountId",
+                          },
+                          ":userDefinedFunction/*",
+                        ],
+                      ],
+                    },
+                  ],
+                },
+                Object {
+                  "Action": "glue:GetDatabases",
+                  "Effect": "Allow",
+                  "Resource": "*",
+                },
+              ],
+              "Version": "2012-10-17",
+            },
+            "PolicyName": "GluePolicy",
           },
         ],
       },
@@ -300,7 +424,7 @@ Object {
                         },
                         ":application/",
                         Object {
-                          "Ref": "TestApplicationFF75924F",
+                          "Ref": "TestApplicationStudio253CD4A9",
                         },
                       ],
                     ],
@@ -315,67 +439,26 @@ Object {
       },
       "Type": "AWS::IAM::Role",
     },
-    "TestApplicationFF75924F": Object {
+    "TestApplicationDatabase2DD251BE": Object {
       "Properties": Object {
-        "ApplicationConfiguration": Object {
-          "ApplicationCodeConfiguration": Object {
-            "CodeContent": Object {
-              "S3ContentLocation": Object {
-                "BucketARN": "arn:aws:s3:::some-bucket",
-                "FileKey": "some-key.zip",
-              },
-            },
-            "CodeContentType": "ZIPFILE",
-          },
-          "ApplicationSnapshotConfiguration": Object {
-            "SnapshotsEnabled": Object {
-              "Fn::If": Array [
-                "TestApplicationEnableSnapshotsB729B643",
-                true,
-                false,
-              ],
-            },
-          },
-          "EnvironmentProperties": Object {
-            "PropertyGroups": Array [
-              Object {
-                "PropertyGroupId": "some-group-id",
-                "PropertyMap": Object {
-                  "some-property": "foo",
+        "CatalogId": Object {
+          "Ref": "AWS::AccountId",
+        },
+        "DatabaseInput": Object {
+          "Description": Object {
+            "Fn::Join": Array [
+              "",
+              Array [
+                Object {
+                  "Ref": "AWS::StackName",
                 },
-              },
+                " - Database for Amazon Kinesis Data Analytics Studio",
+              ],
             ],
           },
-          "FlinkApplicationConfiguration": Object {
-            "CheckpointConfiguration": Object {
-              "ConfigurationType": "DEFAULT",
-            },
-            "MonitoringConfiguration": Object {
-              "ConfigurationType": "CUSTOM",
-              "LogLevel": "INFO",
-              "MetricsLevel": "APPLICATION",
-            },
-            "ParallelismConfiguration": Object {
-              "AutoScalingEnabled": Object {
-                "Fn::If": Array [
-                  "TestApplicationEnableAutoScaling3998F3DF",
-                  true,
-                  false,
-                ],
-              },
-              "ConfigurationType": "CUSTOM",
-            },
-          },
-        },
-        "RuntimeEnvironment": "FLINK-1_13",
-        "ServiceExecutionRole": Object {
-          "Fn::GetAtt": Array [
-            "TestApplicationAppRoleF109DF67",
-            "Arn",
-          ],
         },
       },
-      "Type": "AWS::KinesisAnalyticsV2::Application",
+      "Type": "AWS::Glue::Database",
     },
     "TestApplicationLogGroup970A3DC7": Object {
       "DeletionPolicy": "Retain",
@@ -398,7 +481,7 @@ Object {
     "TestApplicationLoggingB343A6A7": Object {
       "Properties": Object {
         "ApplicationName": Object {
-          "Ref": "TestApplicationFF75924F",
+          "Ref": "TestApplicationStudio253CD4A9",
         },
         "CloudWatchLoggingOption": Object {
           "LogStreamARN": Object {
@@ -432,11 +515,84 @@ Object {
       },
       "Type": "AWS::KinesisAnalyticsV2::ApplicationCloudWatchLoggingOption",
     },
+    "TestApplicationStudio253CD4A9": Object {
+      "Properties": Object {
+        "ApplicationConfiguration": Object {
+          "ZeppelinApplicationConfiguration": Object {
+            "CatalogConfiguration": Object {
+              "GlueDataCatalogConfiguration": Object {
+                "DatabaseARN": Object {
+                  "Fn::Join": Array [
+                    "",
+                    Array [
+                      "arn:",
+                      Object {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":glue:",
+                      Object {
+                        "Ref": "AWS::Region",
+                      },
+                      ":",
+                      Object {
+                        "Ref": "AWS::AccountId",
+                      },
+                      ":database/",
+                      Object {
+                        "Ref": "TestApplicationDatabase2DD251BE",
+                      },
+                    ],
+                  ],
+                },
+              },
+            },
+            "CustomArtifactsConfiguration": Array [
+              Object {
+                "ArtifactType": "DEPENDENCY_JAR",
+                "MavenReference": Object {
+                  "ArtifactId": "flink-sql-connector-kinesis_2.12",
+                  "GroupId": "org.apache.flink",
+                  "Version": "1.13.2",
+                },
+              },
+              Object {
+                "ArtifactType": "DEPENDENCY_JAR",
+                "MavenReference": Object {
+                  "ArtifactId": "flink-connector-kafka_2.12",
+                  "GroupId": "org.apache.flink",
+                  "Version": "1.13.2",
+                },
+              },
+              Object {
+                "ArtifactType": "DEPENDENCY_JAR",
+                "MavenReference": Object {
+                  "ArtifactId": "aws-msk-iam-auth",
+                  "GroupId": "software.amazon.msk",
+                  "Version": "1.1.0",
+                },
+              },
+            ],
+            "MonitoringConfiguration": Object {
+              "LogLevel": "INFO",
+            },
+          },
+        },
+        "ApplicationMode": "INTERACTIVE",
+        "RuntimeEnvironment": "ZEPPELIN-FLINK-2_0",
+        "ServiceExecutionRole": Object {
+          "Fn::GetAtt": Array [
+            "TestApplicationAppRoleF109DF67",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "AWS::KinesisAnalyticsV2::Application",
+    },
     "TestApplicationVpcConfiguration6BA87B39": Object {
       "DeletionPolicy": "Delete",
       "Properties": Object {
         "ApplicationName": Object {
-          "Ref": "TestApplicationFF75924F",
+          "Ref": "TestApplicationStudio253CD4A9",
         },
         "SecurityGroupIds": Array [
           "sg-123",
