@@ -20,7 +20,7 @@ const FIREHOSE_MAX_SIZE_BYTES = 4194304;
 const FIREHOSE_RETRIES = 3;
 
 // OS command does not accept any user input.
-exports.sleep = (seconds) => child_process.execSync(`sleep ${seconds}`); // NOSONAR (javascript:S4721)
+exports.sleep = (seconds) => child_process.execFileSync('sleep', [seconds]); // NOSONAR (javascript:S4721)
 
 const _putRecords = async (records) => {
     const options = JSON.parse(process.env.AWS_SDK_USER_AGENT);
