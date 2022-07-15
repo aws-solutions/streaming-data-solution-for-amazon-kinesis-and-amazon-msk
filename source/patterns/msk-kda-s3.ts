@@ -54,7 +54,9 @@ export class MskKdaS3 extends cdk.Stack {
             logLevel: logLevel.valueAsString,
 
             subnetIds: cdk.Token.asList(kafkaHelper.Subnets),
-            securityGroupIds: cdk.Token.asList(kafkaHelper.SecurityGroups)
+            securityGroupIds: cdk.Token.asList(kafkaHelper.SecurityGroups),
+
+            clusterArn: clusterArn.valueAsString
         });
 
         outputBucket.Bucket.grantReadWrite(kda.ApplicationRole);

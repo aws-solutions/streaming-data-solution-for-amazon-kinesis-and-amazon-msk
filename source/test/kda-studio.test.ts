@@ -29,7 +29,9 @@ beforeAll(() => {
         logLevel: FlinkLogLevels.INFO,
 
         subnetIds: ['subnet-a', 'subnet-b'],
-        securityGroupIds: ['sg-123']
+        securityGroupIds: ['sg-123'],
+
+        clusterArn: 'arn:aws:kafka:region:account:cluster/cluster-name/cluster-uuid'
     });
 });
 

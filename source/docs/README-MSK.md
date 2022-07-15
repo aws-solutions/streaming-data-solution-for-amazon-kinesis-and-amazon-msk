@@ -133,7 +133,20 @@ CREATE TABLE stock_table (
 );
 ```
 
-> **Note**: In order to write records to S3, you need to [enable checkpointing](https://docs.aws.amazon.com/kinesisanalytics/latest/java/how-zeppelin-checkpoint.html).
+> **Note**: If the cluster is configured for IAM access control, you will need to change some properties in the table definition:
+
+```diff
+-'properties.security.protocol' = 'SSL',
+-'properties.ssl.truststore.location' = '/usr/lib/jvm/java-11-amazon-corretto/lib/security/cacerts',
+-'properties.ssl.truststore.password' = 'changeit'
+
++'properties.security.protocol' = 'SASL_SSL',
++'properties.sasl.mechanism' = 'AWS_MSK_IAM',
++'properties.sasl.jaas.config' = 'software.amazon.msk.auth.iam.IAMLoginModule required;',
++'properties.sasl.client.callback.handler.class' = 'software.amazon.msk.auth.iam.IAMClientCallbackHandler'
+```
+
+In order to write records to S3, you need to [enable checkpointing](https://docs.aws.amazon.com/kinesisanalytics/latest/java/how-zeppelin-checkpoint.html):
 
 ```python
 %flink.pyflink

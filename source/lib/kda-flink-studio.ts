@@ -19,15 +19,19 @@ import * as glue from '@aws-cdk/aws-glue';
 import { CfnNagHelper } from './cfn-nag-helper';
 import { FlinkBase, FlinkBaseProps } from './kda-base';
 
+export interface FlinkStudioProps extends FlinkBaseProps {
+    readonly clusterArn?: string;
+}
+
 export class FlinkStudio extends FlinkBase {
     private DatabaseName: string = '';
 
-    constructor(scope: cdk.Construct, id: string, props: FlinkBaseProps) {
+    constructor(scope: cdk.Construct, id: string, props: FlinkStudioProps) {
         super(scope, id, props);
         this.addCfnNagSuppressions();
     }
 
-    protected createRole(_props: FlinkBaseProps): iam.IRole {
+    protected createRole(_props: FlinkStudioProps): iam.IRole {
         const glueDb = new glue.CfnDatabase(this, 'Database', {
             catalogId: cdk.Aws.ACCOUNT_ID,
             databaseInput: {
@@ -100,7 +104,7 @@ export class FlinkStudio extends FlinkBase {
             ]
         });
 
-        return new iam.Role(this, 'AppRole', {
+        const kdaRole = new iam.Role(this, 'AppRole', {
             assumedBy: new iam.ServicePrincipal('kinesisanalytics.amazonaws.com'),
             inlinePolicies: {
                 LogsPolicy: logsPolicy,
@@ -108,9 +112,36 @@ export class FlinkStudio extends FlinkBase {
                 GluePolicy: gluePolicy
             }
         });
+
+        if (_props.clusterArn !== undefined) {
+            const components = cdk.Arn.split(_props.clusterArn, cdk.ArnFormat.SLASH_RESOURCE_NAME);
+            const clusterName = components.resourceName!;
+
+            const mskPolicy = new iam.PolicyStatement({
+                sid: 'IamPolicy',
+                actions: [
+                    'kafka-cluster:Connect',
+                    'kafka-cluster:DescribeGroup',
+                    'kafka-cluster:AlterGroup',
+                    'kafka-cluster:DescribeTopic',
+                    'kafka-cluster:ReadData',
+                    'kafka-cluster:DescribeClusterDynamicConfiguration'
+                ],
+                resources: [
+                    _props.clusterArn,
+                    // TODO: Remove `*` once issue with Arn.Split has been resolved.
+                    `arn:${cdk.Aws.PARTITION}:kafka:${cdk.Aws.REGION}:${cdk.Aws.ACCOUNT_ID}:topic/${clusterName}/*/*`,
+                    `arn:${cdk.Aws.PARTITION}:kafka:${cdk.Aws.REGION}:${cdk.Aws.ACCOUNT_ID}:group/${clusterName}/*/*`
+                ]
+            });
+
+            kdaRole.addToPolicy(mskPolicy);
+        }
+
+        return kdaRole;
     }
 
-    protected createApplication(_props: FlinkBaseProps): analytics.CfnApplicationV2 {
+    protected createApplication(_props: FlinkStudioProps): analytics.CfnApplicationV2 {
         return new analytics.CfnApplicationV2(this, 'Studio', {
             runtimeEnvironment: 'ZEPPELIN-FLINK-2_0',
             applicationMode: 'INTERACTIVE',

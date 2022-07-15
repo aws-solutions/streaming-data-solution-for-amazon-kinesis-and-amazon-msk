@@ -45,7 +45,7 @@ export class DataStreamMonitoring extends MonitoringBase {
         const defaultMetricProps = {
             namespace: 'AWS/Lambda',
             period: this.MONITORING_PERIOD,
-            dimensions: {
+            dimensionsMap: {
                 'FunctionName': functionName,
                 'Resource': functionName
             }

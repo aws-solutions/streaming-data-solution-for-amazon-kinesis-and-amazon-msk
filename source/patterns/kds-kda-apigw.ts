@@ -297,14 +297,15 @@ export class KdsKdaApiGw extends cdk.Stack {
         });
 
         const apiKeyValue = crypto.createHash('sha256').update(cdk.Aws.ACCOUNT_ID).digest('hex');
-        new apigw.UsagePlan(this, 'UsagePlan', {
+        const apiPlan = new apigw.UsagePlan(this, 'UsagePlan', {
             throttle: { rateLimit: 20, burstLimit: 100 },
             apiStages: [{
                 api: predictFareApi.api,
                 stage: predictFareApi.api.deploymentStage,
-            }],
-            apiKey: new apigw.ApiKey(this, 'ApiKey', { value: apiKeyValue })
+            }]
         });
+
+        apiPlan.addApiKey(new apigw.ApiKey(this, 'ApiKey', { value: apiKeyValue }));
 
         return [pattern.apiGateway, apiKeyValue];
     }
