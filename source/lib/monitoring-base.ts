@@ -53,7 +53,7 @@ export abstract class MonitoringBase extends cdk.Construct {
             namespace: 'AWS/Kinesis',
             period: this.MONITORING_PERIOD,
             statistic: 'Average',
-            dimensions: { 'StreamName': streamName }
+            dimensionsMap: { 'StreamName': streamName }
         };
 
         const defaultAlarmProps = {

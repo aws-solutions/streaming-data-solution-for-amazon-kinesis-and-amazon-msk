@@ -49,8 +49,10 @@ export enum KafkaInstanceType {
 export enum KafkaActiveVersion {
     V2_8_1 = '2.8.1',
     V2_8_0 = '2.8.0',
+    V2_7_2 = '2.7.2',
     V2_7_1 = '2.7.1',
     V2_7_0 = '2.7.0',
+    V2_6_3 = '2.6.3',
     V2_6_2 = '2.6.2',
     V2_6_1 = '2.6.1',
     V2_6_0 = '2.6.0',

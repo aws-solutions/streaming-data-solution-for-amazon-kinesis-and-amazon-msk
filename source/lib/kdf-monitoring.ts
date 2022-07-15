@@ -57,7 +57,7 @@ export class DeliveryStreamMonitoring extends MonitoringBase {
         const defaultMetricProps = {
             namespace: 'AWS/Firehose',
             period: monitoringPeriod,
-            dimensions: { 'DeliveryStreamName': deliveryStreamName },
+            dimensionsMap: { 'DeliveryStreamName': deliveryStreamName },
             statistic: cw.Statistic.SUM
         };
 

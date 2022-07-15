@@ -35,7 +35,7 @@ export class ApplicationMonitoring extends MonitoringBase {
     private DEFAULT_METRIC_PROPS = {
         namespace: 'AWS/KinesisAnalytics',
         period: this.MONITORING_PERIOD,
-        dimensions: { 'Application': '' }
+        dimensionsMap: { 'Application': '' }
     };
 
     private DEFAULT_ALARM_PROPS = {
@@ -47,7 +47,7 @@ export class ApplicationMonitoring extends MonitoringBase {
     constructor(scope: cdk.Construct, id: string, props: ApplicationMonitoringProps) {
         super(scope, id);
 
-        this.DEFAULT_METRIC_PROPS.dimensions['Application'] = props.applicationName;
+        this.DEFAULT_METRIC_PROPS.dimensionsMap['Application'] = props.applicationName;
 
         this.addApplicationHealth();
         this.addResourceUtilization();
@@ -284,8 +284,8 @@ export class ApplicationMonitoring extends MonitoringBase {
                 ...this.DEFAULT_METRIC_PROPS,
                 metricName: 'millisBehindLatest',
                 statistic: 'Maximum',
-                dimensions: {
-                    ...this.DEFAULT_METRIC_PROPS.dimensions,
+                dimensionsMap: {
+                    ...this.DEFAULT_METRIC_PROPS.dimensionsMap,
                     'Id': cdk.Fn.join('_', cdk.Fn.split('-', inputStreamName)),
                     'Flow': 'Input'
                 }
@@ -306,8 +306,8 @@ export class ApplicationMonitoring extends MonitoringBase {
                 ...this.DEFAULT_METRIC_PROPS,
                 metricName: 'records_lag_max',
                 statistic: 'Maximum',
-                dimensions: {
-                    ...this.DEFAULT_METRIC_PROPS.dimensions
+                dimensionsMap: {
+                    ...this.DEFAULT_METRIC_PROPS.dimensionsMap
                 }
             });
 
