@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.1] - 2022-07-14
+### Updated
+- npm package security patching (minimist, vm2)
+- Gson 2.8.9
+
 ## [1.6.0] - 2021-11-01
 ### Added
 - Support for [dynamic partitioning](https://aws.amazon.com/about-aws/whats-new/2021/08/introducing-dynamic-partitioning-amazon-kinesis-data-firehose/) in option 3 (Amazon Kinesis Data Streams, Amazon Kinesis Data Firehose, and Amazon S3). When enabled, dynamic partitioning allows for easy extraction of keys (for example, _customer_id_ or _transaction_id_) from incoming records and delivery of data grouped by these keys into corresponding S3 prefixes. Partitioning minimizes the amount of data scanned, optimizing performance and reducing costs of your analytics queries (using services such as Amazon Athena, Amazon EMR, or Amazon Redshift Spectrum).

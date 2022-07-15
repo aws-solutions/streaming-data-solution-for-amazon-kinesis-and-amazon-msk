@@ -49,8 +49,11 @@ export class KafkaClient extends cdk.Construct {
             `wget https://archive.apache.org/dist/kafka/${props.kafkaVersion}/kafka_2.12-${props.kafkaVersion}.tgz`,
             `tar -xzf kafka_2.12-${props.kafkaVersion}.tgz --strip 1 && rm kafka_2.12-${props.kafkaVersion}.tgz`,
 
-            'wget https://github.com/aws/aws-msk-iam-auth/releases/download/1.1.0/aws-msk-iam-auth-1.1.0-all.jar',
-            'mv aws-msk-iam-auth-1.1.0-all.jar ./libs',
+            'wget https://github.com/aws/aws-msk-iam-auth/releases/download/v1.1.1/aws-msk-iam-auth-1.1.1-all.jar',
+            'wget https://github.com/aws/aws-msk-iam-auth/releases/download/v1.1.1/aws-msk-iam-auth-1.1.1-all.jar.sha256',
+            'IAM_LIB_CHECKSUM=`cat aws-msk-iam-auth-1.1.1-all.jar.sha256`',
+            'echo "$IAM_LIB_CHECKSUM aws-msk-iam-auth-1.1.1-all.jar" | sha256sum -c',
+            'mv aws-msk-iam-auth-1.1.1-all.jar aws-msk-iam-auth-1.1.1-all.jar.sha256 ./libs',
 
             `find /usr/lib/jvm/ -name "cacerts" | xargs -I '{}' cp '{}' /tmp/kafka.client.truststore.jks`,
 
@@ -66,8 +69,8 @@ export class KafkaClient extends cdk.Construct {
             `touch bin/client-iam.properties`,
             `echo "security.protocol=SASL_SSL" >> bin/client-iam.properties`,
             `echo "sasl.mechanism=AWS_MSK_IAM" >> bin/client-iam.properties`,
-            `echo "sasl.jaas.config = software.amazon.msk.auth.iam.IAMLoginModule required;" >> bin/client-iam.properties`,
-            `echo "sasl.client.callback.handler.class = software.amazon.msk.auth.iam.IAMClientCallbackHandler" >> bin/client-iam.properties`,
+            `echo "sasl.jaas.config=software.amazon.msk.auth.iam.IAMLoginModule required;" >> bin/client-iam.properties`,
+            `echo "sasl.client.callback.handler.class=software.amazon.msk.auth.iam.IAMClientCallbackHandler" >> bin/client-iam.properties`,
         ];
 
         this.Instance = new ec2.CfnInstance(this, 'Client', {
