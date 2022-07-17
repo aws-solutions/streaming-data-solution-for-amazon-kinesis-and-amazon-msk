@@ -1,4 +1,4 @@
-AWS Streaming Data Solution for Amazon Kinesis and AWS Streaming Data Solution for Amazon MSK
+Streaming Data Solution for Amazon Kinesis and Streaming Data Solution for Amazon MSK
 
 Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 

@@ -34,41 +34,33 @@ function applyAspects(stacks: cdk.Stack[], solutionId: string) {
 function createSolutionKinesisStacks() {
     const stacks: cdk.Stack[] = [];
 
-    stacks.push(new ApiGwKdsLambda(
-        app,
-        'aws-streaming-data-solution-for-kinesis-using-api-gateway-and-lambda',
-        {
-            description: `(${solutionIdKds}) - AWS Streaming Data Solution for Amazon Kinesis (APIGW -> KDS -> Lambda). Version %%VERSION%%`,
+    stacks.push(
+        new ApiGwKdsLambda(app, 'streaming-data-solution-for-kinesis-using-api-gateway-and-lambda', {
+            description: `(${solutionIdKds}) - Streaming Data Solution for Amazon Kinesis (APIGW -> KDS -> Lambda). Version %%VERSION%%`,
             solutionId: solutionIdKds
-        }
-    ));
+        })
+    );
 
-    stacks.push(new KplKdsKda(
-        app,
-        'aws-streaming-data-solution-for-kinesis-using-kpl-and-kinesis-data-analytics',
-        {
-            description: `(${solutionIdKds}) - AWS Streaming Data Solution for Amazon Kinesis (KPL -> KDS -> KDA). Version %%VERSION%%`,
+    stacks.push(
+        new KplKdsKda(app, 'streaming-data-solution-for-kinesis-using-kpl-and-kinesis-data-analytics', {
+            description: `(${solutionIdKds}) - Streaming Data Solution for Amazon Kinesis (KPL -> KDS -> KDA). Version %%VERSION%%`,
             solutionId: solutionIdKds
-        }
-    ));
+        })
+    );
 
-    stacks.push(new KdsKdfS3(
-        app,
-        'aws-streaming-data-solution-for-kinesis-using-kinesis-data-firehose-and-amazon-s3',
-        {
-            description: `(${solutionIdKds}) - AWS Streaming Data Solution for Amazon Kinesis (KDS -> KDF -> S3). Version %%VERSION%%`,
+    stacks.push(
+        new KdsKdfS3(app, 'streaming-data-solution-for-kinesis-using-kinesis-data-firehose-and-amazon-s3', {
+            description: `(${solutionIdKds}) - Streaming Data Solution for Amazon Kinesis (KDS -> KDF -> S3). Version %%VERSION%%`,
             solutionId: solutionIdKds
-        }
-    ));
+        })
+    );
 
-    stacks.push(new KdsKdaApiGw(
-        app,
-        'aws-streaming-data-solution-for-kinesis-using-kinesis-data-analytics-and-api-gateway',
-        {
-            description: `(${solutionIdKds}) - AWS Streaming Data Solution for Amazon Kinesis (KDS -> KDA -> APIGW). Version %%VERSION%%`,
+    stacks.push(
+        new KdsKdaApiGw(app, 'streaming-data-solution-for-kinesis-using-kinesis-data-analytics-and-api-gateway', {
+            description: `(${solutionIdKds}) - Streaming Data Solution for Amazon Kinesis (KDS -> KDA -> APIGW). Version %%VERSION%%`,
             solutionId: solutionIdKds
-        }
-    ));
+        })
+    );
 
     applyAspects(stacks, solutionIdKds);
 }
@@ -76,41 +68,33 @@ function createSolutionKinesisStacks() {
 function createSolutionMskStacks() {
     const stacks: cdk.Stack[] = [];
 
-    stacks.push(new MskStandalone(
-        app,
-        'aws-streaming-data-solution-for-msk',
-        {
-            description: `(${solutionIdMsk}) - AWS Streaming Data Solution for Amazon MSK. Version %%VERSION%%`,
+    stacks.push(
+        new MskStandalone(app, 'streaming-data-solution-for-msk', {
+            description: `(${solutionIdMsk}) - Streaming Data Solution for Amazon MSK. Version %%VERSION%%`,
             solutionId: solutionIdMsk
-        }
-    ));
+        })
+    );
 
-    stacks.push(new MskLambda(
-        app,
-        'aws-streaming-data-solution-for-msk-using-aws-lambda',
-        {
-            description: `(${solutionIdMsk}) - AWS Streaming Data Solution for Amazon MSK (MSK -> Lambda). Version %%VERSION%%`,
+    stacks.push(
+        new MskLambda(app, 'streaming-data-solution-for-msk-using-aws-lambda', {
+            description: `(${solutionIdMsk}) - Streaming Data Solution for Amazon MSK (MSK -> Lambda). Version %%VERSION%%`,
             solutionId: solutionIdMsk
-        }
-    ));
+        })
+    );
 
-    stacks.push(new MskLambdaKdf(
-        app,
-        'aws-streaming-data-solution-for-msk-using-aws-lambda-and-kinesis-data-firehose',
-        {
-            description: `(${solutionIdMsk}) - AWS Streaming Data Solution for Amazon MSK (MSK -> Lambda -> KDF). Version %%VERSION%%`,
+    stacks.push(
+        new MskLambdaKdf(app, 'streaming-data-solution-for-msk-using-aws-lambda-and-kinesis-data-firehose', {
+            description: `(${solutionIdMsk}) - Streaming Data Solution for Amazon MSK (MSK -> Lambda -> KDF). Version %%VERSION%%`,
             solutionId: solutionIdMsk
-        }
-    ));
+        })
+    );
 
-    stacks.push(new MskKdaS3(
-        app,
-        'aws-streaming-data-solution-for-msk-using-kinesis-data-analytics-and-amazon-s3',
-        {
-            description: `(${solutionIdMsk}) - AWS Streaming Data Solution for Amazon MSK (MSK -> KDA -> S3). Version %%VERSION%%`,
+    stacks.push(
+        new MskKdaS3(app, 'streaming-data-solution-for-msk-using-kinesis-data-analytics-and-amazon-s3', {
+            description: `(${solutionIdMsk}) - Streaming Data Solution for Amazon MSK (MSK -> KDA -> S3). Version %%VERSION%%`,
             solutionId: solutionIdMsk
-        }
-    ));
+        })
+    );
 
     applyAspects(stacks, solutionIdMsk);
 }
@@ -118,32 +102,26 @@ function createSolutionMskStacks() {
 function createSolutionMskLabsStacks() {
     const stacks: cdk.Stack[] = [];
 
-    stacks.push(new MskLambdaRoleStack(
-        app,
-        'amazon-msk-labs-lambda-role',
-        {
+    stacks.push(
+        new MskLambdaRoleStack(app, 'amazon-msk-labs-lambda-role', {
             description: `(${solutionIdMskLabs}) - Amazon MSK Labs (IAM Role). Version %%VERSION%%`,
             solutionId: solutionIdMskLabs
-        }
-    ));
+        })
+    );
 
-    stacks.push(new MskClientStack(
-        app,
-        'amazon-msk-labs-ec2-client',
-        {
+    stacks.push(
+        new MskClientStack(app, 'amazon-msk-labs-ec2-client', {
             description: `(${solutionIdMskLabs}) - Amazon MSK Labs (EC2 Client). Version %%VERSION%%`,
             solutionId: solutionIdMskLabs
-        }
-    ));
+        })
+    );
 
-    stacks.push(new MskClusterStack(
-        app,
-        'amazon-msk-labs-cluster',
-        {
+    stacks.push(
+        new MskClusterStack(app, 'amazon-msk-labs-cluster', {
             description: `(${solutionIdMskLabs}) - Amazon MSK Labs (MSK Cluster). Version %%VERSION%%`,
             solutionId: solutionIdMskLabs
-        }
-    ));
+        })
+    );
 
     applyAspects(stacks, solutionIdMskLabs);
 }
