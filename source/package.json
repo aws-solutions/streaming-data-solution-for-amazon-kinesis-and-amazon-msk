@@ -50,7 +50,7 @@
     "@aws-solutions-constructs/aws-kinesisfirehose-s3": "1.136.0",
     "@aws-solutions-constructs/aws-kinesisstreams-lambda": "1.136.0",
     "source-map-support": "^0.5.16",
-    "vm2": "^3.9.10"
+    "vm2": "^3.9.11"
   },
   "private": true,
   "license": "Apache-2.0",
