@@ -148,6 +148,12 @@ done
 
 node $template_dir/cdk-solution-helper/index
 
+# shortening app_registry_name as AppInsights application_id has a character limit
+app_registry_name=$(echo "$solution_name" | sed 's/ /-/g' | sed 's/streaming-data-solution-for/sds/g' | awk '{print tolower($0)}' | cut -c 1-64)
+echo "-----------------------------------------------------------------------------"
+echo "Setting App Registry Application Name as $app_registry_name"
+echo "-----------------------------------------------------------------------------"
+
 echo "------------------------------------------------------------------------------"
 echo "[Packing] Updating placeholders"
 echo "------------------------------------------------------------------------------"
@@ -160,6 +166,9 @@ do
     sed -i -e $replace $file
 
     replace="s/%%VERSION%%/$solution_version/g"
+    sed -i -e $replace $file
+
+    replace="s/%%APP_REG_NAME%%/$app_registry_name/g"
     sed -i -e $replace $file
 done
 

@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.0] - 2022-11-17
+
+### Updated
+
+- [AWS Service Catalog AppRegistry](https://docs.aws.amazon.com/servicecatalog/latest/arguide/intro-app-registry.html) integration. When a stack is deployed, an Service Catalog application is created where all associated resources collections and attribute groups can be viewed.
+- To monitor costs of resources used by the stack, the tag `AppManagerCFNStackKey` is added to the solution by AWS Systems Manager Application Manager.
+- npm package security patching (minimatch)
+
 ## [1.6.2] - 2022-09-28
 
 ### Updated

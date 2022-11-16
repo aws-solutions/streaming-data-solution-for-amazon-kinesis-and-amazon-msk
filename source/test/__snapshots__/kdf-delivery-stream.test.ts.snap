@@ -405,6 +405,9 @@ Object {
             },
           ],
         },
+        "StreamModeDetails": Object {
+          "StreamMode": "PROVISIONED",
+        },
       },
       "Type": "AWS::Kinesis::Stream",
     },
