@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.1] - 2022-12-19
+
+### Updated
+
+- Fixes [Issue #74](https://github.com/aws-solutions/streaming-data-solution-for-amazon-kinesis-and-amazon-msk/issues/74).
+- AppRegistry application name now has 'App' prepended to it, to prevent any failures if the stack name starts with 'AWS'.
+- AppRegistry `AttributeGroup` name now has 'AttrGrp` prepended, to prevent any stack deployment failures if stack names begins with 'AWS'.
+- `npm` package security patching
+
 ## [1.7.0] - 2022-11-17
 
 ### Updated
