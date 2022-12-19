@@ -41,7 +41,7 @@ describe('When a generic stack is registered with AppRegistry', () => {
         template.resourceCountIs('AWS::ServiceCatalogAppRegistry::Application', 1);
         template.hasResourceProperties('AWS::ServiceCatalogAppRegistry::Application', {
             'Name': {
-                'Fn::Join': ['-', [{ Ref: 'AWS::StackName' }, '%%APP_REG_NAME%%']]
+                'Fn::Join': ['-', ['App', { Ref: 'AWS::StackName' }, '%%APP_REG_NAME%%']]
             },
             'Description':
                 'Service Catalog application to track and manage all your resources for the solution %%SOLUTION_NAME%%',
