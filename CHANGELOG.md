@@ -5,11 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.4] - 2023-04-18
+
+### Fixed
+
+- Updated the bucket policy on the logging bucket to grant access to the logging service principal (logging.s3.amazonaws.com) for access log delivery.
+- Updated `org.json` package to address security issues
+
 ## [1.7.3] - 2023-04-13
 
-### Updated
+### Fixed
 
-- npm package security patching
+- Update AWS-SDK V2 that addresses the security issue identified in xml2js (https://github.com/aws/aws-sdk-js/issues/4387)
 
 ## [1.7.2] - 2023-01-10
 
