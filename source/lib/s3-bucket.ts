@@ -12,8 +12,8 @@
  *********************************************************************************************************************/
 
 import * as cdk from '@aws-cdk/core';
-import * as s3 from '@aws-cdk/aws-s3';
 import * as iam from '@aws-cdk/aws-iam';
+import * as s3 from '@aws-cdk/aws-s3';
 
 import { CfnNagHelper } from './cfn-nag-helper';
 
@@ -30,49 +30,70 @@ export class EncryptedBucket extends cdk.Construct {
         const securitySettings: s3.BucketProps = {
             blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
             encryption: s3.BucketEncryption.S3_MANAGED
-        }
+        };
 
         const accessLogsBucket = new s3.Bucket(this, 'AccessLogsBucket', securitySettings);
-        CfnNagHelper.addSuppressions(accessLogsBucket.node.defaultChild as s3.CfnBucket, [
-            { Id: 'W35', Reason: 'This bucket is used to store access logs for another bucket' },
-            { Id: 'W51', Reason: 'This bucket does not need a bucket policy' }
-        ]);
 
-        const rules: s3.LifecycleRule[] = [{
-            id: 'multipart-upload-rule',
-            enabled: true,
-            abortIncompleteMultipartUploadAfter: cdk.Duration.days(7)
-        }];
+        const rules: s3.LifecycleRule[] = [
+            {
+                id: 'multipart-upload-rule',
+                enabled: true,
+                abortIncompleteMultipartUploadAfter: cdk.Duration.days(7)
+            }
+        ];
 
         if (props.enableIntelligentTiering) {
             rules.push({
                 id: 'intelligent-tiering-rule',
                 enabled: true,
-                transitions: [{
-                    storageClass: s3.StorageClass.INTELLIGENT_TIERING,
-                    transitionAfter: cdk.Duration.days(1)
-                }]
+                transitions: [
+                    {
+                        storageClass: s3.StorageClass.INTELLIGENT_TIERING,
+                        transitionAfter: cdk.Duration.days(1)
+                    }
+                ]
             });
         }
 
-       this.Bucket = new s3.Bucket(this, 'Bucket', {
+        this.Bucket = new s3.Bucket(this, 'Bucket', {
             ...securitySettings,
             serverAccessLogsBucket: accessLogsBucket,
             lifecycleRules: rules
         });
 
-        this.Bucket.addToResourcePolicy(new iam.PolicyStatement({
-            sid: 'HttpsOnly',
-            effect: iam.Effect.DENY,
-            resources: [
-                this.Bucket.arnForObjects('*'),
-                this.Bucket.bucketArn
-            ],
-            actions: ['*'],
-            principals: [new iam.AnyPrincipal()],
-            conditions: {
-                Bool: { 'aws:SecureTransport': 'false' }
-            }
-        }));
+        this.Bucket.addToResourcePolicy(
+            new iam.PolicyStatement({
+                sid: 'HttpsOnly',
+                effect: iam.Effect.DENY,
+                resources: [this.Bucket.arnForObjects('*'), this.Bucket.bucketArn],
+                actions: ['*'],
+                principals: [new iam.AnyPrincipal()],
+                conditions: {
+                    Bool: { 'aws:SecureTransport': 'false' }
+                }
+            })
+        );
+
+        // remove ACL and add S3 bucket policy to write to access logging bucket
+        (accessLogsBucket.node.defaultChild as s3.CfnBucket).addDeletionOverride('Properties.AccessControl');
+        accessLogsBucket.addToResourcePolicy(
+            new iam.PolicyStatement({
+                sid: 'S3ServerAccessLogsPolicy',
+                effect: iam.Effect.ALLOW,
+                principals: [new iam.ServicePrincipal('logging.s3.amazonaws.com')],
+                actions: ['s3:PutObject'],
+                resources: [`${accessLogsBucket.bucketArn}/*`],
+                conditions: {
+                    ArnLike: {
+                        'aws:SourceArn': [`${this.Bucket.bucketArn}`]
+                    },
+                    StringEquals: { 'aws:SourceAccount': cdk.Aws.ACCOUNT_ID }
+                }
+            })
+        );
+
+        CfnNagHelper.addSuppressions(accessLogsBucket.node.defaultChild as s3.CfnBucket, [
+            { Id: 'W35', Reason: 'This bucket is used to store access logs for another bucket' }
+        ]);
     }
 }

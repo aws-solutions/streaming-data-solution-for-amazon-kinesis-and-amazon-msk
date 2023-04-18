@@ -175,15 +175,10 @@ Object {
               "id": "W35",
               "reason": "This bucket is used to store access logs for another bucket",
             },
-            Object {
-              "id": "W51",
-              "reason": "This bucket does not need a bucket policy",
-            },
           ],
         },
       },
       "Properties": Object {
-        "AccessControl": "LogDeliveryWrite",
         "BucketEncryption": Object {
           "ServerSideEncryptionConfiguration": Array [
             Object {
@@ -202,6 +197,58 @@ Object {
       },
       "Type": "AWS::S3::Bucket",
       "UpdateReplacePolicy": "Retain",
+    },
+    "TestDeliveryStreamOutputAccessLogsBucketPolicyA3079E22": Object {
+      "Properties": Object {
+        "Bucket": Object {
+          "Ref": "TestDeliveryStreamOutputAccessLogsBucketFF8475CB",
+        },
+        "PolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": "s3:PutObject",
+              "Condition": Object {
+                "ArnLike": Object {
+                  "aws:SourceArn": Array [
+                    Object {
+                      "Fn::GetAtt": Array [
+                        "TestDeliveryStreamOutputBucket4037EDA5",
+                        "Arn",
+                      ],
+                    },
+                  ],
+                },
+                "StringEquals": Object {
+                  "aws:SourceAccount": Object {
+                    "Ref": "AWS::AccountId",
+                  },
+                },
+              },
+              "Effect": "Allow",
+              "Principal": Object {
+                "Service": "logging.s3.amazonaws.com",
+              },
+              "Resource": Object {
+                "Fn::Join": Array [
+                  "",
+                  Array [
+                    Object {
+                      "Fn::GetAtt": Array [
+                        "TestDeliveryStreamOutputAccessLogsBucketFF8475CB",
+                        "Arn",
+                      ],
+                    },
+                    "/*",
+                  ],
+                ],
+              },
+              "Sid": "S3ServerAccessLogsPolicy",
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+      },
+      "Type": "AWS::S3::BucketPolicy",
     },
     "TestDeliveryStreamOutputBucket4037EDA5": Object {
       "DeletionPolicy": "Retain",

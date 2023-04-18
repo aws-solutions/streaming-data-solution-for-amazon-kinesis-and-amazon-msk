@@ -12,7 +12,8 @@
  *********************************************************************************************************************/
 
 import * as cdk from '@aws-cdk/core';
-import { expect as expectCDK, haveResource, haveResourceLike, ResourcePart } from '@aws-cdk/assert';
+
+import { ResourcePart, expect as expectCDK, haveResource, haveResourceLike } from '@aws-cdk/assert';
 
 import { EncryptedBucket } from '../lib/s3-bucket';
 
@@ -27,10 +28,12 @@ const multipartUploadRule = {
 
 const intelligentTieringRule = {
     Status: 'Enabled',
-    Transitions: [{
-        StorageClass: 'INTELLIGENT_TIERING',
-        TransitionInDays: 1
-    }]
+    Transitions: [
+        {
+            StorageClass: 'INTELLIGENT_TIERING',
+            TransitionInDays: 1
+        }
+    ]
 };
 
 beforeEach(() => {
@@ -44,11 +47,13 @@ test('creates a bucket with intelligent tiering', () => {
     });
 
     const expectedEncryption = {
-        ServerSideEncryptionConfiguration: [{
-            ServerSideEncryptionByDefault: {
-                SSEAlgorithm: 'AES256'
+        ServerSideEncryptionConfiguration: [
+            {
+                ServerSideEncryptionByDefault: {
+                    SSEAlgorithm: 'AES256'
+                }
             }
-        }]
+        ]
     };
 
     const expectedPublicConfig = {
@@ -58,46 +63,93 @@ test('creates a bucket with intelligent tiering', () => {
         RestrictPublicBuckets: true
     };
 
-    expectCDK(stack).to(haveResource('AWS::S3::Bucket', {
-        AccessControl: 'LogDeliveryWrite',
-        BucketEncryption: expectedEncryption,
-        PublicAccessBlockConfiguration: expectedPublicConfig
-    }));
+    expectCDK(stack).to(
+        haveResource('AWS::S3::Bucket', {
+            BucketEncryption: expectedEncryption,
+            PublicAccessBlockConfiguration: expectedPublicConfig
+        })
+    );
 
-    expectCDK(stack).to(haveResourceLike('AWS::S3::Bucket', {
-        LifecycleConfiguration: {
-            Rules: [multipartUploadRule, intelligentTieringRule]
-        },
-        LoggingConfiguration: {},
-        BucketEncryption: expectedEncryption,
-        PublicAccessBlockConfiguration: expectedPublicConfig
-    }));
+    expectCDK(stack).to(
+        haveResourceLike('AWS::S3::Bucket', {
+            LifecycleConfiguration: {
+                Rules: [multipartUploadRule, intelligentTieringRule]
+            },
+            LoggingConfiguration: {},
+            BucketEncryption: expectedEncryption,
+            PublicAccessBlockConfiguration: expectedPublicConfig
+        })
+    );
 
-    expectCDK(stack).to(haveResource('AWS::S3::BucketPolicy', {
-        PolicyDocument: {
-            Statement: [{
-                Sid: 'HttpsOnly',
-                Effect: 'Deny',
-                Action: '*',
-                Condition: {
-                    Bool: { 'aws:SecureTransport': 'false' }
-                },
-                Principal: { 'AWS': '*' },
-                Resource: [
+    expectCDK(stack).to(
+        haveResource('AWS::S3::BucketPolicy', {
+            PolicyDocument: {
+                Statement: [
                     {
-                        'Fn::Join': [
-                            '',
-                            [{ 'Fn::GetAtt': ['TestBucket9EEBCF70', 'Arn'] }, '/*']
+                        Sid: 'HttpsOnly',
+                        Effect: 'Deny',
+                        Action: '*',
+                        Condition: {
+                            Bool: { 'aws:SecureTransport': 'false' }
+                        },
+                        Principal: { 'AWS': '*' },
+                        Resource: [
+                            {
+                                'Fn::Join': ['', [{ 'Fn::GetAtt': ['TestBucket9EEBCF70', 'Arn'] }, '/*']]
+                            },
+                            {
+                                'Fn::GetAtt': ['TestBucket9EEBCF70', 'Arn']
+                            }
                         ]
-                    },
-                    {
-                        'Fn::GetAtt': ['TestBucket9EEBCF70', 'Arn']
                     }
-                ]
-            }],
-            Version: '2012-10-17'
-        }
-    }));
+                ],
+                Version: '2012-10-17'
+            }
+        })
+    );
+
+    expectCDK(stack).to(
+        haveResource('AWS::S3::BucketPolicy', {
+            PolicyDocument: {
+                Statement: [
+                    {
+                        Action: 's3:PutObject',
+                        Sid: 'S3ServerAccessLogsPolicy',
+                        Effect: 'Allow',
+                        Condition: {
+                            ArnLike: {
+                                'aws:SourceArn': [
+                                    {
+                                        'Fn::GetAtt': ['TestBucket9EEBCF70', 'Arn']
+                                    }
+                                ]
+                            },
+                            StringEquals: {
+                                'aws:SourceAccount': {
+                                    'Ref': 'AWS::AccountId'
+                                }
+                            }
+                        },
+                        Principal: {
+                            Service: 'logging.s3.amazonaws.com'
+                        },
+                        Resource: {
+                            'Fn::Join': [
+                                '',
+                                [
+                                    {
+                                        'Fn::GetAtt': ['TestBucketAccessLogsBucket4922A84A', 'Arn']
+                                    },
+                                    '/*'
+                                ]
+                            ]
+                        }
+                    }
+                ],
+                Version: '2012-10-17'
+            }
+        })
+    );
 });
 
 test('creates a bucket without intelligent tiering', () => {
@@ -105,11 +157,13 @@ test('creates a bucket without intelligent tiering', () => {
         enableIntelligentTiering: false
     });
 
-    expectCDK(stack).notTo(haveResourceLike('AWS::S3::Bucket', {
-        LifecycleConfiguration: {
-            Rules: [intelligentTieringRule]
-        }
-    }));
+    expectCDK(stack).notTo(
+        haveResourceLike('AWS::S3::Bucket', {
+            LifecycleConfiguration: {
+                Rules: [intelligentTieringRule]
+            }
+        })
+    );
 });
 
 test('adds cfn_nag suppressions', () => {
@@ -117,20 +171,22 @@ test('adds cfn_nag suppressions', () => {
         enableIntelligentTiering: true
     });
 
-    expectCDK(stack).to(haveResource('AWS::S3::Bucket', {
-        Metadata: {
-            cfn_nag: {
-                rules_to_suppress: [
-                    {
-                        id: 'W35',
-                        reason: 'This bucket is used to store access logs for another bucket'
-                    },
-                    {
-                        id: 'W51',
-                        reason: 'This bucket does not need a bucket policy'
+    expectCDK(stack).to(
+        haveResource(
+            'AWS::S3::Bucket',
+            {
+                Metadata: {
+                    cfn_nag: {
+                        rules_to_suppress: [
+                            {
+                                id: 'W35',
+                                reason: 'This bucket is used to store access logs for another bucket'
+                            }
+                        ]
                     }
-                ]
-            }
-        }
-    }, ResourcePart.CompleteDefinition));
+                }
+            },
+            ResourcePart.CompleteDefinition
+        )
+    );
 });
