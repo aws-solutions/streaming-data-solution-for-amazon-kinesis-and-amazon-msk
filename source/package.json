@@ -1,6 +1,6 @@
 {
   "name": "streaming-data-solution",
-  "version": "1.7.4",
+  "version": "1.7.5",
   "bin": {
     "streaming-data-solution": "bin/streaming-data-solution.js"
   },
@@ -53,7 +53,7 @@
     "@aws-solutions-constructs/aws-kinesisfirehose-s3": "1.173.0",
     "@aws-solutions-constructs/aws-kinesisstreams-lambda": "1.173.0",
     "source-map-support": "^0.5.16",
-    "vm2": "^3.9.16"
+    "vm2": "^3.9.17"
   },
   "private": true,
   "license": "Apache-2.0",
