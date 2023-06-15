@@ -80,7 +80,7 @@ export class AppRegistry extends cdk.Construct implements cdk.IAspect {
      * @returns - Instance of AppRegistry's Application class
      */
     private createAppForAppRegistry(id: string): void {
-        this.application = new appreg.Application(this, `RegistrySetup-${id}`, {
+        this.application = new appreg.Application(this, `AppRegistrySetup-${id}`, {
             applicationName: cdk.Fn.join('-', ['App', cdk.Aws.STACK_NAME, this.applicationName]),
             description: `Service Catalog application to track and manage all your resources for the solution ${this.solutionName}`
         });
@@ -109,7 +109,7 @@ export class AppRegistry extends cdk.Construct implements cdk.IAspect {
             this.createAppForAppRegistry(this.id);
         }
         this.application.associateAttributeGroup(
-            new appreg.AttributeGroup(this, 'AppAttributes', {
+            new appreg.AttributeGroup(this, 'ApplicationAttributes', {
                 attributeGroupName: `AttrGrp-${cdk.Aws.STACK_NAME}`,
                 description: 'Attributes for Solutions Metadata',
                 attributes: {
