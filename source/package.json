@@ -46,7 +46,7 @@
     "@aws-cdk/aws-msk": "1.173.0",
     "@aws-cdk/aws-s3": "1.173.0",
     "@aws-cdk/aws-servicecatalogappregistry": "1.173.0",
-    "@aws-cdk/cloudformation-include": "1.173.0",
+    "@aws-cdk/cloudformation-include": "1.204.0",
     "@aws-cdk/core": "1.173.0",
     "@aws-solutions-constructs/aws-apigateway-kinesisstreams": "1.173.0",
     "@aws-solutions-constructs/aws-apigateway-lambda": "1.173.0",
