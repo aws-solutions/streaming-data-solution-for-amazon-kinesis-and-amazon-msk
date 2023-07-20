@@ -31,10 +31,10 @@ def _get_key_arn_for_secret(secret_arn):
 
     describe_response = client_secrets_manager.describe_secret(SecretId=secret_arn)
     if not describe_response['Name'].startswith('AmazonMSK_'):
-        raise Exception('The name of secrets associated with an Amazon MSK cluster must have the prefix AmazonMSK_')
+        raise ValueError('The name of secrets associated with an Amazon MSK cluster must have the prefix AmazonMSK_')
 
     if not 'KmsKeyId' in describe_response:
-        raise Exception('You cannot use a Secret that uses the default Secrets Manager encryption key with Amazon MSK')
+        raise KeyError('You cannot use a Secret that uses the default Secrets Manager encryption key with Amazon MSK')
 
     return describe_response['KmsKeyId']
 
