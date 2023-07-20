@@ -59,7 +59,7 @@ class LambdaTest(unittest.TestCase):
             from lambda_function import _get_key_arn_for_secret
             _get_key_arn_for_secret('my-secret-arn')
             self.fail('Custom resource should fail when secret name does not start with AmazonMSK_')
-        except:
+        except ValueError:
             pass
 
     @patch.object(boto3, 'client')
@@ -70,7 +70,7 @@ class LambdaTest(unittest.TestCase):
             from lambda_function import _get_key_arn_for_secret
             _get_key_arn_for_secret('my-secret-arn')
             self.fail('Custom resource should fail when secret uses default KMS key')
-        except:
+        except KeyError:
             pass
 
     @patch.object(boto3, 'client')

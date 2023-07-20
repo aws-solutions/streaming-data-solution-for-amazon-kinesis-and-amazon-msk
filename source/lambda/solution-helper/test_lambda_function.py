@@ -81,7 +81,7 @@ class LambdaTest(unittest.TestCase):
         try:
             from lambda_function import custom_resource
             custom_resource(event, None)
-        except:
+        except requests.exceptions.RequestException:
             self.fail('Exception should not be raised when metrics cannot be sent')
 
     @mock.patch('requests.post')
@@ -97,7 +97,7 @@ class LambdaTest(unittest.TestCase):
 
             from lambda_function import custom_resource
             custom_resource(invalid_event, None)
-        except:
+        except requests.exceptions.RequestException:
             self.fail('Exception should not be raised when metrics cannot be sent')
 
     def test_sanitize_data(self):

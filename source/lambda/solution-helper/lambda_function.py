@@ -64,8 +64,8 @@ def custom_resource(event, _):
             logger.info(f"Response from metrics endpoint: {response.status_code} {response.reason}")
         except requests.exceptions.RequestException:
             logger.exception("Could not send usage data")
-        except Exception:
-            logger.exception("Unknown error when trying to send usage data")
+        except KeyError:
+            logger.exception("One or more resource properties are missing")
 
 
 def handler(event, context):

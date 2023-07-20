@@ -1,6 +1,6 @@
 {
   "name": "streaming-data-solution",
-  "version": "1.7.7",
+  "version": "1.7.8",
   "bin": {
     "streaming-data-solution": "bin/streaming-data-solution.js"
   },
@@ -20,13 +20,13 @@
     "@types/node": "10.17.27",
     "@types/prettier": "2.6.0",
     "@types/babel__traverse": "7.18.2",
-    "@typescript-eslint/eslint-plugin": "^5.0.0",
-    "@typescript-eslint/parser": "^5.0.0",
+    "@typescript-eslint/eslint-plugin": "6.1.0",
+    "@typescript-eslint/parser": "6.1.0",
     "aws-cdk": "1.173.0",
     "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-prettier": "5.0.0",
     "jest": "^26.4.2",
-    "prettier": "2.6.0",
+    "prettier": "3.0.0",
     "ts-jest": "^26.2.0",
     "ts-node": "^9.0.0",
     "typescript": "~3.9.7"
@@ -52,8 +52,7 @@
     "@aws-solutions-constructs/aws-apigateway-lambda": "1.173.0",
     "@aws-solutions-constructs/aws-kinesisfirehose-s3": "1.173.0",
     "@aws-solutions-constructs/aws-kinesisstreams-lambda": "1.173.0",
-    "source-map-support": "^0.5.16",
-    "vm2": "^3.9.18"
+    "source-map-support": "^0.5.16"
   },
   "private": true,
   "license": "Apache-2.0",
