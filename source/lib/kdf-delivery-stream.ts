@@ -11,12 +11,10 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-import * as cdk from '@aws-cdk/core';
-import * as iam from '@aws-cdk/aws-iam';
-import * as s3 from '@aws-cdk/aws-s3';
-import * as kinesis from '@aws-cdk/aws-kinesis';
-import * as firehose from '@aws-cdk/aws-kinesisfirehose';
-
+import * as cdk  from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { aws_iam as iam, aws_s3 as s3, aws_kinesis as kinesis,  aws_kinesisfirehose as firehose} from 'aws-cdk-lib';
+import { NagSuppressions } from 'cdk-nag';
 import { EncryptedBucket } from './s3-bucket';
 
 export interface DeliveryStreamProps {
@@ -47,7 +45,7 @@ export enum CompressionFormat {
     ZIP = 'ZIP'
 }
 
-export class DeliveryStream extends cdk.Construct {
+export class DeliveryStream extends Construct {
     private readonly Output: EncryptedBucket;
     public readonly DeliveryStreamArn: string;
     public readonly DeliveryStreamName: string;
@@ -56,7 +54,7 @@ export class DeliveryStream extends cdk.Construct {
         return this.Output.Bucket;
     }
 
-    constructor(scope: cdk.Construct, id: string, props: DeliveryStreamProps) {
+    constructor(scope: Construct, id: string, props: DeliveryStreamProps) {
         super(scope, id);
 
         const firehoseRole = new iam.Role(this, 'Role', {
@@ -110,11 +108,12 @@ export class DeliveryStream extends cdk.Construct {
             bufferingHints: {
                 intervalInSeconds: props.bufferingInterval,
                 sizeInMBs: props.bufferingSize
-            },
+            },      
             compressionFormat: props.compressionFormat,
             prefix: props.dataPrefix,
             errorOutputPrefix: props.errorsPrefix
         }
+
 
         const kdfWithoutDP = new firehose.CfnDeliveryStream(this, 'DeliveryStreamWithoutDP', {
             ...commonFirehoseProps,
@@ -122,6 +121,13 @@ export class DeliveryStream extends cdk.Construct {
                 ...commonDestinationProps
             }
         });
+
+        NagSuppressions.addResourceSuppressions(kdfWithoutDP, [
+            {
+              id: "AwsSolutions-KDF1",
+              reason: "Server-Side Encryption isn't supported on deliveryStreamType: KinesisStreamAsSource",
+            }
+          ]);
 
         const kdfWithDp = new firehose.CfnDeliveryStream(this, 'DeliveryStreamWithDP', {
             ...commonFirehoseProps,
@@ -171,6 +177,13 @@ export class DeliveryStream extends cdk.Construct {
                 }
             }
         });
+
+        NagSuppressions.addResourceSuppressions(kdfWithDp, [
+            {
+              id: "AwsSolutions-KDF1",
+              reason: "Server-Side Encryption isn't supported on deliveryStreamType: KinesisStreamAsSource",
+            }
+          ]);
 
         kdfWithoutDP.cfnOptions.condition = dpDisabledCondition;
         kdfWithDp.cfnOptions.condition = dpEnabledCondition;

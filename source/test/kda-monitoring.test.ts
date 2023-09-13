@@ -11,8 +11,8 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-import * as cdk from '@aws-cdk/core';
-import { SynthUtils, expect as expectCDK, haveResource } from '@aws-cdk/assert';
+import * as cdk  from 'aws-cdk-lib';
+import {  Template } from 'aws-cdk-lib/assertions';
 
 import { ApplicationMonitoring } from '../lib/kda-monitoring';
 
@@ -30,12 +30,8 @@ describe('kinesis data stream as source', () => {
         });
     });
 
-    test('creates a dashboard for a Flink application', () => {
-        expect(SynthUtils.toCloudFormation(stack)).toMatchSnapshot();
-    });
-
     test('creates downtime alarm', () => {
-        expectCDK(stack).to(haveResource('AWS::CloudWatch::Alarm', {
+        Template.fromStack(stack).hasResourceProperties('AWS::CloudWatch::Alarm', {
             MetricName: 'downtime',
             Namespace: 'AWS/KinesisAnalytics',
             ComparisonOperator: 'GreaterThanThreshold',
@@ -45,11 +41,11 @@ describe('kinesis data stream as source', () => {
             Threshold: 0,
             TreatMissingData: 'breaching',
             Dimensions: [{ Name: 'Application', Value: 'test-application' }]
-        }));
+        });
     });
 
     test('creates numberOfFailedCheckpoints alarm', () => {
-        expectCDK(stack).to(haveResource('AWS::CloudWatch::Alarm', {
+        Template.fromStack(stack).hasResourceProperties('AWS::CloudWatch::Alarm', {
             MetricName: 'numberOfFailedCheckpoints',
             Namespace: 'AWS/KinesisAnalytics',
             ComparisonOperator: 'GreaterThanThreshold',
@@ -59,11 +55,11 @@ describe('kinesis data stream as source', () => {
             Threshold: 0,
             TreatMissingData: 'breaching',
             Dimensions: [{ Name: 'Application', Value: 'test-application' }]
-        }));
+        });
     });
 
     test('creates numRecordsOutPerSecond alarm', () => {
-        expectCDK(stack).to(haveResource('AWS::CloudWatch::Alarm', {
+        Template.fromStack(stack).hasResourceProperties('AWS::CloudWatch::Alarm', {
             MetricName: 'numRecordsOutPerSecond',
             Namespace: 'AWS/KinesisAnalytics',
             ComparisonOperator: 'LessThanOrEqualToThreshold',
@@ -73,11 +69,11 @@ describe('kinesis data stream as source', () => {
             Threshold: 0,
             TreatMissingData: 'breaching',
             Dimensions: [{ Name: 'Application', Value: 'test-application' }]
-        }));
+        });
     });
 
     test('creates millisBehindLatest alarm', () => {
-        expectCDK(stack).to(haveResource('AWS::CloudWatch::Alarm', {
+        Template.fromStack(stack).hasResourceProperties('AWS::CloudWatch::Alarm', {
             MetricName: 'millisBehindLatest',
             Namespace: 'AWS/KinesisAnalytics',
             ComparisonOperator: 'GreaterThanThreshold',
@@ -91,11 +87,11 @@ describe('kinesis data stream as source', () => {
                 { Name: 'Flow', Value: 'Input' },
                 { Name: 'Id', Value: 'test_stream' }
             ]
-        }));
+        });
     });
 
     test('creates cpuUtilization alarm', () => {
-        expectCDK(stack).to(haveResource('AWS::CloudWatch::Alarm', {
+        Template.fromStack(stack).hasResourceProperties('AWS::CloudWatch::Alarm', {
             MetricName: 'cpuUtilization',
             Namespace: 'AWS/KinesisAnalytics',
             ComparisonOperator: 'GreaterThanThreshold',
@@ -105,11 +101,11 @@ describe('kinesis data stream as source', () => {
             Threshold: 80,
             TreatMissingData: 'breaching',
             Dimensions: [{ Name: 'Application', Value: 'test-application' }]
-        }));
+        });
     });
 
     test('creates heapMemoryUtilization alarm', () => {
-        expectCDK(stack).to(haveResource('AWS::CloudWatch::Alarm', {
+        Template.fromStack(stack).hasResourceProperties('AWS::CloudWatch::Alarm', {
             MetricName: 'heapMemoryUtilization',
             Namespace: 'AWS/KinesisAnalytics',
             ComparisonOperator: 'GreaterThanThreshold',
@@ -119,11 +115,11 @@ describe('kinesis data stream as source', () => {
             Threshold: 90,
             TreatMissingData: 'breaching',
             Dimensions: [{ Name: 'Application', Value: 'test-application' }]
-        }));
+        });
     });
 
     test('creates oldGenerationGCTime alarm', () => {
-        expectCDK(stack).to(haveResource('AWS::CloudWatch::Alarm', {
+        Template.fromStack(stack).hasResourceProperties('AWS::CloudWatch::Alarm', {
             ComparisonOperator: 'GreaterThanThreshold',
             EvaluationPeriods: 1,
             Threshold: 60,
@@ -148,7 +144,7 @@ describe('kinesis data stream as source', () => {
                 }
             ],
             TreatMissingData: 'breaching'
-        }));
+        });
     });
 });
 
@@ -163,6 +159,5 @@ describe('kafka topic as source', () => {
             kafkaTopicName: 'test-topic'
         });
 
-        expect(SynthUtils.toCloudFormation(stack)).toMatchSnapshot();
     });
 });

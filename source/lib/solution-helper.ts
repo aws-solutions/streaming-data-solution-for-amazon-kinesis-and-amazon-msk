@@ -11,8 +11,9 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-import * as cdk from '@aws-cdk/core';
-import * as lambda from '@aws-cdk/aws-lambda';
+import * as cdk  from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { aws_lambda as lambda } from 'aws-cdk-lib';
 
 import { ExecutionRole } from './lambda-role-cloudwatch';
 
@@ -37,8 +38,8 @@ export interface SolutionHelperProps {
     readonly accessControlMethod?: string;
 }
 
-export class SolutionHelper extends cdk.Construct {
-    constructor(scope: cdk.Construct, id: string, props: SolutionHelperProps) {
+export class SolutionHelper extends Construct {
+    constructor(scope: Construct, id: string, props: SolutionHelperProps) {
         super(scope, id);
 
         const metricsMapping = new cdk.CfnMapping(this, 'AnonymousData', {
@@ -55,7 +56,7 @@ export class SolutionHelper extends cdk.Construct {
 
         const helperRole = new ExecutionRole(this, 'Role');
         const helperFunction = new lambda.Function(this, 'SolutionHelper', {
-            runtime: lambda.Runtime.PYTHON_3_8,
+            runtime: lambda.Runtime.PYTHON_3_10,
             handler: 'lambda_function.handler',
             description: 'This function generates UUID for each deployment and sends anonymous data to the AWS Solutions team',
             role: helperRole.Role,

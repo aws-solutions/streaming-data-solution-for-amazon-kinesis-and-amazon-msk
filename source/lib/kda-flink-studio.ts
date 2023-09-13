@@ -11,10 +11,9 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-import * as cdk from '@aws-cdk/core';
-import * as analytics from '@aws-cdk/aws-kinesisanalytics';
-import * as iam from '@aws-cdk/aws-iam';
-import * as glue from '@aws-cdk/aws-glue';
+import * as cdk  from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { aws_kinesisanalytics as analytics, aws_iam as iam, aws_glue as glue } from 'aws-cdk-lib';
 
 import { CfnNagHelper } from './cfn-nag-helper';
 import { FlinkBase, FlinkBaseProps } from './kda-base';
@@ -26,7 +25,7 @@ export interface FlinkStudioProps extends FlinkBaseProps {
 export class FlinkStudio extends FlinkBase {
     private DatabaseName: string = '';
 
-    constructor(scope: cdk.Construct, id: string, props: FlinkStudioProps) {
+    constructor(scope: Construct, id: string, props: FlinkStudioProps) {
         super(scope, id, props);
         this.addCfnNagSuppressions();
     }

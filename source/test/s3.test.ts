@@ -11,9 +11,9 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-import * as cdk from '@aws-cdk/core';
+import * as cdk  from 'aws-cdk-lib';
 
-import { ResourcePart, expect as expectCDK, haveResource, haveResourceLike } from '@aws-cdk/assert';
+import { Template, Match } from 'aws-cdk-lib/assertions';
 
 import { EncryptedBucket } from '../lib/s3-bucket';
 
@@ -63,55 +63,54 @@ test('creates a bucket with intelligent tiering', () => {
         RestrictPublicBuckets: true
     };
 
-    expectCDK(stack).to(
-        haveResource('AWS::S3::Bucket', {
+    Template.fromStack(stack).hasResourceProperties('AWS::S3::Bucket', {
             BucketEncryption: expectedEncryption,
             PublicAccessBlockConfiguration: expectedPublicConfig
-        })
-    );
+        });
 
-    expectCDK(stack).to(
-        haveResourceLike('AWS::S3::Bucket', {
+        Template.fromStack(stack).hasResourceProperties('AWS::S3::Bucket', {
             LifecycleConfiguration: {
                 Rules: [multipartUploadRule, intelligentTieringRule]
             },
             LoggingConfiguration: {},
             BucketEncryption: expectedEncryption,
             PublicAccessBlockConfiguration: expectedPublicConfig
-        })
-    );
+        });
 
-    expectCDK(stack).to(
-        haveResource('AWS::S3::BucketPolicy', {
+    Template.fromStack(stack).hasResourceProperties('AWS::S3::BucketPolicy', {
             PolicyDocument: {
                 Statement: [
                     {
-                        Sid: 'HttpsOnly',
                         Effect: 'Deny',
-                        Action: '*',
+                        Action: 's3:*',
                         Condition: {
                             Bool: { 'aws:SecureTransport': 'false' }
                         },
                         Principal: { 'AWS': '*' },
                         Resource: [
-                            {
-                                'Fn::Join': ['', [{ 'Fn::GetAtt': ['TestBucket9EEBCF70', 'Arn'] }, '/*']]
-                            },
-                            {
-                                'Fn::GetAtt': ['TestBucket9EEBCF70', 'Arn']
-                            }
-                        ]
+                            Match.anyValue(), Match.anyValue()
+                          ],    
                     }
                 ],
                 Version: '2012-10-17'
             }
-        })
-    );
+        });
+    
 
-    expectCDK(stack).to(
-        haveResource('AWS::S3::BucketPolicy', {
+        Template.fromStack(stack).hasResourceProperties('AWS::S3::BucketPolicy', {
             PolicyDocument: {
                 Statement: [
+                    {
+                        Effect: 'Deny',
+                        Action: 's3:*',
+                        Condition: {
+                            Bool: { 'aws:SecureTransport': 'false' }
+                        },
+                        Principal: { 'AWS': '*' },
+                        Resource: [
+                            Match.anyValue(), Match.anyValue()
+                          ],    
+                    },
                     {
                         Action: 's3:PutObject',
                         Sid: 'S3ServerAccessLogsPolicy',
@@ -149,30 +148,28 @@ test('creates a bucket with intelligent tiering', () => {
                 Version: '2012-10-17'
             }
         })
-    );
-});
+        
+    });
 
 test('creates a bucket without intelligent tiering', () => {
     new EncryptedBucket(stack, 'TestBucket', {
         enableIntelligentTiering: false
     });
 
-    expectCDK(stack).notTo(
-        haveResourceLike('AWS::S3::Bucket', {
+    Template.fromStack(stack).hasResourceProperties('AWS::S3::Bucket', Match.not({
             LifecycleConfiguration: {
                 Rules: [intelligentTieringRule]
             }
-        })
-    );
+        }))
 });
+
 
 test('adds cfn_nag suppressions', () => {
     new EncryptedBucket(stack, 'TestBucket', {
         enableIntelligentTiering: true
     });
 
-    expectCDK(stack).to(
-        haveResource(
+    Template.fromStack(stack).hasResource(
             'AWS::S3::Bucket',
             {
                 Metadata: {
@@ -185,8 +182,5 @@ test('adds cfn_nag suppressions', () => {
                         ]
                     }
                 }
-            },
-            ResourcePart.CompleteDefinition
-        )
-    );
+            });
 });

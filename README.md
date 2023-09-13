@@ -75,9 +75,9 @@ git clone https://github.com/aws-solutions/streaming-data-solution-for-amazon-ki
 ### 2. After introducing changes, run the unit tests to make sure the customizations don't break existing functionality
 
 ```
-cd ./source
-chmod +x ./run-all-tests.sh
-./run-all-tests.sh
+cd ./deployment
+chmod +x ./run-unit-tests.sh
+./run-unit-tests.sh
 ```
 
 ### 3. Build the solution for deployment
@@ -119,9 +119,7 @@ aws s3 sync ./regional-s3-assets s3://$ARTIFACT_BUCKET-us-east-1/$SOLUTION_NAME/
 - Deploy the solution to your account by launching a new AWS CloudFormation stack
 
 ## Collection of operational metrics
-
-This solution collects anonymous operational metrics to help AWS improve the quality of features of the solution.
-For more information, including how to disable this capability, please see the [implementation guide for the Streaming Data Solution for Amazon Kinesis](https://docs.aws.amazon.com/solutions/latest/streaming-data-solution-for-amazon-kinesis/operational-metrics.html) and the [implementation guide for the Streaming Data Solution for Amazon MSK](https://docs.aws.amazon.com/solutions/latest/streaming-data-solution-for-amazon-msk/operational-metrics.html).
+This solution collects anonymous operational metrics to help AWS improve the quality and features of the solution. For more information, including how to disable this capability, please see the [implementation guide for the Streaming Data Solution for Amazon Kinesis](https://docs.aws.amazon.com/solutions/latest/streaming-data-solution-for-amazon-kinesis/operational-metrics.html) and the [implementation guide for the Streaming Data Solution for Amazon MSK](https://docs.aws.amazon.com/solutions/latest/streaming-data-solution-for-amazon-msk/operational-metrics.html).
 
 ## Known issues
 

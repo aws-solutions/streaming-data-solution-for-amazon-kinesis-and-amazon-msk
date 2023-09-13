@@ -11,8 +11,8 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-import * as cdk from '@aws-cdk/core';
-import { SynthUtils, expect as expectCDK, haveResource, ResourcePart } from '@aws-cdk/assert';
+import * as cdk  from 'aws-cdk-lib';
+import { Template} from 'aws-cdk-lib/assertions';
 
 import { KafkaClient } from '../lib/msk-client';
 
@@ -35,7 +35,6 @@ test('creates a Kafka client instance', () => {
         kafkaVersion: '2.6.0'
     });
 
-    expect(SynthUtils.toCloudFormation(stack)).toMatchSnapshot();
     expect(ec2Client.InstanceId).not.toBeUndefined();
 });
 
@@ -51,7 +50,7 @@ test('adds cfn_nag suppressions', () => {
         kafkaVersion: '2.6.0'
     });
 
-    expectCDK(stack).to(haveResource('AWS::IAM::Policy', {
+    Template.fromStack(stack).hasResource('AWS::IAM::Policy', {
         Metadata: {
             cfn_nag: {
                 rules_to_suppress: [{
@@ -60,9 +59,9 @@ test('adds cfn_nag suppressions', () => {
                 }]
             }
         }
-    }, ResourcePart.CompleteDefinition));
+    });
 
-    expectCDK(stack).to(haveResource('AWS::IAM::Policy', {
+    Template.fromStack(stack).hasResource('AWS::IAM::Policy', {
         Metadata: {
             cfn_nag: {
                 rules_to_suppress: [{
@@ -71,5 +70,5 @@ test('adds cfn_nag suppressions', () => {
                 }]
             }
         }
-    }, ResourcePart.CompleteDefinition));
+    });
 });

@@ -11,10 +11,9 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-import * as cdk from '@aws-cdk/core';
-import * as ec2 from '@aws-cdk/aws-ec2';
-import * as iam from '@aws-cdk/aws-iam';
-import * as kinesis from '@aws-cdk/aws-kinesis';
+import * as cdk  from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { aws_ec2 as ec2, aws_iam as iam, aws_kinesis as kinesis } from 'aws-cdk-lib';
 
 import { CfnNagHelper } from './cfn-nag-helper';
 
@@ -29,14 +28,14 @@ export interface KinesisProducerProps {
     readonly codeFileKey: string;
 }
 
-export class KinesisProducer extends cdk.Construct {
+export class KinesisProducer extends Construct {
     private readonly Instance: ec2.CfnInstance;
 
     public get InstanceId(): string {
         return this.Instance.ref;
     }
 
-    constructor(scope: cdk.Construct, id: string, props: KinesisProducerProps) {
+    constructor(scope: Construct, id: string, props: KinesisProducerProps) {
         super(scope, id);
 
         const s3Path = `${props.codeBucketName}/${props.codeFileKey}`;
@@ -53,8 +52,15 @@ export class KinesisProducer extends cdk.Construct {
         ];
 
         this.Instance = new ec2.CfnInstance(this, 'Producer', {
+            blockDeviceMappings: [{
+                deviceName: '/dev/xvda',
+                ebs: {
+                    encrypted: true,
+                }
+            }],
             imageId: props.imageId,
             instanceType: 't3.small',
+            monitoring: true,
             subnetId: props.subnetId,
             iamInstanceProfile: instanceProfile.ref,
             securityGroupIds: [securityGroup.attrGroupId],

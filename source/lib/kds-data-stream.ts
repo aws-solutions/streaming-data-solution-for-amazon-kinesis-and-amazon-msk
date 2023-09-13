@@ -11,10 +11,9 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-import * as cdk from '@aws-cdk/core';
-import * as kinesis from '@aws-cdk/aws-kinesis';
-import * as lambda from '@aws-cdk/aws-lambda';
-import * as iam from '@aws-cdk/aws-iam';
+import * as cdk  from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { aws_kinesis as kinesis, aws_lambda as lambda, aws_iam as iam } from 'aws-cdk-lib';
 
 import { ExecutionRole } from './lambda-role-cloudwatch';
 import { CfnNagHelper } from './cfn-nag-helper';
@@ -25,10 +24,10 @@ export interface DataStreamProps {
     readonly enableEnhancedMonitoring: string;
 }
 
-export class DataStream extends cdk.Construct {
+export class DataStream extends Construct {
     public readonly Stream: kinesis.Stream;
 
-    constructor(scope: cdk.Construct, id: string, props: DataStreamProps) {
+    constructor(scope: Construct, id: string, props: DataStreamProps) {
         super(scope, id);
 
         if (!cdk.Token.isUnresolved(props.shardCount) && props.shardCount <= 0) {
@@ -62,7 +61,7 @@ export class DataStream extends cdk.Construct {
         });
 
         const customResourceFunction = new lambda.Function(this, 'CustomResource', {
-            runtime: lambda.Runtime.PYTHON_3_8,
+            runtime: lambda.Runtime.PYTHON_3_10,
             handler: 'lambda_function.handler',
             role: customResouceRole.Role,
             code: lambda.Code.fromAsset('lambda/kds-enhanced-monitoring'),

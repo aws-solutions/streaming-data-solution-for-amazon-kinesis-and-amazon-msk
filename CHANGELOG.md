@@ -5,10 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.7.8] - 2023-07-20
+## [1.8.0] - 2023-09-14
 
 ### Updated
 
+- Migrate to AWS SDKv3
+- Migrate to CDKv2
+- Migrate Lambda functions to NodeJS 18 and Python 3.10 runtime
+- npm package security patching
+
+## [1.7.8] - 2023-07-13
+
+### Updated
 - Set urllib3 version to address security issue
 - Remove vm2 dependency
 - Patch word-wrap and tough-cookie vulnerability

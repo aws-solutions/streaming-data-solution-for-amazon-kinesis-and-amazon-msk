@@ -11,9 +11,9 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-import * as cdk from '@aws-cdk/core';
-import * as iam from '@aws-cdk/aws-iam';
-import * as s3 from '@aws-cdk/aws-s3';
+import * as cdk  from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { aws_iam as iam, aws_s3 as s3 } from 'aws-cdk-lib';
 
 import { CfnNagHelper } from './cfn-nag-helper';
 
@@ -21,15 +21,16 @@ export interface EncryptedBucketProps {
     readonly enableIntelligentTiering: boolean;
 }
 
-export class EncryptedBucket extends cdk.Construct {
+export class EncryptedBucket extends Construct {
     public readonly Bucket: s3.IBucket;
 
-    constructor(scope: cdk.Construct, id: string, props: EncryptedBucketProps) {
+    constructor(scope: Construct, id: string, props: EncryptedBucketProps) {
         super(scope, id);
 
         const securitySettings: s3.BucketProps = {
             blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
-            encryption: s3.BucketEncryption.S3_MANAGED
+            encryption: s3.BucketEncryption.S3_MANAGED,
+            enforceSSL: true
         };
 
         const accessLogsBucket = new s3.Bucket(this, 'AccessLogsBucket', securitySettings);
@@ -60,19 +61,6 @@ export class EncryptedBucket extends cdk.Construct {
             serverAccessLogsBucket: accessLogsBucket,
             lifecycleRules: rules
         });
-
-        this.Bucket.addToResourcePolicy(
-            new iam.PolicyStatement({
-                sid: 'HttpsOnly',
-                effect: iam.Effect.DENY,
-                resources: [this.Bucket.arnForObjects('*'), this.Bucket.bucketArn],
-                actions: ['*'],
-                principals: [new iam.AnyPrincipal()],
-                conditions: {
-                    Bool: { 'aws:SecureTransport': 'false' }
-                }
-            })
-        );
 
         // remove ACL and add S3 bucket policy to write to access logging bucket
         (accessLogsBucket.node.defaultChild as s3.CfnBucket).addDeletionOverride('Properties.AccessControl');

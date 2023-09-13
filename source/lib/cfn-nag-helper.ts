@@ -11,7 +11,7 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-import * as cdk from '@aws-cdk/core';
+import * as cdk  from 'aws-cdk-lib';
 
 export interface CfnNagSuppression {
     Id: string;
