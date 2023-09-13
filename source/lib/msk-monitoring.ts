@@ -11,9 +11,9 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-import * as cdk from '@aws-cdk/core';
-import * as lambda from '@aws-cdk/aws-lambda';
-import * as iam from '@aws-cdk/aws-iam';
+import * as cdk  from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { aws_lambda as lambda, aws_iam as iam } from 'aws-cdk-lib';
 
 import { ExecutionRole } from './lambda-role-cloudwatch';
 import { CfnNagHelper } from './cfn-nag-helper';
@@ -23,8 +23,8 @@ export interface KafkaMonitoringProps {
     readonly dashboardName: string;
 }
 
-export class KafkaMonitoring extends cdk.Construct {
-    constructor(scope: cdk.Construct, id: string, props: KafkaMonitoringProps) {
+export class KafkaMonitoring extends Construct {
+    constructor(scope: Construct, id: string, props: KafkaMonitoringProps) {
         super(scope, id);
 
         const monitoringRole = new ExecutionRole(this, 'Role', {
@@ -50,7 +50,7 @@ export class KafkaMonitoring extends cdk.Construct {
         });
 
         const monitoringFunction = new lambda.Function(this, 'Function', {
-            runtime: lambda.Runtime.PYTHON_3_8,
+            runtime: lambda.Runtime.PYTHON_3_10,
             handler: 'lambda_function.handler',
             description: 'This function creates a dashboard that monitors the health of a MSK cluster',
             role: monitoringRole.Role,

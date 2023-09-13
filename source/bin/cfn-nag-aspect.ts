@@ -11,15 +11,14 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-import * as cdk from '@aws-cdk/core';
-import * as ec2 from '@aws-cdk/aws-ec2';
-import * as lambda from '@aws-cdk/aws-lambda';
-import * as logs from '@aws-cdk/aws-logs';
+import * as cdk  from 'aws-cdk-lib';
+import { Construct, IConstruct } from 'constructs';
+import { aws_ec2 as ec2, aws_lambda as lambda, aws_logs as logs } from 'aws-cdk-lib';
 
 import { CfnNagHelper } from '../lib/cfn-nag-helper';
 
-export class CfnNagAspect extends cdk.Construct implements cdk.IAspect {
-    public visit(node: cdk.IConstruct): void {
+export class CfnNagAspect extends Construct implements cdk.IAspect {
+    public visit(node: IConstruct): void {
         if (node instanceof lambda.Function) {
             const cfnFunction = node.node.defaultChild as lambda.CfnFunction;
             CfnNagHelper.addSuppressions(cfnFunction, [

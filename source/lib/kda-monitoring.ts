@@ -11,8 +11,9 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-import * as cdk from '@aws-cdk/core';
-import * as cw from '@aws-cdk/aws-cloudwatch';
+import * as cdk  from 'aws-cdk-lib';
+import {aws_cloudwatch as cw} from 'aws-cdk-lib';
+import { Construct } from 'constructs';
 import { MonitoringBase } from './monitoring-base';
 
 export interface ApplicationMonitoringProps {
@@ -44,7 +45,7 @@ export class ApplicationMonitoring extends MonitoringBase {
         comparisonOperator: cw.ComparisonOperator.GREATER_THAN_THRESHOLD
     };
 
-    constructor(scope: cdk.Construct, id: string, props: ApplicationMonitoringProps) {
+    constructor(scope: Construct, id: string, props: ApplicationMonitoringProps) {
         super(scope, id);
 
         this.DEFAULT_METRIC_PROPS.dimensionsMap['Application'] = props.applicationName;

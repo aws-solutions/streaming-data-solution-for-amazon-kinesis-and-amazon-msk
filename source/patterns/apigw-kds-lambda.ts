@@ -11,10 +11,9 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-import * as cdk from '@aws-cdk/core';
-import * as lambda from '@aws-cdk/aws-lambda';
-import * as apigw from '@aws-cdk/aws-apigateway';
-import * as cognito from '@aws-cdk/aws-cognito';
+import * as cdk  from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { aws_lambda as lambda, aws_apigateway as apigw, aws_cognito as cognito } from 'aws-cdk-lib';
 
 import { ApiGatewayToKinesisStreams } from '@aws-solutions-constructs/aws-apigateway-kinesisstreams';
 import { KinesisStreamsToLambda } from '@aws-solutions-constructs/aws-kinesisstreams-lambda';
@@ -25,7 +24,7 @@ import { SolutionStackProps } from '../bin/solution-props';
 import { DataStreamMonitoring } from '../lib/kds-monitoring';
 
 export class ApiGwKdsLambda extends cdk.Stack {
-    constructor(scope: cdk.Construct, id: string, props: SolutionStackProps) {
+    constructor(scope: Construct, id: string, props: SolutionStackProps) {
         super(scope, id, props);
 
         //---------------------------------------------------------------------
@@ -129,7 +128,7 @@ export class ApiGwKdsLambda extends cdk.Stack {
             createCloudWatchAlarms: false,
             deploySqsDlqQueue: true,
             lambdaFunctionProps: {
-                runtime: lambda.Runtime.NODEJS_14_X,
+                runtime: lambda.Runtime.NODEJS_18_X,
                 handler: 'index.handler',
                 code: lambda.Code.fromAsset('lambda/kds-lambda-consumer'),
                 timeout: cdk.Duration.minutes(5)

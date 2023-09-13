@@ -11,7 +11,7 @@
 #  and limitations under the License.                                                                                #
 ######################################################################################################################
 
-import boto3, logging, os, json
+import boto3, logging, os, json, time
 from crhelper import CfnResource
 from botocore import config
 
@@ -50,13 +50,26 @@ def _add_config(application_name, version_id, subnets, security_groups):
     return response['VpcConfigurationDescription']['VpcConfigurationId']
 
 def _remove_config(application_name, version_id, vpc_config_id):
-    response = client_kinesis_analytics.delete_application_vpc_configuration(
-        ApplicationName=application_name,
-        CurrentApplicationVersionId=version_id,
-        VpcConfigurationId=vpc_config_id
-    )
+    is_deleted = False
+    while not is_deleted:
+        try:
+            response = client_kinesis_analytics.delete_application_vpc_configuration(
+                ApplicationName=application_name,
+                CurrentApplicationVersionId=version_id,
+                VpcConfigurationId=vpc_config_id
+            )
 
-    return response['ApplicationVersionId']
+            is_deleted = True
+            return response['ApplicationVersionId']
+        except Exception as err: # NOSONAR: There isn't a built-in type to catch concurrency errors.
+            logger.error(err)
+            time.sleep(5)
+            (version_id, vpc_config_id) = _get_application_details(application_name)
+            if vpc_config_id:
+                is_deleted = False
+            else:
+                is_deleted = True
+    return None
 
 def _add_vpc_configuration(application_name, subnet_ids, security_group_ids):
     (version_id, vpc_config_id) = _get_application_details(application_name)

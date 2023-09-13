@@ -11,8 +11,9 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-import * as cdk from '@aws-cdk/core';
-import * as cw from '@aws-cdk/aws-cloudwatch';
+import * as cdk  from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import {aws_cloudwatch as cw} from 'aws-cdk-lib';
 import { MonitoringBase } from './monitoring-base';
 
 export interface DeliveryStreamMonitoringProps {
@@ -28,7 +29,7 @@ export class DeliveryStreamMonitoring extends MonitoringBase {
     private readonly KDF_INCOMING_REQUESTS_PCT_THRESHOLD: number = 75;
     private readonly KDF_INCOMING_RECORDS_PCT_THRESHOLD: number = 75;
 
-    constructor(scope: cdk.Construct, id: string, props: DeliveryStreamMonitoringProps) {
+    constructor(scope: Construct, id: string, props: DeliveryStreamMonitoringProps) {
         super(scope, id);
 
         this.addDataStreamMetrics(props.dataStreamName);
@@ -58,7 +59,7 @@ export class DeliveryStreamMonitoring extends MonitoringBase {
             namespace: 'AWS/Firehose',
             period: monitoringPeriod,
             dimensionsMap: { 'DeliveryStreamName': deliveryStreamName },
-            statistic: cw.Statistic.SUM
+            statistic: cw.Stats.SUM
         };
 
         const defaultAlarmProps = {
@@ -79,7 +80,7 @@ export class DeliveryStreamMonitoring extends MonitoringBase {
                 ...defaultMetricProps,
                 metricName: 'BytesPerSecondLimit',
                 color: cw.Color.RED,
-                statistic: cw.Statistic.MINIMUM
+                statistic: cw.Stats.MINIMUM
             });
 
             const incomingBytesExpression = new cw.MathExpression({
@@ -96,7 +97,7 @@ export class DeliveryStreamMonitoring extends MonitoringBase {
                 ...defaultMetricProps,
                 metricName: 'PutRequestsPerSecondLimit',
                 color: cw.Color.RED,
-                statistic: cw.Statistic.MINIMUM
+                statistic: cw.Stats.MINIMUM
             });
 
             const putRequestsExpression = new cw.MathExpression({
@@ -113,7 +114,7 @@ export class DeliveryStreamMonitoring extends MonitoringBase {
                 ...defaultMetricProps,
                 metricName: 'RecordsPerSecondLimit',
                 color: cw.Color.RED,
-                statistic: cw.Statistic.MINIMUM
+                statistic: cw.Stats.MINIMUM
             });
 
             const incomingRecordsExpression = new cw.MathExpression({
@@ -202,7 +203,7 @@ export class DeliveryStreamMonitoring extends MonitoringBase {
             const getRecordsThrottledMetric = new cw.Metric({
                 ...defaultMetricProps,
                 metricName: 'ThrottledGetRecords',
-                statistic: cw.Statistic.AVERAGE
+                statistic: cw.Stats.AVERAGE
             });
 
             //---------------------------------------------------------------------
@@ -222,7 +223,7 @@ export class DeliveryStreamMonitoring extends MonitoringBase {
                 'm1': new cw.Metric({
                     ...defaultMetricProps,
                     metricName: 'DeliveryToS3.Success',
-                    statistic: cw.Statistic.AVERAGE,
+                    statistic: cw.Stats.AVERAGE,
                     label: ''
                 })
             }
@@ -235,7 +236,7 @@ export class DeliveryStreamMonitoring extends MonitoringBase {
             metric: new cw.Metric({
                 ...defaultMetricProps,
                 metricName: 'DeliveryToS3.DataFreshness',
-                statistic: cw.Statistic.MAXIMUM
+                statistic: cw.Stats.MAXIMUM
             })
         });
 

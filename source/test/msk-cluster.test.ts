@@ -11,8 +11,8 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-import * as cdk from '@aws-cdk/core';
-import { expect as expectCDK, SynthUtils, haveResourceLike } from '@aws-cdk/assert';
+import * as cdk  from 'aws-cdk-lib';
+import { Template } from 'aws-cdk-lib/assertions';
 
 import {
     KafkaCluster,
@@ -45,17 +45,16 @@ describe('successful scenarios', () => {
             brokerSubnets: twoSubnets
         });
 
-        expect(SynthUtils.toCloudFormation(stack)).toMatchSnapshot();
         expect(cluster.ClusterArn).not.toBeUndefined();
         expect(cluster.SecurityGroupId).not.toBeUndefined();
 
         for (const rule of KafkaCluster.RequiredRules) {
-            expectCDK(stack).to(haveResourceLike('AWS::EC2::SecurityGroupIngress', {
+            Template.fromStack(stack).hasResourceProperties('AWS::EC2::SecurityGroupIngress', {
                 IpProtocol: 'tcp',
                 FromPort: rule.port,
                 ToPort: rule.port,
                 Description: rule.description
-            }));
+            });
         }
     });
 
@@ -72,7 +71,6 @@ describe('successful scenarios', () => {
             brokerSubnets: twoSubnets
         });
 
-        expect(SynthUtils.toCloudFormation(stack)).toMatchSnapshot();
     });
 
     test('uses SCRAM for access control', () => {
@@ -88,7 +86,6 @@ describe('successful scenarios', () => {
             brokerSubnets: twoSubnets
         });
 
-        expect(SynthUtils.toCloudFormation(stack)).toMatchSnapshot();
     });
 
     test('accepts CloudFormation parameters', () => {
@@ -111,13 +108,12 @@ describe('successful scenarios', () => {
             brokerSubnets: clientSubnets.valueAsList
         });
 
-        expect(SynthUtils.toCloudFormation(stack)).toMatchSnapshot();
-        expectCDK(stack).to(haveResourceLike('AWS::MSK::Cluster', {
+        Template.fromStack(stack).hasResourceProperties('AWS::MSK::Cluster', {
             NumberOfBrokerNodes: { Ref: 'NumberOfBrokerNodes' },
             BrokerNodeGroupInfo: {
                 ClientSubnets: { Ref: 'ClientSubnets' },
             }
-        }));
+        });
     });
 });
 

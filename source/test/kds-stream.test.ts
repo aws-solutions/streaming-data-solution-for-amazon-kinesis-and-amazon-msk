@@ -11,8 +11,8 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-import * as cdk from '@aws-cdk/core';
-import { expect as expectCDK, haveResource, ResourcePart } from '@aws-cdk/assert';
+import * as cdk  from 'aws-cdk-lib';
+import { Template} from 'aws-cdk-lib/assertions';
 
 import { DataStream } from '../lib/kds-data-stream';
 
@@ -30,14 +30,14 @@ test('creates a KDS data stream', () => {
         shardCount: 2
     });
 
-    expectCDK(stack).to(haveResource('AWS::Kinesis::Stream', {
+    Template.fromStack(stack).hasResourceProperties('AWS::Kinesis::Stream', {
         ShardCount: 2,
         RetentionPeriodHours: 72,
         StreamEncryption: {
             EncryptionType: 'KMS',
             KeyId: 'alias/aws/kinesis'
         }
-    }));
+    });
 });
 
 test('adds cfn_nag suppressions', () => {
@@ -47,7 +47,7 @@ test('adds cfn_nag suppressions', () => {
         shardCount: 2
     });
 
-    expectCDK(stack).to(haveResource('AWS::IAM::Role', {
+    Template.fromStack(stack).hasResource('AWS::IAM::Role', {
         Metadata: {
             cfn_nag: {
                 rules_to_suppress: [{
@@ -56,7 +56,7 @@ test('adds cfn_nag suppressions', () => {
                 }]
             }
         }
-    }, ResourcePart.CompleteDefinition));
+    });
 });
 
 test.each([0, -1])('shard count must be positive', (invalidShardCount) => {

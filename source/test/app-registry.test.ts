@@ -11,10 +11,10 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-import * as cdk from '@aws-cdk/core';
+import * as cdk from 'aws-cdk-lib';
 import * as crypto from 'crypto';
 
-import { Capture, Template } from '@aws-cdk/assertions';
+import { Capture, Template } from 'aws-cdk-lib/assertions';
 
 import { AppRegistry } from '../lib/app-registry';
 

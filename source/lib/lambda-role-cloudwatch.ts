@@ -11,18 +11,19 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-import * as cdk from '@aws-cdk/core';
-import * as iam from '@aws-cdk/aws-iam';
+import * as cdk  from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { aws_iam as iam } from 'aws-cdk-lib';
 
 export interface ExecutionRoleProps {
     readonly inlinePolicyName: string;
     readonly inlinePolicyDocument: iam.PolicyDocument;
 }
 
-export class ExecutionRole extends cdk.Construct {
+export class ExecutionRole extends Construct {
     public readonly Role: iam.IRole;
 
-    constructor(scope: cdk.Construct, id: string, props?: ExecutionRoleProps) {
+    constructor(scope: Construct, id: string, props?: ExecutionRoleProps) {
         super(scope, id);
 
         const logsPolicy = new iam.PolicyStatement({

@@ -24,11 +24,12 @@ By default, the construct will add all metrics listed as recommended in the [dev
 We'll create a new stack class (in the `patterns` folder) to use the modified version of the `DataStreamMonitoring` construct.
 
 ```typescript
-import * as cdk from '@aws-cdk/core';
+import * as cdk  from 'aws-cdk-lib';
+import { Construct } from 'constructs';
 import { DataStreamMonitoring } from '../lib/kds-monitoring';
 
 export class StreamingMonitoringStack extends cdk.Stack {
-    constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+    constructor(scope: Construct, id: string, props?: cdk.StackProps) {
         super(scope, id, props);
 
         const streamName = new cdk.CfnParameter(this, 'StreamName');
@@ -48,7 +49,7 @@ We'll also modify the entrypoint file (`bin/streaming-data-solution.ts`) so that
 ```typescript
 #!/usr/bin/env node
 import 'source-map-support/register';
-import * as cdk from '@aws-cdk/core';
+import * as cdk  from 'aws-cdk-lib';
 
 import { StreamingMonitoringStack } from '../patterns/streaming-monitoring-stack';
 const app = new cdk.App();

@@ -11,9 +11,9 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-import * as cdk from '@aws-cdk/core';
-import * as lambda from '@aws-cdk/aws-lambda';
-import * as iam from '@aws-cdk/aws-iam';
+import * as cdk  from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { aws_lambda as lambda, aws_iam as iam } from 'aws-cdk-lib';
 
 import { ExecutionRole } from './lambda-role-cloudwatch';
 import { CfnNagHelper } from './cfn-nag-helper';
@@ -22,7 +22,7 @@ export interface KafkaMetadataProps {
     readonly clusterArn: string;
 }
 
-export class KafkaMetadata extends cdk.Construct {
+export class KafkaMetadata extends Construct {
     private readonly CustomResource: cdk.CustomResource;
 
     public get Subnets(): cdk.Reference {
@@ -37,7 +37,7 @@ export class KafkaMetadata extends cdk.Construct {
         return this.CustomResource.getAtt('BootstrapServers');
     }
 
-    constructor(scope: cdk.Construct, id: string, props: KafkaMetadataProps) {
+    constructor(scope: Construct, id: string, props: KafkaMetadataProps) {
         super(scope, id);
 
         const metadataRole = new ExecutionRole(this, 'Role', {
@@ -59,7 +59,7 @@ export class KafkaMetadata extends cdk.Construct {
         });
 
         const metadataFunction = new lambda.Function(this, 'CustomResource', {
-            runtime: lambda.Runtime.PYTHON_3_8,
+            runtime: lambda.Runtime.PYTHON_3_10,
             handler: 'lambda_function.handler',
             description: 'This function retrieves metadata (such as list of brokers and networking) from a MSK cluster',
             role: metadataRole.Role,
