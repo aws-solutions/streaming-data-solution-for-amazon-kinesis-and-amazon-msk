@@ -11,9 +11,9 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-import * as cdk from '@aws-cdk/core';
-import * as cwlogs from '@aws-cdk/aws-logs';
-
+import * as cdk  from 'aws-cdk-lib';
+import { aws_logs as cwlogs } from 'aws-cdk-lib';
+import { Construct } from 'constructs';
 import { DataStream } from '../lib/kds-data-stream';
 import { KinesisProducer } from '../lib/kpl-producer';
 import { FlinkStudio } from '../lib/kda-flink-studio';
@@ -25,7 +25,7 @@ import { SolutionStackProps } from '../bin/solution-props';
 export class KplKdsKda extends cdk.Stack {
     private readonly BinaryOptions = ['true', 'false'];
 
-    constructor(scope: cdk.Construct, id: string, props: SolutionStackProps) {
+    constructor(scope: Construct, id: string, props: SolutionStackProps) {
         super(scope, id, props);
 
         //---------------------------------------------------------------------

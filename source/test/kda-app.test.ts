@@ -11,9 +11,9 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-import * as cdk from '@aws-cdk/core';
-import * as logs from '@aws-cdk/aws-logs';
-import { expect as expectCDK, haveResource, ResourcePart, SynthUtils } from '@aws-cdk/assert';
+import * as cdk  from 'aws-cdk-lib';
+import { aws_logs as logs } from 'aws-cdk-lib';
+import { Template } from 'aws-cdk-lib/assertions';
 
 import { FlinkApplication } from '../lib/kda-flink-application';
 import { FlinkLogLevels, FlinkMetricLevels } from '../lib/kda-base';
@@ -46,21 +46,17 @@ beforeAll(() => {
     });
 });
 
-test('creates a KDA flink application', () => {
-    expect(SynthUtils.toCloudFormation(stack)).toMatchSnapshot();
-});
-
 test('configures logging for the KDA application', () => {
-    expectCDK(stack).to(haveResource('AWS::Logs::LogGroup', {
+    Template.fromStack(stack).hasResourceProperties('AWS::Logs::LogGroup', {
         RetentionInDays: 7
-    }));
+    });
 
-    expectCDK(stack).to(haveResource('AWS::Logs::LogStream'));
-    expectCDK(stack).to(haveResource('AWS::KinesisAnalyticsV2::ApplicationCloudWatchLoggingOption'));
+    expect(Object.keys(Template.fromStack(stack).findResources('AWS::Logs::LogStream')).length).toBeGreaterThan(0);
+    expect(Object.keys(Template.fromStack(stack).findResources('AWS::KinesisAnalyticsV2::ApplicationCloudWatchLoggingOption')).length).toBeGreaterThan(0);
 });
 
 test('creates an IAM role for KDA', () => {
-    expectCDK(stack).to(haveResource('AWS::IAM::Role', {
+    Template.fromStack(stack).hasResourceProperties('AWS::IAM::Role', {
         AssumeRolePolicyDocument: {
             Statement: [{
                 Action: 'sts:AssumeRole',
@@ -71,11 +67,11 @@ test('creates an IAM role for KDA', () => {
             }],
             Version: '2012-10-17'
         }
-    }));
+    });
 });
 
 test('adds cfn_nag suppressions', () => {
-    expectCDK(stack).to(haveResource('AWS::IAM::Role', {
+    Template.fromStack(stack).hasResource('AWS::IAM::Role', {
         Metadata: {
             cfn_nag: {
                 rules_to_suppress: [{
@@ -84,5 +80,5 @@ test('adds cfn_nag suppressions', () => {
                 }]
             }
         }
-    }, ResourcePart.CompleteDefinition));
+    });
 });

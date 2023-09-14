@@ -12,14 +12,15 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-import * as appreg from '@aws-cdk/aws-servicecatalogappregistry';
-import * as cdk from '@aws-cdk/core';
+import * as appreg from "@aws-cdk/aws-servicecatalogappregistry-alpha";
+import * as cdk  from 'aws-cdk-lib';
+import { Construct, IConstruct } from 'constructs';
 
 export interface AppRegistryProps {
     readonly solutionID: string;
 }
 
-export class AppRegistry extends cdk.Construct implements cdk.IAspect {
+export class AppRegistry extends Construct implements cdk.IAspect {
     private solutionName: string;
     private solutionID: string;
     private solutionVersion: string;
@@ -39,7 +40,7 @@ export class AppRegistry extends cdk.Construct implements cdk.IAspect {
      */
     private applicationName: string;
 
-    constructor(scope: cdk.Construct, id: string, props: AppRegistryProps) {
+    constructor(scope: Construct, id: string, props: AppRegistryProps) {
         super(scope, id);
         this.id = id;
 
@@ -55,13 +56,13 @@ export class AppRegistry extends cdk.Construct implements cdk.IAspect {
      *
      * @param node
      */
-    public visit(node: cdk.IConstruct): void {
+    public visit(node: IConstruct): void {
         if (node instanceof cdk.Stack) {
             if (!node.nested) {
                 // parent stack
                 const stack = node as cdk.Stack;
                 this.createAppForAppRegistry(this.id);
-                this.application.associateStack(stack);
+                this.application.associateApplicationWithStack(stack);
                 this.createAttributeGroup();
                 this.addTagsforApplication();
             } else {
@@ -69,7 +70,7 @@ export class AppRegistry extends cdk.Construct implements cdk.IAspect {
                 if (!this.application) {
                     this.createAppForAppRegistry(this.id);
                 }
-                this.application.associateStack(node);
+                this.application.associateApplicationWithStack(node);
             }
         }
     }

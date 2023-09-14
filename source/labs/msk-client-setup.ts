@@ -11,12 +11,10 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-import * as cdk from '@aws-cdk/core';
-import * as cfninc from '@aws-cdk/cloudformation-include';
-import * as cloud9 from '@aws-cdk/aws-cloud9';
-import * as ec2 from '@aws-cdk/aws-ec2';
-import * as iam from '@aws-cdk/aws-iam';
-import * as lambda from '@aws-cdk/aws-lambda';
+import * as cdk  from 'aws-cdk-lib';
+import { Construct} from 'constructs';
+import * as cfninc from "aws-cdk-lib/cloudformation-include";
+import { aws_cloud9 as cloud9, aws_ec2 as ec2, aws_iam as iam,  aws_lambda as lambda} from 'aws-cdk-lib';
 
 import { CfnNagHelper } from '../lib/cfn-nag-helper';
 import { SolutionHelper } from '../lib/solution-helper';
@@ -24,7 +22,7 @@ import { SolutionStackProps } from '../bin/solution-props';
 import { ExecutionRole } from '../lib/lambda-role-cloudwatch';
 
 export class MskClientStack extends cdk.Stack {
-    constructor(scope: cdk.Construct, id: string, props: SolutionStackProps) {
+    constructor(scope: Construct, id: string, props: SolutionStackProps) {
         super(scope, id, props);
 
         const keyPair = new cdk.CfnParameter(this, 'KeyPair', {
@@ -123,7 +121,7 @@ export class MskClientStack extends cdk.Stack {
         });
 
         const cloud9Setup = new lambda.Function(this, 'CustomResource', {
-            runtime: lambda.Runtime.PYTHON_3_8,
+            runtime: lambda.Runtime.PYTHON_3_10,
             handler: 'lambda_function.handler',
             description: 'This function creates prerequisite resources for Cloud9 (such as IAM roles)',
             code: lambda.Code.fromAsset('lambda/cloud9-setup'),
@@ -193,8 +191,15 @@ export class MskClientStack extends cdk.Stack {
         ];
 
         const kafkaClient = new ec2.CfnInstance(this, 'KafkaClientEC2Instance', {
+            blockDeviceMappings: [{
+                deviceName: '/dev/xvda',
+                ebs: {
+                    encrypted: true,
+                }
+            }],
             instanceType: 'm5.large',
             keyName: keyPair.valueAsString,
+            monitoring: true,
             subnetId: cdk.Fn.ref('PrivateSubnetMSKOne'),
             securityGroupIds: [kafkaClientSG.attrGroupId],
             imageId: latestAmiId.valueAsString,
@@ -205,7 +210,7 @@ export class MskClientStack extends cdk.Stack {
 
         // If the instance is created before the route table (to the NAT Gateway) is available,
         // any commands that reach the internet (e.g. yum) will fail.
-        kafkaClient.addDependsOn(mskVpc.getResource('PrivateRoute'));
+        kafkaClient.addDependency(mskVpc.getResource('PrivateRoute'));
 
         //---------------------------------------------------------------------
         // Solution metrics

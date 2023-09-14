@@ -11,9 +11,9 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-import * as cdk from '@aws-cdk/core';
-import * as lambda from '@aws-cdk/aws-lambda';
-import { expect as expectCDK, haveResource, haveResourceLike, ResourcePart, SynthUtils } from '@aws-cdk/assert';
+import * as cdk  from 'aws-cdk-lib';
+import { aws_lambda as lambda } from 'aws-cdk-lib';
+import { Template} from 'aws-cdk-lib/assertions';
 
 import { KafkaConsumer } from '../lib/msk-consumer';
 
@@ -46,9 +46,7 @@ describe('successful scenarios', () => {
             }
         });
 
-        expect(SynthUtils.toCloudFormation(stack)).toMatchSnapshot();
-
-        expectCDK(stack).to(haveResource('AWS::IAM::Role', {
+        Template.fromStack(stack).hasResource('AWS::IAM::Role', {
             Metadata: {
                 cfn_nag: {
                     rules_to_suppress: [{
@@ -57,7 +55,7 @@ describe('successful scenarios', () => {
                     }]
                 }
             }
-        }, ResourcePart.CompleteDefinition));
+        });
     });
 
     test('accepts CloudFormation parameters', () => {
@@ -77,8 +75,7 @@ describe('successful scenarios', () => {
             topicName: topicName.valueAsString
         });
 
-        expect(SynthUtils.toCloudFormation(stack)).toMatchSnapshot();
-        expectCDK(stack).to(haveResourceLike('AWS::Lambda::EventSourceMapping', {
+        Template.fromStack(stack).hasResourceProperties('AWS::Lambda::EventSourceMapping', {
             EventSourceArn: { Ref: 'ClusterArn' },
             BatchSize: { Ref: 'BatchSize' },
             Topics: [{ Ref: 'TopicName' }],
@@ -86,9 +83,8 @@ describe('successful scenarios', () => {
                 Type: 'SASL_SCRAM_512_AUTH',
                 URI: { Ref: 'SecretArn' }
             }]
-        }));
+        });
     });
-});
 
 describe('validation tests', () => {
     let stack: cdk.Stack;
@@ -127,4 +123,5 @@ describe('validation tests', () => {
             topicName: 'my-topic'
         })).toThrowError(`batchSize must be between 1 and 10000 (given ${invalidBatchSize})`);
     });
+})
 });

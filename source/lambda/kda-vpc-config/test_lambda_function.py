@@ -40,6 +40,17 @@ class LambdaTest(unittest.TestCase):
         stubber.add_response('describe_application', stub_application_with_vpc)
         stubber.add_response('delete_application_vpc_configuration', stub_delete_config)
 
+        # Test 07
+        stubber.add_response('describe_application', stub_application_with_vpc)
+        stubber.add_client_error('delete_application_vpc_configuration', service_error_code='400')
+        stubber.add_response('describe_application', stub_application_with_vpc)
+        stubber.add_response('delete_application_vpc_configuration', stub_delete_config)
+
+        # Test 08
+        stubber.add_response('describe_application', stub_application_with_vpc)
+        stubber.add_client_error('delete_application_vpc_configuration', service_error_code='400')
+        stubber.add_response('describe_application', stub_application_without_vpc)
+
         stubber.activate()
 
     @classmethod
@@ -96,6 +107,22 @@ class LambdaTest(unittest.TestCase):
         empty_expected = []
         empty_actual = _filter_empty_items([''])
         self.assertCountEqual(empty_expected, empty_actual)
+
+    @patch.object(boto3, 'client')
+    def test_07_delete_vpc_configuration_with_concurrency(self, mock_client):
+        mock_client.return_value = self._kinesisAnalytics
+
+        from lambda_function import _delete_vpc_configuration
+        response = _delete_vpc_configuration('test-application')
+        self.assertEqual(60, response)
+
+    @patch.object(boto3, 'client')
+    def test_08_delete_vpc_configuration_with_concurrency(self, mock_client):
+        mock_client.return_value = self._kinesisAnalytics
+
+        from lambda_function import _delete_vpc_configuration
+        response = _delete_vpc_configuration('test-application')
+        self.assertEqual(None, response)
 
 stub_application_without_vpc = {
     'ApplicationDetail': {

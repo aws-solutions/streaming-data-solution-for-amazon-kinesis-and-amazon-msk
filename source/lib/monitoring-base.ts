@@ -11,10 +11,11 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-import * as cdk from '@aws-cdk/core';
-import * as cw from '@aws-cdk/aws-cloudwatch';
+import * as cdk  from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import {aws_cloudwatch as cw} from 'aws-cdk-lib';
 
-export abstract class MonitoringBase extends cdk.Construct {
+export abstract class MonitoringBase extends Construct {
     protected readonly Dashboard: cw.Dashboard;
     protected readonly MONITORING_PERIOD: cdk.Duration = cdk.Duration.minutes(1);
 
@@ -24,7 +25,7 @@ export abstract class MonitoringBase extends cdk.Construct {
     private readonly KDS_PUT_RECORDS_THRESHOLD: number = 0.95;
     private readonly KDS_GET_RECORDS_THRESHOLD: number = 0.98;
 
-    constructor(scope: cdk.Construct, id: string) {
+    constructor(scope: Construct, id: string) {
         super(scope, id);
         this.Dashboard = new cw.Dashboard(this, 'Dashboard');
     }

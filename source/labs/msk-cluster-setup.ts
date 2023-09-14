@@ -11,15 +11,15 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-import * as cdk from '@aws-cdk/core';
-import * as ec2 from '@aws-cdk/aws-ec2';
-import * as msk from '@aws-cdk/aws-msk';
+import * as cdk  from 'aws-cdk-lib';
+import { Construct} from 'constructs';
+import { aws_ec2 as ec2, aws_msk as msk } from 'aws-cdk-lib';
 
 import { SolutionHelper } from '../lib/solution-helper';
 import { SolutionStackProps } from '../bin/solution-props';
 
 export class MskClusterStack extends cdk.Stack {
-    constructor(scope: cdk.Construct, id: string, props: SolutionStackProps) {
+    constructor(scope: Construct, id: string, props: SolutionStackProps) {
         super(scope, id, props);
 
         const kafkaVersion = new cdk.CfnParameter(this, 'MSKKafkaVersion', {

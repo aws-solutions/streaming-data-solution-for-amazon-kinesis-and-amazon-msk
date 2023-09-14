@@ -39,7 +39,7 @@ run_python_lambda_test() {
     coverage xml -o $coverage_report_path
     coverage report --show-missing
     if [ "$?" = "1" ]; then
-        echo "(source/run-all-tests.sh) ERROR: there is likely output above." 1>&2
+        echo "(deployment/run-unit-tests.sh) ERROR: there is likely output above." 1>&2
         exit 1
     fi
 
@@ -61,7 +61,7 @@ run_javascript_lambda_test() {
 
     npm test
     if [ "$?" = "1" ]; then
-        echo "(source/run-all-tests.sh) ERROR: there is likely output above." 1>&2
+        echo "(deployment/run-unit-tests.sh) ERROR: there is likely output above." 1>&2
         exit 1
     fi
 
@@ -85,7 +85,7 @@ run_cdk_project_test() {
     npm run test -- -u
 
     if [ "$?" = "1" ]; then
-        echo "(source/run-all-tests.sh) ERROR: there is likely output above." 1>&2
+        echo "(deployment/run-unit-tests.sh) ERROR: there is likely output above." 1>&2
         exit 1
     fi
 
@@ -97,13 +97,15 @@ run_cdk_project_test() {
 }
 
 # Save the current working directory and set source directory
+starting_dir=$PWD
+cd ../source
 source_dir=$PWD
 cd $source_dir
 
 # Option to clean or not clean the unit test environment before and after running tests.
 # The environment variable CLEAN has default of 'true' and can be overwritten by caller
 # by setting it to 'false'. For instance:
-#    $ CLEAN=false ./run-all-tests.sh
+#    $ CLEAN=false ./run-unit-tests.sh
 CLEAN="${CLEAN:-true}"
 
 # Test the CDK project
@@ -125,4 +127,4 @@ for folder in */ ; do
 done
 
 # Return to the source/ level where we started
-cd $source_dir
+cd $starting_dir

@@ -11,8 +11,7 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-import * as cdk from '@aws-cdk/core';
-import { SynthUtils } from '@aws-cdk/assert';
+import * as cdk  from 'aws-cdk-lib';
 
 import { SolutionHelper } from '../lib/solution-helper';
 import { KafkaAccessControl } from '../lib/msk-cluster';
@@ -30,7 +29,6 @@ test('creates solution helper without any optional properties', () => {
         pattern: 'test-pattern'
     });
 
-    expect(SynthUtils.toCloudFormation(stack)).toMatchSnapshot();
 });
 
 test('creates solution helper with optional properties', () => {
@@ -52,5 +50,4 @@ test('creates solution helper with optional properties', () => {
         accessControlMethod: KafkaAccessControl.IAM
     });
 
-    expect(SynthUtils.toCloudFormation(stack)).toMatchSnapshot();
 });

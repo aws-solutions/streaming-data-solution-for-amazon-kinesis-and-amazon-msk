@@ -11,16 +11,16 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-import * as cdk from '@aws-cdk/core';
-import * as iam from '@aws-cdk/aws-iam';
-import * as s3 from '@aws-cdk/aws-s3';
+import * as cdk  from 'aws-cdk-lib';
+import { aws_iam as iam, aws_s3 as s3 } from 'aws-cdk-lib';
+import { Construct } from 'constructs';
 
 import { CfnNagHelper } from '../lib/cfn-nag-helper';
 import { SolutionHelper } from '../lib/solution-helper';
 import { SolutionStackProps } from '../bin/solution-props';
 
 export class MskLambdaRoleStack extends cdk.Stack {
-    constructor(scope: cdk.Construct, id: string, props: SolutionStackProps) {
+    constructor(scope: Construct, id: string, props: SolutionStackProps) {
         super(scope, id, props);
 
         const ec2Role = new iam.Role(this, 'EC2Role', {

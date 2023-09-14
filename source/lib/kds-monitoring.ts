@@ -11,8 +11,8 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-import * as cdk from '@aws-cdk/core';
-import * as cw from '@aws-cdk/aws-cloudwatch';
+import { Construct } from 'constructs';
+import {aws_cloudwatch as cw} from 'aws-cdk-lib';
 import { MonitoringBase } from './monitoring-base';
 
 export interface DataStreamMonitoringProps {
@@ -21,7 +21,7 @@ export interface DataStreamMonitoringProps {
 }
 
 export class DataStreamMonitoring extends MonitoringBase {
-    constructor(scope: cdk.Construct, id: string, props: DataStreamMonitoringProps) {
+    constructor(scope: Construct, id: string, props: DataStreamMonitoringProps) {
         super(scope, id);
 
         this.addDataStreamMetrics(props.streamName);

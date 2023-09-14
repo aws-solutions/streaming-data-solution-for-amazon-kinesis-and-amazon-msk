@@ -11,11 +11,9 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-import * as cdk from '@aws-cdk/core';
-import * as analytics from '@aws-cdk/aws-kinesisanalytics';
-import * as iam from '@aws-cdk/aws-iam';
-import * as logs from '@aws-cdk/aws-logs';
-import * as lambda from '@aws-cdk/aws-lambda';
+import * as cdk  from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { aws_kinesisanalytics as analytics, aws_iam as iam, aws_logs as logs, aws_lambda as lambda } from 'aws-cdk-lib';
 
 import { ExecutionRole } from './lambda-role-cloudwatch';
 
@@ -41,7 +39,7 @@ export enum FlinkMetricLevels {
     TASK = 'TASK'
 }
 
-export abstract class FlinkBase extends cdk.Construct {
+export abstract class FlinkBase extends Construct {
     protected readonly Application: analytics.CfnApplicationV2;
     protected readonly LogGroup: logs.LogGroup;
     protected readonly Role: iam.IRole;
@@ -58,7 +56,7 @@ export abstract class FlinkBase extends cdk.Construct {
         return this.Role;
     }
 
-    constructor(scope: cdk.Construct, id: string, props: FlinkBaseProps) {
+    constructor(scope: Construct, id: string, props: FlinkBaseProps) {
         super(scope, id);
 
         this.LogGroup = new logs.LogGroup(this, 'LogGroup', {
@@ -110,7 +108,7 @@ export abstract class FlinkBase extends cdk.Construct {
         });
 
         const customResourceFunction = new lambda.Function(this, 'CustomResource', {
-            runtime: lambda.Runtime.PYTHON_3_8,
+            runtime: lambda.Runtime.PYTHON_3_10,
             handler: 'lambda_function.handler',
             role: customResouceRole.Role,
             code: lambda.Code.fromAsset('lambda/kda-vpc-config'),
