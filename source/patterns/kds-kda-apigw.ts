@@ -11,11 +11,9 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-import * as cdk from '@aws-cdk/core';
-import * as iam from '@aws-cdk/aws-iam';
-import * as cwlogs from '@aws-cdk/aws-logs';
-import * as lambda from '@aws-cdk/aws-lambda';
-import * as apigw from '@aws-cdk/aws-apigateway';
+import * as cdk  from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { aws_iam as iam, aws_logs as cwlogs,  aws_lambda as lambda, aws_apigateway as apigw } from 'aws-cdk-lib';
 
 import { ApiGatewayToLambda } from '@aws-solutions-constructs/aws-apigateway-lambda';
 import crypto = require('crypto');
@@ -32,7 +30,7 @@ import { FlinkLogLevels, FlinkMetricLevels } from '../lib/kda-base';
 export class KdsKdaApiGw extends cdk.Stack {
     private readonly BinaryOptions = ['true', 'false'];
 
-    constructor(scope: cdk.Construct, id: string, props: SolutionStackProps) {
+    constructor(scope: Construct, id: string, props: SolutionStackProps) {
         super(scope, id, props);
 
         //---------------------------------------------------------------------
@@ -263,7 +261,7 @@ export class KdsKdaApiGw extends cdk.Stack {
     private createFarePredictionEndpoint(): [apigw.RestApi, string] {
         const functionRole = new ExecutionRole(this, 'PredictFareRole');
         const predictFareLambda =  new lambda.Function(this, 'PredictFareLambda', {
-            runtime: lambda.Runtime.NODEJS_14_X,
+            runtime: lambda.Runtime.NODEJS_18_X,
             code: lambda.Code.fromAsset('lambda/taxi-fare-endpoint'),
             handler: 'index.handler',
             role: functionRole.Role

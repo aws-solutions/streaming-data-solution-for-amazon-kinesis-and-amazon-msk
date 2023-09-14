@@ -11,9 +11,9 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-import * as cdk from '@aws-cdk/core';
-import * as iam from '@aws-cdk/aws-iam';
-import { expect as expectCDK, haveResource, haveResourceLike } from '@aws-cdk/assert';
+import * as cdk  from 'aws-cdk-lib';
+import { aws_iam as iam } from 'aws-cdk-lib';
+import { Template, Match } from 'aws-cdk-lib/assertions';
 
 import { ExecutionRole } from '../lib/lambda-role-cloudwatch';
 
@@ -63,12 +63,12 @@ beforeEach(() => {
 test('creates a CloudWatch role for Lambda functions without extra policies', () => {
     new ExecutionRole(stack, 'TestRole');
 
-    expectCDK(stack).to(haveResource('AWS::IAM::Role', {
+    Template.fromStack(stack).hasResourceProperties('AWS::IAM::Role', {
         AssumeRolePolicyDocument: expectedAssumeRolePolicy,
         Policies: [expectedLogPolicy]
-    }));
+    });
 
-    expectCDK(stack).notTo(haveResourceLike('AWS::IAM::Role', {
+    Template.fromStack(stack).hasResourceProperties('AWS::IAM::Role', Match.not({
         ManagedPolicyArns: []
     }));
 });
@@ -96,12 +96,12 @@ test('creates a CloudWatch role for Lambda functions with extra policies', () =>
         PolicyName: 'extra-policy'
     };
 
-    expectCDK(stack).to(haveResource('AWS::IAM::Role', {
+    Template.fromStack(stack).hasResourceProperties('AWS::IAM::Role', {
         AssumeRolePolicyDocument: expectedAssumeRolePolicy,
         Policies: [expectedLogPolicy, expectedExtraPolicy]
-    }));
+    });
 
-    expectCDK(stack).notTo(haveResourceLike('AWS::IAM::Role', {
+    Template.fromStack(stack).hasResourceProperties('AWS::IAM::Role', Match.not({
         ManagedPolicyArns: []
     }));
 });

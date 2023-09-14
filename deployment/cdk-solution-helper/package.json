@@ -6,7 +6,9 @@
   },
   "private": true,
   "license": "Apache-2.0",
+  "description": "CDK solution helper",
   "author": {
-    "name": "aws-solutions-builder"
+    "name": "Amazon Web Services",
+    "url": "https://aws.amazon.com/solutions"
   }
 }

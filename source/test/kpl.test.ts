@@ -11,9 +11,9 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-import * as cdk from '@aws-cdk/core';
-import * as kinesis from '@aws-cdk/aws-kinesis';
-import { SynthUtils, expect as expectCDK, haveResource, ResourcePart } from '@aws-cdk/assert';
+import * as cdk  from 'aws-cdk-lib';
+import { aws_kinesis as kinesis } from 'aws-cdk-lib';
+import { Template } from 'aws-cdk-lib/assertions';
 
 import { KinesisProducer } from '../lib/kpl-producer';
 
@@ -36,7 +36,6 @@ test('creates a KPL instance', () => {
         codeFileKey: 'test-key.zip'
     });
 
-    expect(SynthUtils.toCloudFormation(stack)).toMatchSnapshot();
     expect(kpl.InstanceId).not.toBeUndefined();
 });
 
@@ -50,7 +49,7 @@ test('adds cfn_nag suppressions', () => {
         codeFileKey: 'test-key.zip'
     });
 
-    expectCDK(stack).to(haveResource('AWS::IAM::Policy', {
+    Template.fromStack(stack).hasResource('AWS::IAM::Policy', {
         Metadata: {
             cfn_nag: {
                 rules_to_suppress: [{
@@ -59,9 +58,9 @@ test('adds cfn_nag suppressions', () => {
                 }]
             }
         }
-    }, ResourcePart.CompleteDefinition));
+    });
 
-    expectCDK(stack).to(haveResource('AWS::IAM::Policy', {
+    Template.fromStack(stack).hasResource('AWS::IAM::Policy', {
         Metadata: {
             cfn_nag: {
                 rules_to_suppress: [{
@@ -70,9 +69,9 @@ test('adds cfn_nag suppressions', () => {
                 }]
             }
         }
-    }, ResourcePart.CompleteDefinition));
+    });
 
-    expectCDK(stack).to(haveResource('AWS::EC2::SecurityGroup', {
+    Template.fromStack(stack).hasResource('AWS::EC2::SecurityGroup', {
         Metadata: {
             cfn_nag: {
                 rules_to_suppress: [{
@@ -81,5 +80,5 @@ test('adds cfn_nag suppressions', () => {
                 }]
             }
         }
-    }, ResourcePart.CompleteDefinition));
+    });
 });

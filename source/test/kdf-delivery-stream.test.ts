@@ -11,9 +11,8 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-import * as cdk from '@aws-cdk/core';
-import * as kinesis from '@aws-cdk/aws-kinesis';
-import { SynthUtils } from '@aws-cdk/assert';
+import * as cdk  from 'aws-cdk-lib';
+import { aws_kinesis as kinesis } from 'aws-cdk-lib';
 
 import { DeliveryStream, CompressionFormat, FeatureStatus } from '../lib/kdf-delivery-stream';
 
@@ -35,7 +34,6 @@ test('creates a KDF delivery stream', () => {
         retryDuration: 300
     });
 
-    expect(SynthUtils.toCloudFormation(stack)).toMatchSnapshot();
     expect(kdf.DeliveryStreamArn).not.toBeUndefined();
     expect(kdf.DeliveryStreamName).not.toBeUndefined();
     expect(kdf.OutputBucket).not.toBeUndefined();

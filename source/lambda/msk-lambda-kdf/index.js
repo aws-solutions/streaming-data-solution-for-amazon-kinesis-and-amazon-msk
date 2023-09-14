@@ -11,7 +11,7 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-const AWS = require('aws-sdk');
+const { FirehoseClient, PutRecordBatchCommand } = require('@aws-sdk/client-firehose');
 const child_process = require('child_process');
 
 // Each PutRecordBatch request supports up to 500 records or 4 MB
@@ -20,16 +20,18 @@ const FIREHOSE_MAX_SIZE_BYTES = 4194304;
 const FIREHOSE_RETRIES = 3;
 
 // OS command does not accept any user input.
-exports.sleep = (seconds) => child_process.execSync(`sleep ${seconds}`); // NOSONAR (javascript:S4721)
+exports.sleep = (seconds) => child_process.execFileSync('sleep', [seconds]); // NOSONAR (javascript:S4721)
 
 const _putRecords = async (records) => {
-    const options = JSON.parse(process.env.AWS_SDK_USER_AGENT);
-    const firehose = new AWS.Firehose(options);
-
-    return firehose.putRecordBatch({
+    const config = JSON.parse(process.env.AWS_SDK_USER_AGENT);
+    const client = new FirehoseClient(config);
+    const input = {
         DeliveryStreamName: process.env.DELIVERY_STREAM_NAME,
         Records: records
-    }).promise();
+    };
+
+    const command = new PutRecordBatchCommand(input);
+    return client.send(command);
 };
 
 const _putRecordsBatch = async (records, batchNumber) => {
@@ -106,7 +108,7 @@ exports.handler = async (event, context) => {
                 sizeInBytes = 0;
             }
 
-            recordList.push({ 'Data': record });
+            recordList.push({ 'Data': Buffer.from(record).toString('base64') });
             sizeInBytes += size;
         }
     }

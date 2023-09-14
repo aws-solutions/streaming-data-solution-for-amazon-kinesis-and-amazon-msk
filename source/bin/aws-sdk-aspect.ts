@@ -10,19 +10,19 @@
  *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
+import {Construct, IConstruct} from 'constructs';
+import * as cdk  from 'aws-cdk-lib';
+import { aws_lambda as lambda } from 'aws-cdk-lib';
 
-import * as cdk from '@aws-cdk/core';
-import * as lambda from '@aws-cdk/aws-lambda';
-
-export class AwsSdkConfig extends cdk.Construct implements cdk.IAspect {
+export class AwsSdkConfig extends Construct implements cdk.IAspect {
     private readonly solutionId: string;
 
-    constructor(scope: cdk.Construct, id: string, solutionId: string) {
+    constructor(scope: Construct, id: string, solutionId: string) {
         super(scope, id);
         this.solutionId = solutionId;
     }
 
-    public visit(node: cdk.IConstruct): void {
+    public visit(node: IConstruct): void {
         let userAgent = '';
 
         if (node instanceof lambda.Function) {

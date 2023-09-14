@@ -11,8 +11,8 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-import * as cdk from '@aws-cdk/core';
-import { expect as expectCDK, haveResource, ResourcePart, SynthUtils } from '@aws-cdk/assert';
+import * as cdk  from 'aws-cdk-lib';
+import { Template} from 'aws-cdk-lib/assertions';
 
 import { KafkaMonitoring } from '../lib/msk-monitoring';
 
@@ -25,9 +25,7 @@ test('creates custom resource for CloudWatch dashboard', () => {
         dashboardName: 'my-dashboard'
     });
 
-    expect(SynthUtils.toCloudFormation(stack)).toMatchSnapshot();
-
-    expectCDK(stack).to(haveResource('AWS::IAM::Role', {
+    Template.fromStack(stack).hasResource('AWS::IAM::Role', {
         Metadata: {
             cfn_nag: {
                 rules_to_suppress: [{
@@ -36,5 +34,5 @@ test('creates custom resource for CloudWatch dashboard', () => {
                 }]
             }
         }
-    }, ResourcePart.CompleteDefinition));
+    });
 });

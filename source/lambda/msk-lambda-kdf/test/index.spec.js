@@ -13,8 +13,9 @@
 
 const expect = require('chai').expect;
 const sinon = require('sinon');
-const AWS = require('aws-sdk-mock');
+const awsMock = require('aws-sdk-client-mock');
 const lambdaFn = require('../index.js');
+const { FirehoseClient, PutRecordBatchCommand } = require('@aws-sdk/client-firehose');
 
 const getSimpleEvent = () => ({
     eventSource: 'aws:kafka',
@@ -83,8 +84,11 @@ const createResponse = (numberOfRecords, failedPutCount) => {
     return response;
 }
 
+const firehoseMock = awsMock.mockClient(FirehoseClient);
+
 describe('MSK Lambda to KDF', () => {
     beforeEach(() => {
+        firehoseMock.reset();
         process.env.AWS_SDK_USER_AGENT = '{ "customUserAgent": "AwsSolution/SO9999/v0.0.1" }';
         process.env.DELIVERY_STREAM_NAME = 'test-stream';
 
@@ -96,16 +100,18 @@ describe('MSK Lambda to KDF', () => {
         delete process.env.DELIVERY_STREAM_NAME;
 
         lambdaFn.sleep.restore();
-        AWS.restore('Firehose');
+        firehoseMock.restore();
     });
 
     it('should only invoke KDF once when all records are delivered successfully', async () => {
         let callCount = 0;
 
-        AWS.mock('Firehose', 'putRecordBatch', () => {
-            callCount++;
-            return Promise.resolve(createResponse(2, 0));
-        });
+        firehoseMock
+            .on(PutRecordBatchCommand)
+            .callsFake(() => {
+                callCount++;
+                return Promise.resolve(createResponse(2,0));
+            });
 
         const batchesProcessed = await lambdaFn.handler(getSimpleEvent());
         expect(batchesProcessed).to.equal(1);
@@ -115,10 +121,12 @@ describe('MSK Lambda to KDF', () => {
     it('should send multiple batches if input is larger than KDF limits', async () => {
         let callCount = 0;
 
-        AWS.mock('Firehose', 'putRecordBatch', (parameters) => {
-            callCount++;
-            return Promise.resolve(createResponse(parameters['Records'].length, 0));
-        });
+        firehoseMock
+            .on(PutRecordBatchCommand)
+            .callsFake((parameters) => {
+                callCount++;
+                return Promise.resolve(createResponse(parameters['Records'].length, 0));
+            });
 
         const batchesProcessed = await lambdaFn.handler(getComplexEvent());
         expect(batchesProcessed).to.equal(2);
@@ -128,20 +136,22 @@ describe('MSK Lambda to KDF', () => {
     it('should retry if at least one record failed', async () => {
         let callCount = 0;
 
-        AWS.mock('Firehose', 'putRecordBatch', () => {
-            callCount++;
-
-            const putResponse =
-                callCount === 1 ?
-
-                // Initial call (2 records and 1 failure)
-                createResponse(2, 1) :
-
-                // Retry (1 record and 0 failures)
-                createResponse(1, 0);
-
-            return Promise.resolve(putResponse);
-        });
+        firehoseMock
+            .on(PutRecordBatchCommand)
+            .callsFake(() => {
+                callCount++;
+    
+                const putResponse =
+                    callCount === 1 ?
+    
+                    // Initial call (2 records and 1 failure)
+                    createResponse(2, 1) :
+    
+                    // Retry (1 record and 0 failures)
+                    createResponse(1, 0);
+    
+                return Promise.resolve(putResponse);
+            });
 
         const batchesProcessed = await lambdaFn.handler(getSimpleEvent());
         expect(batchesProcessed).to.equal(1);
@@ -151,20 +161,22 @@ describe('MSK Lambda to KDF', () => {
     it('should give up after 3 retries', async () => {
         let callCount = 0;
 
-        AWS.mock('Firehose', 'putRecordBatch', () => {
-            callCount++;
-
-            const putResponse =
-                callCount === 1 ?
-
-                // Initial call (2 records and 1 failure)
-                createResponse(2, 1) :
-
-                // Retries (1 record and 1 failure)
-                createResponse(1, 1);
-
-            return Promise.resolve(putResponse);
-        });
+        firehoseMock
+            .on(PutRecordBatchCommand)
+            .callsFake(() => {
+                callCount++;
+    
+                const putResponse =
+                    callCount === 1 ?
+    
+                    // Initial call (2 records and 1 failure)
+                    createResponse(2, 1) :
+    
+                    // Retries (1 record and 1 failure)
+                    createResponse(1, 1);
+    
+                return Promise.resolve(putResponse);
+            });
 
         const batchesProcessed = await lambdaFn.handler(getSimpleEvent());
         expect(batchesProcessed).to.equal(1);

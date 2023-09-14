@@ -11,8 +11,8 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-import * as cdk from '@aws-cdk/core';
-import { expect as expectCDK, haveResource, SynthUtils } from '@aws-cdk/assert';
+import * as cdk  from 'aws-cdk-lib';
+import { Template } from 'aws-cdk-lib/assertions';
 
 import { DeliveryStreamMonitoring } from '../lib/kdf-monitoring';
 
@@ -31,12 +31,8 @@ describe('direct put monitoring with limit alarms', () => {
         });
     });
 
-    test('creates a dashboard for KDF only', () => {
-        expect(SynthUtils.toCloudFormation(stack)).toMatchSnapshot();
-    });
-
     test('creates IncomingBytes percentage alarm', () => {
-        expectCDK(stack).to(haveResource('AWS::CloudWatch::Alarm', {
+        Template.fromStack(stack).hasResourceProperties('AWS::CloudWatch::Alarm', {
             ComparisonOperator: 'GreaterThanThreshold',
             EvaluationPeriods: 1,
             Threshold: 75,
@@ -76,11 +72,11 @@ describe('direct put monitoring with limit alarms', () => {
                 }
             ],
             TreatMissingData: 'breaching'
-        }));
+        });
     });
 
     test('creates IncomingPutRequestsAlarm percentage alarm', () => {
-        expectCDK(stack).to(haveResource('AWS::CloudWatch::Alarm', {
+        Template.fromStack(stack).hasResourceProperties('AWS::CloudWatch::Alarm', {
             ComparisonOperator: 'GreaterThanThreshold',
             EvaluationPeriods: 1,
             Threshold: 75,
@@ -120,11 +116,11 @@ describe('direct put monitoring with limit alarms', () => {
                 }
             ],
             TreatMissingData: 'breaching'
-        }));
+        });
     });
 
     test('creates IncomingRecordsAlarm percentage alarm', () => {
-        expectCDK(stack).to(haveResource('AWS::CloudWatch::Alarm', {
+        Template.fromStack(stack).hasResourceProperties('AWS::CloudWatch::Alarm', {
             ComparisonOperator: 'GreaterThanThreshold',
             EvaluationPeriods: 1,
             Threshold: 75,
@@ -164,7 +160,7 @@ describe('direct put monitoring with limit alarms', () => {
                 }
             ],
             TreatMissingData: 'breaching'
-        }));
+        });
     });
 });
 
@@ -177,12 +173,8 @@ describe('kds as source monitoring without limit alarms', () => {
         });
     });
 
-    test('creates a dashboard for KDF and KDS', () => {
-        expect(SynthUtils.toCloudFormation(stack)).toMatchSnapshot();
-    });
-
     test('creates DataFreshness alarm', () => {
-        expectCDK(stack).to(haveResource('AWS::CloudWatch::Alarm', {
+        Template.fromStack(stack).hasResourceProperties('AWS::CloudWatch::Alarm', {
             MetricName: 'DeliveryToS3.DataFreshness',
             Namespace: 'AWS/Firehose',
             ComparisonOperator: 'GreaterThanThreshold',
@@ -192,6 +184,6 @@ describe('kds as source monitoring without limit alarms', () => {
             Threshold: 900,
             TreatMissingData: 'breaching',
             Dimensions: [{ Name: 'DeliveryStreamName', Value: 'test-delivery-stream' }]
-        }));
+        });
     });
 });

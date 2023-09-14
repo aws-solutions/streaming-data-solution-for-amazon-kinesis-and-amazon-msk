@@ -11,10 +11,9 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-import * as cdk from '@aws-cdk/core';
-import * as msk from '@aws-cdk/aws-msk';
-import * as ec2 from '@aws-cdk/aws-ec2';
-import * as logs from '@aws-cdk/aws-logs';
+import * as cdk  from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { aws_msk as msk, aws_ec2 as ec2, aws_logs as logs } from 'aws-cdk-lib';
 
 export interface KafkaClusterProps {
     readonly kafkaVersion: string;
@@ -69,7 +68,7 @@ export enum KafkaMonitoringLevel {
     PER_TOPIC_PER_PARTITION = 'PER_TOPIC_PER_PARTITION'
 }
 
-export class KafkaCluster extends cdk.Construct {
+export class KafkaCluster extends Construct {
     private readonly Cluster: msk.CfnCluster;
     private readonly SecurityGroup: ec2.CfnSecurityGroup;
 
@@ -107,7 +106,7 @@ export class KafkaCluster extends cdk.Construct {
         ];
     }
 
-    constructor(scope: cdk.Construct, id: string, props: KafkaClusterProps) {
+    constructor(scope: Construct, id: string, props: KafkaClusterProps) {
         super(scope, id);
 
         this.validateProps(props);

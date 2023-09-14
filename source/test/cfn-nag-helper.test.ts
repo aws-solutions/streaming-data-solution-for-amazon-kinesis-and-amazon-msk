@@ -11,9 +11,9 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-import * as cdk from '@aws-cdk/core';
-import * as s3 from '@aws-cdk/aws-s3';
-import { expect as expectCDK, haveResource, ResourcePart } from '@aws-cdk/assert';
+import * as cdk  from 'aws-cdk-lib';
+import { aws_s3 as s3 } from 'aws-cdk-lib';
+import { Template } from 'aws-cdk-lib/assertions';
 
 import { CfnNagHelper } from '../lib/cfn-nag-helper';
 
@@ -49,7 +49,7 @@ test('removes duplicate suppressions', () => {
         }
     ]);
 
-    expectCDK(stack).to(haveResource('AWS::S3::Bucket', {
+    Template.fromStack(stack).hasResource('AWS::S3::Bucket', {
         Metadata: {
             cfn_nag: {
                 rules_to_suppress: [
@@ -68,5 +68,4 @@ test('removes duplicate suppressions', () => {
                 ]
             }
         }
-    }, ResourcePart.CompleteDefinition));
-});
+    })});

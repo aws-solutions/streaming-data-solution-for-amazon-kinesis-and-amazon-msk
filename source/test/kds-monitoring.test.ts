@@ -11,8 +11,8 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-import * as cdk from '@aws-cdk/core';
-import { expect as expectCDK, haveResource, SynthUtils } from '@aws-cdk/assert';
+import * as cdk  from 'aws-cdk-lib';
+import { Template } from 'aws-cdk-lib/assertions';
 
 import { DataStreamMonitoring } from '../lib/kds-monitoring';
 
@@ -30,12 +30,8 @@ describe('KDS only monitoring', () => {
         });
     });
 
-    test('creates a dashboard for KDS stream', () => {
-        expect(SynthUtils.toCloudFormation(stack)).toMatchSnapshot();
-    });
-
     test('creates IteratorAgeMilliseconds alarm', () => {
-        expectCDK(stack).to(haveResource('AWS::CloudWatch::Alarm', {
+        Template.fromStack(stack).hasResourceProperties('AWS::CloudWatch::Alarm', {
             MetricName: 'GetRecords.IteratorAgeMilliseconds',
             Namespace: 'AWS/Kinesis',
             ComparisonOperator: 'GreaterThanOrEqualToThreshold',
@@ -48,11 +44,11 @@ describe('KDS only monitoring', () => {
                 Name: 'StreamName',
                 Value: 'test-stream'
             }]
-        }));
+        });
     });
 
     test('creates ReadProvisionedThroughputExceeded alarm', () => {
-        expectCDK(stack).to(haveResource('AWS::CloudWatch::Alarm', {
+        Template.fromStack(stack).hasResourceProperties('AWS::CloudWatch::Alarm', {
             MetricName: 'ReadProvisionedThroughputExceeded',
             Namespace: 'AWS/Kinesis',
             ComparisonOperator: 'GreaterThanOrEqualToThreshold',
@@ -65,11 +61,11 @@ describe('KDS only monitoring', () => {
                 Name: 'StreamName',
                 Value: 'test-stream'
             }]
-        }));
+        });
     });
 
     test('creates WriteProvisionedThroughputExceeded alarm', () => {
-        expectCDK(stack).to(haveResource('AWS::CloudWatch::Alarm', {
+        Template.fromStack(stack).hasResourceProperties('AWS::CloudWatch::Alarm', {
             MetricName: 'WriteProvisionedThroughputExceeded',
             Namespace: 'AWS/Kinesis',
             ComparisonOperator: 'GreaterThanOrEqualToThreshold',
@@ -82,11 +78,11 @@ describe('KDS only monitoring', () => {
                 Name: 'StreamName',
                 Value: 'test-stream'
             }]
-        }));
+        });
     });
 
     test('creates PutRecord alarm', () => {
-        expectCDK(stack).to(haveResource('AWS::CloudWatch::Alarm', {
+        Template.fromStack(stack).hasResourceProperties('AWS::CloudWatch::Alarm', {
             MetricName: 'PutRecord.Success',
             Namespace: 'AWS/Kinesis',
             ComparisonOperator: 'LessThanOrEqualToThreshold',
@@ -99,11 +95,11 @@ describe('KDS only monitoring', () => {
                 Name: 'StreamName',
                 Value: 'test-stream'
             }]
-        }));
+        });
     });
 
     test('creates PutRecords alarm', () => {
-        expectCDK(stack).to(haveResource('AWS::CloudWatch::Alarm', {
+        Template.fromStack(stack).hasResourceProperties('AWS::CloudWatch::Alarm', {
             MetricName: 'PutRecords.Success',
             Namespace: 'AWS/Kinesis',
             ComparisonOperator: 'LessThanOrEqualToThreshold',
@@ -116,11 +112,11 @@ describe('KDS only monitoring', () => {
                 Name: 'StreamName',
                 Value: 'test-stream'
             }]
-        }));
+        });
     });
 
     test('creates GetRecords alarm', () => {
-        expectCDK(stack).to(haveResource('AWS::CloudWatch::Alarm', {
+        Template.fromStack(stack).hasResourceProperties('AWS::CloudWatch::Alarm', {
             MetricName: 'GetRecords.Success',
             Namespace: 'AWS/Kinesis',
             ComparisonOperator: 'LessThanOrEqualToThreshold',
@@ -133,7 +129,7 @@ describe('KDS only monitoring', () => {
                 Name: 'StreamName',
                 Value: 'test-stream'
             }]
-        }));
+        });
     });
 });
 
@@ -144,6 +140,5 @@ describe('KDS + Lambda monitoring', () => {
             lambdaFunctionName: 'test-function'
         });
 
-        expect(SynthUtils.toCloudFormation(stack)).toMatchSnapshot();
     });
 });

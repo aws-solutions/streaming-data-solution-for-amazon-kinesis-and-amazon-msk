@@ -11,9 +11,9 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-import * as cdk from '@aws-cdk/core';
-import * as ec2 from '@aws-cdk/aws-ec2';
-import * as iam from '@aws-cdk/aws-iam';
+import * as cdk  from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { aws_ec2 as ec2, aws_iam as iam } from 'aws-cdk-lib';
 
 import { CfnNagHelper } from './cfn-nag-helper';
 
@@ -28,14 +28,14 @@ export interface KafkaClientProps {
     readonly clusterSecurityGroupId: string;
 }
 
-export class KafkaClient extends cdk.Construct {
+export class KafkaClient extends Construct {
     private readonly Instance: ec2.CfnInstance;
 
     public get InstanceId(): string {
         return this.Instance.ref;
     }
 
-    constructor(scope: cdk.Construct, id: string, props: KafkaClientProps) {
+    constructor(scope: Construct, id: string, props: KafkaClientProps) {
         super(scope, id);
 
         const instanceProfile = this.createInstanceProfile(props.clusterName);
@@ -73,15 +73,35 @@ export class KafkaClient extends cdk.Construct {
             `echo "sasl.client.callback.handler.class=software.amazon.msk.auth.iam.IAMClientCallbackHandler" >> bin/client-iam.properties`,
         ];
 
+        // Require IMDSv2 for this EC2 instance.
+        const launchTemplate = new ec2.CfnLaunchTemplate(this, 'LaunchTemplate', {
+            launchTemplateData: {
+                metadataOptions: {
+                    httpTokens: 'required'
+                }
+            }
+        });
+
         this.Instance = new ec2.CfnInstance(this, 'Client', {
+            blockDeviceMappings: [{
+                deviceName: '/dev/xvda',
+                ebs: {
+                    encrypted: true,
+                }
+            }],
             imageId: props.imageId,
             instanceType: props.instanceType,
+            monitoring: true,
             subnetId: props.subnetId,
             iamInstanceProfile: instanceProfile.ref,
             securityGroupIds: [props.clusterSecurityGroupId],
             userData: cdk.Fn.base64(userDataCommands.join('\n')),
             tags: [{ key: 'Name', value: 'KafkaClient' }],
-        })
+            launchTemplate: {
+                launchTemplateId: launchTemplate.ref,
+                version: launchTemplate.attrLatestVersionNumber
+            }
+        });
     }
 
     private createInstanceProfile(clusterName: string): iam.CfnInstanceProfile {

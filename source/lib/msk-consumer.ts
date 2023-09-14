@@ -11,9 +11,9 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-import * as cdk from '@aws-cdk/core';
-import * as lambda from '@aws-cdk/aws-lambda';
-import * as iam from '@aws-cdk/aws-iam';
+import * as cdk  from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { aws_lambda as lambda, aws_iam as iam } from 'aws-cdk-lib';
 
 import { ExecutionRole } from './lambda-role-cloudwatch';
 import { CfnNagHelper } from './cfn-nag-helper';
@@ -32,7 +32,7 @@ export interface KafkaConsumerProps {
     readonly environmentVariables?: { [key: string]: string };
 }
 
-export class KafkaConsumer extends cdk.Construct {
+export class KafkaConsumer extends Construct {
     public readonly Function: lambda.IFunction;
 
     private readonly IsSecretEmpty: cdk.CfnCondition;
@@ -43,7 +43,7 @@ export class KafkaConsumer extends cdk.Construct {
     private MIN_TIMEOUT_SECONDS: number = 1;
     private MAX_TIMEOUT_SECONDS: number = 900;
 
-    constructor(scope: cdk.Construct, id: string, props: KafkaConsumerProps) {
+    constructor(scope: Construct, id: string, props: KafkaConsumerProps) {
         super(scope, id);
 
         if (!cdk.Token.isUnresolved(props.batchSize)) {
@@ -73,7 +73,7 @@ export class KafkaConsumer extends cdk.Construct {
         const secretPolicy = this.createPolicyForSecret(executionRole, props.scramSecretArn!);
 
         const lambdaFn = new lambda.Function(this, 'Consumer', {
-            runtime: lambda.Runtime.NODEJS_14_X,
+            runtime: lambda.Runtime.NODEJS_18_X,
             handler: 'index.handler',
             role: executionRole,
             code: props.code,
@@ -102,7 +102,7 @@ export class KafkaConsumer extends cdk.Construct {
 
         const cfnMapping = mappingWithSecret.node.defaultChild as lambda.CfnEventSourceMapping;
         cfnMapping.cfnOptions.condition = this.IsSecretNotEmpty;
-        cfnMapping.addDependsOn(secretPolicy);
+        cfnMapping.addDependency(secretPolicy);
 
         return lambdaFn;
     }
@@ -204,7 +204,7 @@ export class KafkaConsumer extends cdk.Construct {
         });
 
         const customResourceFunction = new lambda.Function(this, 'CustomResource', {
-            runtime: lambda.Runtime.PYTHON_3_8,
+            runtime: lambda.Runtime.PYTHON_3_10,
             handler: 'lambda_function.handler',
             role: customResouceRole.Role,
             code: lambda.Code.fromAsset('lambda/secrets-manager-metadata'),
