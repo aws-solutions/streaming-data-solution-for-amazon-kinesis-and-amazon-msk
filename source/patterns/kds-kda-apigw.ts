@@ -261,7 +261,7 @@ export class KdsKdaApiGw extends cdk.Stack {
     private createFarePredictionEndpoint(): [apigw.RestApi, string] {
         const functionRole = new ExecutionRole(this, 'PredictFareRole');
         const predictFareLambda =  new lambda.Function(this, 'PredictFareLambda', {
-            runtime: lambda.Runtime.NODEJS_18_X,
+            runtime: lambda.Runtime.NODEJS_20_X,
             code: lambda.Code.fromAsset('lambda/taxi-fare-endpoint'),
             handler: 'index.handler',
             role: functionRole.Role

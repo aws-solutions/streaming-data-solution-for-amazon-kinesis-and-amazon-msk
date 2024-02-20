@@ -108,7 +108,7 @@ exports.handler = async (event, context) => {
                 sizeInBytes = 0;
             }
 
-            recordList.push({ 'Data': Buffer.from(record).toString('base64') });
+            recordList.push({ 'Data': Buffer.from(record) });
             sizeInBytes += size;
         }
     }

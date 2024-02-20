@@ -50,7 +50,7 @@ export class KafkaMonitoring extends Construct {
         });
 
         const monitoringFunction = new lambda.Function(this, 'Function', {
-            runtime: lambda.Runtime.PYTHON_3_10,
+            runtime: lambda.Runtime.PYTHON_3_12,
             handler: 'lambda_function.handler',
             description: 'This function creates a dashboard that monitors the health of a MSK cluster',
             role: monitoringRole.Role,

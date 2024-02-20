@@ -40,64 +40,68 @@ function applyAspects(stacks: cdk.Stack[], solutionId: string) {
                 solutionID: solutionId
             })
         );
-        NagSuppressions.addStackSuppressions(stack, [
-            { id: 'AwsSolutions-IAM5', reason: 'IAM role requires more permissions' },
-            { id: 'AwsSolutions-SQS3', reason: 'SQS is already a deadletter queue' },
-            { id: 'AwsSolutions-APIG2', reason: 'Request Validation happens by default with construct and more validations can be added by customer' },
-            { id: 'AwsSolutions-APIG3', reason: 'REST API stage is not associated with AWS WAFv2 web ACL because the solution is data agnostic' },
-            { id: 'AwsSolutions-COG2', reason: 'Customer will need to setup MFA with their information that they want to provide' },
-            { id: 'AwsSolutions-COG4', reason: 'Customer will need to setup Cognito authorizer as we have the default settings enabled. See patterns/apigw-kds-lambda.ts' },
-            { id: 'AwsSolutions-VPC7', reason: 'MSKLabs do not need VPC flow logs' },
-            { id: 'AwsSolutions-EC29', reason: 'EC2 does not need ASG' },
-            { id: 'AwsSolutions-MSK2', reason: 'MSKLabs uses Plaintext communication' },
-            { id: 'AwsSolutions-MSK6', reason: 'MSKLabs uses broker logs' },
-            {id: 'AwsSolutions-S10', reason: 'Bucket policy has condition to block non HTTPS traffic' }
-          ]);
     }
 }
 
 function createSolutionKinesisStacks() {
     const stacks: cdk.Stack[] = [];
+    
+    const apiGwKdsLambda = new ApiGwKdsLambda(app, 'streaming-data-solution-for-kinesis-using-api-gateway-and-lambda', {
+        synthesizer: new cdk.DefaultStackSynthesizer({
+            generateBootstrapVersionRule: false,
+        }),
+        description: `(${solutionIdKds}) - Streaming Data Solution for Amazon Kinesis (APIGW -> KDS -> Lambda). Version %%VERSION%%`,
+        solutionId: solutionIdKds
+    });
+    NagSuppressions.addStackSuppressions(apiGwKdsLambda, [
+        { id: 'AwsSolutions-IAM5', reason: 'IAM role requires more permissions' },
+        { id: 'AwsSolutions-SQS3', reason: 'SQS is already a deadletter queue' },
+        { id: 'AwsSolutions-APIG2', reason: 'Request Validation happens by default with construct and more validations can be added by customer' },
+        { id: 'AwsSolutions-APIG3', reason: 'REST API stage is not associated with AWS WAFv2 web ACL because the solution is data agnostic' },
+        { id: 'AwsSolutions-COG2', reason: 'Customer will need to setup MFA with their information that they want to provide' },
+    ]);
+    stacks.push(apiGwKdsLambda);
 
-    stacks.push(
-        new ApiGwKdsLambda(app, 'streaming-data-solution-for-kinesis-using-api-gateway-and-lambda', {
-            synthesizer: new cdk.DefaultStackSynthesizer({
-                generateBootstrapVersionRule: false,
-            }),
-            description: `(${solutionIdKds}) - Streaming Data Solution for Amazon Kinesis (APIGW -> KDS -> Lambda). Version %%VERSION%%`,
-            solutionId: solutionIdKds
-        })
-    );
+    const kplKdsKda = new KplKdsKda(app, 'streaming-data-solution-for-kinesis-using-kpl-and-kinesis-data-analytics', {
+        synthesizer: new cdk.DefaultStackSynthesizer({
+            generateBootstrapVersionRule: false,
+        }),
+        description: `(${solutionIdKds}) - Streaming Data Solution for Amazon Kinesis (KPL -> KDS -> KDA). Version %%VERSION%%`,
+        solutionId: solutionIdKds
+    });
+    NagSuppressions.addStackSuppressions(kplKdsKda, [
+        { id: 'AwsSolutions-IAM5', reason: 'IAM role requires more permissions' },
+        { id: 'AwsSolutions-EC29', reason: 'EC2 does not need ASG' },
+      ]);
+    stacks.push(kplKdsKda);
 
-    stacks.push(
-        new KplKdsKda(app, 'streaming-data-solution-for-kinesis-using-kpl-and-kinesis-data-analytics', {
-            synthesizer: new cdk.DefaultStackSynthesizer({
-                generateBootstrapVersionRule: false,
-            }),
-            description: `(${solutionIdKds}) - Streaming Data Solution for Amazon Kinesis (KPL -> KDS -> KDA). Version %%VERSION%%`,
-            solutionId: solutionIdKds
-        })
-    );
+    const kdsKdfS3 = new KdsKdfS3(app, 'streaming-data-solution-for-kinesis-using-kinesis-data-firehose-and-amazon-s3', {
+        synthesizer: new cdk.DefaultStackSynthesizer({
+            generateBootstrapVersionRule: false,
+        }),
+        description: `(${solutionIdKds}) - Streaming Data Solution for Amazon Kinesis (KDS -> KDF -> S3). Version %%VERSION%%`,
+        solutionId: solutionIdKds
+    });
+    NagSuppressions.addStackSuppressions(kdsKdfS3, [
+        { id: 'AwsSolutions-IAM5', reason: 'IAM role requires more permissions' },
+      ]);
+    stacks.push(kdsKdfS3);
 
-    stacks.push(
-        new KdsKdfS3(app, 'streaming-data-solution-for-kinesis-using-kinesis-data-firehose-and-amazon-s3', {
-            synthesizer: new cdk.DefaultStackSynthesizer({
-                generateBootstrapVersionRule: false,
-            }),
-            description: `(${solutionIdKds}) - Streaming Data Solution for Amazon Kinesis (KDS -> KDF -> S3). Version %%VERSION%%`,
-            solutionId: solutionIdKds
-        })
-    );
-
-    stacks.push(
-        new KdsKdaApiGw(app, 'streaming-data-solution-for-kinesis-using-kinesis-data-analytics-and-api-gateway', {
-            synthesizer: new cdk.DefaultStackSynthesizer({
-                generateBootstrapVersionRule: false,
-            }),
-            description: `(${solutionIdKds}) - Streaming Data Solution for Amazon Kinesis (KDS -> KDA -> APIGW). Version %%VERSION%%`,
-            solutionId: solutionIdKds
-        })
-    );
+    const kdsKdaApiGw = new KdsKdaApiGw(app, 'streaming-data-solution-for-kinesis-using-kinesis-data-analytics-and-api-gateway', {
+        synthesizer: new cdk.DefaultStackSynthesizer({
+            generateBootstrapVersionRule: false,
+        }),
+        description: `(${solutionIdKds}) - Streaming Data Solution for Amazon Kinesis (KDS -> KDA -> APIGW). Version %%VERSION%%`,
+        solutionId: solutionIdKds
+    });
+    NagSuppressions.addStackSuppressions(kdsKdaApiGw, [
+        { id: 'AwsSolutions-IAM5', reason: 'IAM role requires more permissions' },
+        { id: 'AwsSolutions-APIG2', reason: 'Request Validation happens by default with construct and more validations can be added by customer' },
+        { id: 'AwsSolutions-APIG3', reason: 'REST API stage is not associated with AWS WAFv2 web ACL because the solution is data agnostic' },
+        { id: 'AwsSolutions-COG4', reason: 'Customer will need to setup Cognito authorizer as we have the default settings enabled. See patterns/apigw-kds-lambda.ts' },
+        { id: 'AwsSolutions-EC29', reason: 'EC2 does not need ASG' },
+      ]);
+    stacks.push(kdsKdaApiGw);
 
     applyAspects(stacks, solutionIdKds);
 }
@@ -105,45 +109,54 @@ function createSolutionKinesisStacks() {
 function createSolutionMskStacks() {
     const stacks: cdk.Stack[] = [];
 
-    stacks.push(
-        new MskStandalone(app, 'streaming-data-solution-for-msk', {
-            synthesizer: new cdk.DefaultStackSynthesizer({
-                generateBootstrapVersionRule: false,
-            }),
-            description: `(${solutionIdMsk}) - Streaming Data Solution for Amazon MSK. Version %%VERSION%%`,
-            solutionId: solutionIdMsk
-        })
-    );
+    const mskStandalone = new MskStandalone(app, 'streaming-data-solution-for-msk', {
+        synthesizer: new cdk.DefaultStackSynthesizer({
+            generateBootstrapVersionRule: false,
+        }),
+        description: `(${solutionIdMsk}) - Streaming Data Solution for Amazon MSK. Version %%VERSION%%`,
+        solutionId: solutionIdMsk
+    })
+    NagSuppressions.addStackSuppressions(mskStandalone, [
+        { id: 'AwsSolutions-IAM5', reason: 'IAM role requires more permissions' },
+        { id: 'AwsSolutions-EC29', reason: 'EC2 does not need ASG' },
+      ]);
+    stacks.push(mskStandalone);
 
-    stacks.push(
-        new MskLambda(app, 'streaming-data-solution-for-msk-using-aws-lambda', {
-            synthesizer: new cdk.DefaultStackSynthesizer({
-                generateBootstrapVersionRule: false,
-            }),
-            description: `(${solutionIdMskLambda}) - Streaming Data Solution for Amazon MSK (MSK -> Lambda). Version %%VERSION%%`,
-            solutionId: solutionIdMskLambda
-        })
-    );
+    const mskLambda = new MskLambda(app, 'streaming-data-solution-for-msk-using-aws-lambda', {
+        synthesizer: new cdk.DefaultStackSynthesizer({
+            generateBootstrapVersionRule: false,
+        }),
+        description: `(${solutionIdMskLambda}) - Streaming Data Solution for Amazon MSK (MSK -> Lambda). Version %%VERSION%%`,
+        solutionId: solutionIdMskLambda
+    });
+    NagSuppressions.addStackSuppressions(mskLambda, [
+        { id: 'AwsSolutions-IAM5', reason: 'IAM role requires more permissions' },
+      ]);
+    stacks.push(mskLambda);
 
-    stacks.push(
-        new MskLambdaKdf(app, 'streaming-data-solution-for-msk-using-aws-lambda-and-kinesis-data-firehose', {
-            synthesizer: new cdk.DefaultStackSynthesizer({
-                generateBootstrapVersionRule: false,
-            }),
-            description: `(${solutionIdMskLambdaKdf}) - Streaming Data Solution for Amazon MSK (MSK -> Lambda -> KDF). Version %%VERSION%%`,
-            solutionId: solutionIdMskLambdaKdf
-        })
-    );
+    const mskLambdaKdf = new MskLambdaKdf(app, 'streaming-data-solution-for-msk-using-aws-lambda-and-kinesis-data-firehose', {
+        synthesizer: new cdk.DefaultStackSynthesizer({
+            generateBootstrapVersionRule: false,
+        }),
+        description: `(${solutionIdMskLambdaKdf}) - Streaming Data Solution for Amazon MSK (MSK -> Lambda -> KDF). Version %%VERSION%%`,
+        solutionId: solutionIdMskLambdaKdf
+    });
+    NagSuppressions.addStackSuppressions(mskLambdaKdf, [
+        { id: 'AwsSolutions-IAM5', reason: 'IAM role requires more permissions' },
+      ]);
+    stacks.push(mskLambdaKdf);
 
-    stacks.push(
-        new MskKdaS3(app, 'streaming-data-solution-for-msk-using-kinesis-data-analytics-and-amazon-s3', {
-            synthesizer: new cdk.DefaultStackSynthesizer({
-                generateBootstrapVersionRule: false,
-            }),
-            description: `(${solutionIdMskKdaS3}) - Streaming Data Solution for Amazon MSK (MSK -> KDA -> S3). Version %%VERSION%%`,
-            solutionId: solutionIdMskKdaS3
-        })
-    );
+    const mskKdaS3 = new MskKdaS3(app, 'streaming-data-solution-for-msk-using-kinesis-data-analytics-and-amazon-s3', {
+        synthesizer: new cdk.DefaultStackSynthesizer({
+            generateBootstrapVersionRule: false,
+        }),
+        description: `(${solutionIdMskKdaS3}) - Streaming Data Solution for Amazon MSK (MSK -> KDA -> S3). Version %%VERSION%%`,
+        solutionId: solutionIdMskKdaS3
+    });
+    NagSuppressions.addStackSuppressions(mskKdaS3, [
+        { id: 'AwsSolutions-IAM5', reason: 'IAM role requires more permissions' },
+      ]);
+    stacks.push(mskKdaS3);
 
     applyAspects(stacks, solutionIdMsk);
 }
@@ -151,40 +164,51 @@ function createSolutionMskStacks() {
 function createSolutionMskLabsStacks() {
     const stacks: cdk.Stack[] = [];
 
-    stacks.push(
-        new MskLambdaRoleStack(app, 'amazon-msk-labs-lambda-role', {
-            synthesizer: new cdk.DefaultStackSynthesizer({
-                generateBootstrapVersionRule: false,
-            }),
-            description: `(${solutionIdMskLabs}) - Amazon MSK Labs (IAM Role). Version %%VERSION%%`,
-            solutionId: solutionIdMskLabs
-        })
-    );
+    const mskLambdaRoleStack = new MskLambdaRoleStack(app, 'amazon-msk-labs-lambda-role', {
+        synthesizer: new cdk.DefaultStackSynthesizer({
+            generateBootstrapVersionRule: false,
+        }),
+        description: `(${solutionIdMskLabs}) - Amazon MSK Labs (IAM Role). Version %%VERSION%%`,
+        solutionId: solutionIdMskLabs
+    });
+    NagSuppressions.addStackSuppressions(mskLambdaRoleStack, [
+        { id: 'AwsSolutions-IAM5', reason: 'IAM role requires more permissions' },
+      ]);
+    stacks.push(mskLambdaRoleStack);
 
-    stacks.push(
-        new MskClientStack(app, 'amazon-msk-labs-ec2-client', {
-            synthesizer: new cdk.DefaultStackSynthesizer({
-                generateBootstrapVersionRule: false,
-            }),
-            description: `(${solutionIdMskLabs}) - Amazon MSK Labs (EC2 Client). Version %%VERSION%%`,
-            solutionId: solutionIdMskLabs
-        })
-    );
+    const mskClientStack = new MskClientStack(app, 'amazon-msk-labs-ec2-client', {
+        synthesizer: new cdk.DefaultStackSynthesizer({
+            generateBootstrapVersionRule: false,
+        }),
+        description: `(${solutionIdMskLabs}) - Amazon MSK Labs (EC2 Client). Version %%VERSION%%`,
+        solutionId: solutionIdMskLabs
+    });
+    NagSuppressions.addStackSuppressions(mskClientStack, [
+        { id: 'AwsSolutions-IAM5', reason: 'IAM role requires more permissions' },
+        { id: 'AwsSolutions-VPC7', reason: 'MSKLabs do not need VPC flow logs' },
+        { id: 'AwsSolutions-EC29', reason: 'EC2 does not need ASG' },
+        { id: 'CdkNagValidationFailure', reason: 'We are using an intrinsic function to determine the IP address' }
+      ]);
+    stacks.push(mskClientStack);
 
-    stacks.push(
-        new MskClusterStack(app, 'amazon-msk-labs-cluster', {
-            synthesizer: new cdk.DefaultStackSynthesizer({
-                generateBootstrapVersionRule: false,
-            }),
-            description: `(${solutionIdMskLabs}) - Amazon MSK Labs (MSK Cluster). Version %%VERSION%%`,
-            solutionId: solutionIdMskLabs
-        })
-    );
+    const mskClusterStack = new MskClusterStack(app, 'amazon-msk-labs-cluster', {
+        synthesizer: new cdk.DefaultStackSynthesizer({
+            generateBootstrapVersionRule: false,
+        }),
+        description: `(${solutionIdMskLabs}) - Amazon MSK Labs (MSK Cluster). Version %%VERSION%%`,
+        solutionId: solutionIdMskLabs
+    });
+    NagSuppressions.addStackSuppressions(mskClusterStack, [
+        { id: 'AwsSolutions-IAM5', reason: 'IAM role requires more permissions' },
+        { id: 'AwsSolutions-MSK2', reason: 'MSKLabs uses Plaintext communication' },
+        { id: 'AwsSolutions-MSK6', reason: 'MSKLabs uses broker logs' },
+      ]);
+    stacks.push(mskClusterStack);
 
     applyAspects(stacks, solutionIdMskLabs);
 }
 
-cdk.Aspects.of(app).add(new AwsSolutionsChecks());
+cdk.Aspects.of(app).add(new AwsSolutionsChecks( {verbose: true} ));
 createSolutionKinesisStacks();
 createSolutionMskStacks();
 createSolutionMskLabsStacks();

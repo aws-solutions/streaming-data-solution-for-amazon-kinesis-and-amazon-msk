@@ -59,10 +59,10 @@ To customize the solution, follow the steps below:
 ### Prerequisites
 
 - [AWS Command Line Interface](https://aws.amazon.com/cli/)
-- Node.js 14.x (or later) and npm 7 (or later)
-- Python 3.8 or later
+- Node.js 20.x (or later) and npm 9 (or later)
+- Python 3.12 or later
 - Java 11 (only required if using Apache Flink)
-- Apache Maven 3.1 (only required if using Apache Flink)
+- Apache Maven 3.6 (only required if using Apache Flink)
 
 > **Note**: The commands listed below will build all patterns. To only include one, you can modify the CDK entrypoint file on `source/bin/streaming-data-solution.ts`
 

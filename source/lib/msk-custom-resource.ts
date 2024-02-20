@@ -59,7 +59,7 @@ export class KafkaMetadata extends Construct {
         });
 
         const metadataFunction = new lambda.Function(this, 'CustomResource', {
-            runtime: lambda.Runtime.PYTHON_3_10,
+            runtime: lambda.Runtime.PYTHON_3_12,
             handler: 'lambda_function.handler',
             description: 'This function retrieves metadata (such as list of brokers and networking) from a MSK cluster',
             role: metadataRole.Role,

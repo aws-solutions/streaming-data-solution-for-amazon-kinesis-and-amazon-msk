@@ -121,7 +121,7 @@ export class MskClientStack extends cdk.Stack {
         });
 
         const cloud9Setup = new lambda.Function(this, 'CustomResource', {
-            runtime: lambda.Runtime.PYTHON_3_10,
+            runtime: lambda.Runtime.PYTHON_3_12,
             handler: 'lambda_function.handler',
             description: 'This function creates prerequisite resources for Cloud9 (such as IAM roles)',
             code: lambda.Code.fromAsset('lambda/cloud9-setup'),

@@ -34,7 +34,7 @@ export class MskStandalone extends cdk.Stack {
         // Broker configuration
         const kafkaVersion = new cdk.CfnParameter(this, 'KafkaVersion', {
             type: 'String',
-            default: KafkaActiveVersion.V2_8_1,
+            default: KafkaActiveVersion.V3_5_1,
             allowedValues: Object.values(KafkaActiveVersion)
         });
 
