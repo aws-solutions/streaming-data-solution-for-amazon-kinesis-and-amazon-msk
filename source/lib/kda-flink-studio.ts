@@ -38,6 +38,15 @@ export class FlinkStudio extends FlinkBase {
             }
         });
 
+        new glue.CfnDataCatalogEncryptionSettings(this, 'DataCatalogEncryptionSettings', {
+            catalogId: glueDb.catalogId,
+            dataCatalogEncryptionSettings: {
+                encryptionAtRest: {
+                    catalogEncryptionMode: 'SSE-KMS'
+                }
+            }
+        });
+
         this.DatabaseName = glueDb.ref;
 
         const logsPolicy = new iam.PolicyDocument({
@@ -142,7 +151,7 @@ export class FlinkStudio extends FlinkBase {
 
     protected createApplication(_props: FlinkStudioProps): analytics.CfnApplicationV2 {
         return new analytics.CfnApplicationV2(this, 'Studio', {
-            runtimeEnvironment: 'ZEPPELIN-FLINK-2_0',
+            runtimeEnvironment: 'ZEPPELIN-FLINK-3_0',
             applicationMode: 'INTERACTIVE',
             serviceExecutionRole: this.Role.roleArn,
             applicationConfiguration: {
@@ -160,16 +169,16 @@ export class FlinkStudio extends FlinkBase {
                             artifactType: 'DEPENDENCY_JAR',
                             mavenReference: {
                                 groupId: 'org.apache.flink',
-                                artifactId: 'flink-sql-connector-kinesis_2.12',
-                                version: '1.13.2'
+                                artifactId: 'flink-sql-connector-kinesis',
+                                version: '1.15.4'
                             }
                         },
                         {
                             artifactType: 'DEPENDENCY_JAR',
                             mavenReference: {
                                 groupId: 'org.apache.flink',
-                                artifactId: 'flink-connector-kafka_2.12',
-                                version: '1.13.2'
+                                artifactId: 'flink-connector-kafka',
+                                version: '1.15.4'
                             }
                         },
                         {
@@ -177,7 +186,7 @@ export class FlinkStudio extends FlinkBase {
                             mavenReference: {
                                 groupId: 'software.amazon.msk',
                                 artifactId: 'aws-msk-iam-auth',
-                                version: '1.1.0'
+                                version: '1.1.6'
                             }
                         }
                     ]

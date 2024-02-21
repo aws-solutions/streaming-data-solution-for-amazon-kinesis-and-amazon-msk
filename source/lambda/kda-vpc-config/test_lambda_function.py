@@ -109,7 +109,7 @@ class LambdaTest(unittest.TestCase):
         self.assertCountEqual(empty_expected, empty_actual)
 
     @patch.object(boto3, 'client')
-    def test_07_delete_vpc_configuration_with_concurrency(self, mock_client):
+    def test_07_delete_vpc_configuration_with_concurrency(self, mock_client): # NOSONAR: Underlying mocks are different
         mock_client.return_value = self._kinesisAnalytics
 
         from lambda_function import _delete_vpc_configuration

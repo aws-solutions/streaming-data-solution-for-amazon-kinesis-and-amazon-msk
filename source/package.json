@@ -1,6 +1,6 @@
 {
   "name": "streaming-data-solution",
-  "version": "1.8.1",
+  "version": "1.9.0",
   "bin": {
     "streaming-data-solution": "bin/streaming-data-solution.js"
   },
@@ -14,33 +14,30 @@
     "code-formatter": "./node_modules/prettier/bin-prettier.js --config .prettierrc.yml '**/*.ts' '**/*.js' --write"
   },
   "devDependencies": {
-    "@aws-cdk/aws-servicecatalogappregistry-alpha": "^2.86.0-alpha.0",
-    "@types/babel__traverse": "7.18.2",
-    "@types/jest": "^26.0.10",
-    "@types/node": "10.17.27",
-    "@types/prettier": "2.6.0",
-    "@typescript-eslint/eslint-plugin": "^6.0.0",
-    "@typescript-eslint/parser": "^6.0.0",
-    "aws-cdk": "^2.86.0",
+    "@aws-cdk/aws-servicecatalogappregistry-alpha": "^2.102.0-alpha.0",
+    "@types/babel__traverse": "^7.20.5",
+    "@types/jest": "^29.5.11",
+    "@types/node": "^20.11.0",
+    "@types/prettier": "^3.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.18.1",
+    "@typescript-eslint/parser": "^6.18.1",
     "eslint-config-prettier": "^9.0.0",
-    "eslint-plugin-prettier": "^5.0.0",
-    "jest": "^26.4.2",
+    "eslint-plugin-prettier": "^5.0.1",
+    "jest": "^29.7.0",
     "prettier": "3.0.0",
-    "ts-jest": "^26.2.0",
-    "ts-node": "^9.0.0",
-    "typescript": "~3.9.7"
-  },
-  "overrides": {
-    "semver": "7.5.2"
+    "ts-jest": "^29.1.1",
+    "ts-node": "^9.1.1",
+    "typescript": "^5.3.3"
   },
   "dependencies": {
-    "@aws-solutions-constructs/aws-apigateway-kinesisstreams": "2.41.0",
-    "@aws-solutions-constructs/aws-apigateway-lambda": "2.41.0",
-    "@aws-solutions-constructs/aws-kinesisfirehose-s3": "2.41.0",
-    "@aws-solutions-constructs/aws-kinesisstreams-lambda": "2.41.0",
-    "aws-cdk-lib": "2.86.0",
-    "cdk-nag": "^2.27.60",
-    "source-map-support": "^0.5.16"
+    "@aws-solutions-constructs/aws-apigateway-kinesisstreams": "2.45.0",
+    "@aws-solutions-constructs/aws-apigateway-lambda": "2.45.0",
+    "@aws-solutions-constructs/aws-kinesisfirehose-s3": "2.45.0",
+    "@aws-solutions-constructs/aws-kinesisstreams-lambda": "2.45.0",
+    "aws-cdk": "^2.121.0",
+    "aws-cdk-lib": "^2.121.0",
+    "cdk-nag": "^2.27.172",
+    "source-map-support": "^0.5.21"
   },
   "private": true,
   "license": "Apache-2.0",

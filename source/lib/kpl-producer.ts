@@ -16,6 +16,7 @@ import { Construct } from 'constructs';
 import { aws_ec2 as ec2, aws_iam as iam, aws_kinesis as kinesis } from 'aws-cdk-lib';
 
 import { CfnNagHelper } from './cfn-nag-helper';
+import Constants from './constants';
 
 export interface KinesisProducerProps {
     readonly vpcId: string;
@@ -74,16 +75,10 @@ export class KinesisProducer extends Construct {
             assumedBy: new iam.ServicePrincipal('ec2.amazonaws.com')
         });
 
-        const ssmPolicy = new iam.Policy(this, 'SessionManagerPolicy', {
+        const ssmPolicy = new iam.Policy(this, 'SessionManagerPolicy', { // NOSONAR: Explicitly listing actions is security standard
             statements: [new iam.PolicyStatement({
                 resources: ['*'],
-                actions: [
-                    'ssm:UpdateInstanceInformation',
-                    'ssmmessages:CreateControlChannel',
-                    'ssmmessages:CreateDataChannel',
-                    'ssmmessages:OpenControlChannel',
-                    'ssmmessages:OpenDataChannel'
-                ]
+                actions: Constants.SsmManagedActions
             })]
         });
 

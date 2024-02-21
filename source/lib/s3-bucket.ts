@@ -33,7 +33,7 @@ export class EncryptedBucket extends Construct {
             enforceSSL: true
         };
 
-        const accessLogsBucket = new s3.Bucket(this, 'AccessLogsBucket', securitySettings);
+        const accessLogsBucket = new s3.Bucket(this, 'AccessLogsBucket', securitySettings); // NOSONAR: log bucket
 
         const rules: s3.LifecycleRule[] = [
             {
@@ -56,7 +56,7 @@ export class EncryptedBucket extends Construct {
             });
         }
 
-        this.Bucket = new s3.Bucket(this, 'Bucket', {
+        this.Bucket = new s3.Bucket(this, 'Bucket', { // NOSONAR: securitySettings provide needed security
             ...securitySettings,
             serverAccessLogsBucket: accessLogsBucket,
             lifecycleRules: rules

@@ -73,7 +73,7 @@ export class KafkaConsumer extends Construct {
         const secretPolicy = this.createPolicyForSecret(executionRole, props.scramSecretArn!);
 
         const lambdaFn = new lambda.Function(this, 'Consumer', {
-            runtime: lambda.Runtime.NODEJS_18_X,
+            runtime: lambda.Runtime.NODEJS_20_X,
             handler: 'index.handler',
             role: executionRole,
             code: props.code,
@@ -163,7 +163,8 @@ export class KafkaConsumer extends Construct {
     }
 
     private createPolicyForSecret(functionRole: iam.IRole, scramSecretArn: string) {
-        const kmsKeyArn = this.getKmsKeyForSecret(scramSecretArn);
+        const kmsKeyId = this.getKmsKeyForSecret(scramSecretArn);
+        const kmsKeyArn = this.getKmsArn(kmsKeyId);
 
         const secretPolicy = new iam.Policy(this, 'SecretPolicy', {
             document: new iam.PolicyDocument({
@@ -204,7 +205,7 @@ export class KafkaConsumer extends Construct {
         });
 
         const customResourceFunction = new lambda.Function(this, 'CustomResource', {
-            runtime: lambda.Runtime.PYTHON_3_10,
+            runtime: lambda.Runtime.PYTHON_3_12,
             handler: 'lambda_function.handler',
             role: customResouceRole.Role,
             code: lambda.Code.fromAsset('lambda/secrets-manager-metadata'),
@@ -222,5 +223,43 @@ export class KafkaConsumer extends Construct {
         (secretMetadata.node.defaultChild as cdk.CfnResource).cfnOptions.condition = this.IsSecretNotEmpty;
 
         return secretMetadata.getAttString('KmsKeyId');
+    }
+
+    private getKmsArn(kmsKeyId: string) {
+        const kmsMetadataResourceRole = new ExecutionRole(this, 'KmsMetadataResourceRole', {
+            inlinePolicyName: 'KmsMetadataPolicy',
+            inlinePolicyDocument: new iam.PolicyDocument({
+                statements: [new iam.PolicyStatement({
+                    resources: ['*'],
+                    actions: ['kms:DescribeKey', 'kms:ListKeys']
+                })]
+            })
+        });
+
+        const cfnRole = kmsMetadataResourceRole.Role.node.defaultChild as iam.CfnRole;
+        CfnNagHelper.addSuppressions(cfnRole, {
+            Id: 'W11',
+            Reason: 'KMS actions do not support resource level permissions'
+        });
+
+        const kmsMetadataResourceFunction = new lambda.Function(this, 'KmsMetadataResource', {
+            runtime: lambda.Runtime.PYTHON_3_12,
+            handler: 'lambda_function.handler',
+            role: kmsMetadataResourceRole.Role,
+            code: lambda.Code.fromAsset('lambda/kms-metadata'),
+            timeout: cdk.Duration.seconds(30)
+        });
+
+        const kmsMetadata = new cdk.CustomResource(this, 'KmsMetadata', {
+            serviceToken: kmsMetadataResourceFunction.functionArn,
+            properties: { KmsKeyId: kmsKeyId },
+            resourceType: 'Custom::KmsMetadata'
+        });
+
+        (kmsMetadataResourceRole.Role.node.defaultChild as iam.CfnRole).cfnOptions.condition = this.IsSecretNotEmpty;
+        (kmsMetadataResourceFunction.node.defaultChild as lambda.CfnFunction).cfnOptions.condition = this.IsSecretNotEmpty;
+        (kmsMetadata.node.defaultChild as cdk.CfnResource).cfnOptions.condition = this.IsSecretNotEmpty;
+
+        return kmsMetadata.getAttString('KmsKeyArn');
     }
 }
