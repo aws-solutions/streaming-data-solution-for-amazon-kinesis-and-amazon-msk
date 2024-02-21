@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.0] - 2024-02-21
+
+### Added
+- Encrypt Glue Data Catalog data at-rest
+- Add custom CloudWatch dashboard
+
+### Updated
+- Fix SASL authentication deployment
+- Upgrade MSK to 3.5.1
+- Upgrade Apache Flink to Flink 1.15
+- Upgrade Lambda Functions to Python 3.12 and NodeJS 20
+- Patch security vulnerabilities
+
 ## [1.8.1] - 2023-10-18
 
 ### Updated

@@ -45,7 +45,7 @@ export class FlinkApplication extends FlinkBase {
         });
 
         return new analytics.CfnApplicationV2(this, 'Application', {
-            runtimeEnvironment: 'FLINK-1_13',
+            runtimeEnvironment: 'FLINK-1_15',
             serviceExecutionRole: this.Role.roleArn,
             applicationConfiguration: {
                 applicationCodeConfiguration: {

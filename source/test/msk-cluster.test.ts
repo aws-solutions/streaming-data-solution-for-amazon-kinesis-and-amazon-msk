@@ -34,7 +34,7 @@ describe('successful scenarios', () => {
 
     test.each([2, 4, 6])('creates a MSK cluster', (validNodeCount) => {
         const cluster = new KafkaCluster(stack, 'TestMsk', {
-            kafkaVersion: KafkaActiveVersion.V2_8_1,
+            kafkaVersion: KafkaActiveVersion.V3_5_1,
             numberOfBrokerNodes: validNodeCount,
             brokerInstanceType: KafkaInstanceType.m5_large,
             monitoringLevel: KafkaMonitoringLevel.DEFAULT,
@@ -60,7 +60,7 @@ describe('successful scenarios', () => {
 
     test('uses IAM for access control', () => {
         new KafkaCluster(stack, 'TestMsk', {
-            kafkaVersion: KafkaActiveVersion.V2_8_1,
+            kafkaVersion: KafkaActiveVersion.V3_5_1,
             numberOfBrokerNodes: 2,
             brokerInstanceType: KafkaInstanceType.m5_large,
             monitoringLevel: KafkaMonitoringLevel.DEFAULT,
@@ -75,7 +75,7 @@ describe('successful scenarios', () => {
 
     test('uses SCRAM for access control', () => {
         new KafkaCluster(stack, 'TestMsk', {
-            kafkaVersion: KafkaActiveVersion.V2_8_1,
+            kafkaVersion: KafkaActiveVersion.V3_5_1,
             numberOfBrokerNodes: 2,
             brokerInstanceType: KafkaInstanceType.m5_large,
             monitoringLevel: KafkaMonitoringLevel.DEFAULT,
@@ -132,7 +132,7 @@ describe('validation tests', () => {
         }
 
         expect(() => new KafkaCluster(stack, 'TestMsk', {
-            kafkaVersion: KafkaActiveVersion.V2_8_1,
+            kafkaVersion: KafkaActiveVersion.V3_5_1,
             numberOfBrokerNodes: 2,
             brokerInstanceType: KafkaInstanceType.m5_large,
             monitoringLevel: KafkaMonitoringLevel.DEFAULT,
@@ -146,7 +146,7 @@ describe('validation tests', () => {
 
     test.each([0, -1])('number of broker nodes must be positive', (invalidNodeCount) => {
         expect(() => new KafkaCluster(stack, 'TestMsk', {
-            kafkaVersion: KafkaActiveVersion.V2_8_1,
+            kafkaVersion: KafkaActiveVersion.V3_5_1,
             numberOfBrokerNodes: invalidNodeCount,
             brokerInstanceType: KafkaInstanceType.m5_large,
             monitoringLevel: KafkaMonitoringLevel.DEFAULT,
@@ -160,7 +160,7 @@ describe('validation tests', () => {
 
     test.each([1, 3, 5])('number of broker nodes must be multiple of subnet count', (invalidNodeCount) => {
         expect(() => new KafkaCluster(stack, 'TestMsk', {
-            kafkaVersion: KafkaActiveVersion.V2_8_1,
+            kafkaVersion: KafkaActiveVersion.V3_5_1,
             numberOfBrokerNodes: invalidNodeCount,
             brokerInstanceType: KafkaInstanceType.m5_large,
             monitoringLevel: KafkaMonitoringLevel.DEFAULT,
@@ -174,7 +174,7 @@ describe('validation tests', () => {
 
     test.each([0, 16385])('volume size must be between allowed values', (invalidSize) => {
         expect(() => new KafkaCluster(stack, 'TestMsk', {
-            kafkaVersion: KafkaActiveVersion.V2_8_1,
+            kafkaVersion: KafkaActiveVersion.V3_5_1,
             numberOfBrokerNodes: 2,
             brokerInstanceType: KafkaInstanceType.m5_large,
             monitoringLevel: KafkaMonitoringLevel.DEFAULT,

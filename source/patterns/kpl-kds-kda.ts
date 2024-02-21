@@ -21,6 +21,7 @@ import { FlinkLogLevels } from '../lib/kda-base';
 import { EncryptedBucket } from '../lib/s3-bucket';
 import { SolutionHelper } from '../lib/solution-helper';
 import { SolutionStackProps } from '../bin/solution-props';
+import { ApplicationMonitoring } from '../lib/kda-monitoring';
 
 export class KplKdsKda extends cdk.Stack {
     private readonly BinaryOptions = ['true', 'false'];
@@ -120,6 +121,14 @@ export class KplKdsKda extends cdk.Stack {
             shardCount: shardCount.valueAsNumber,
             retentionHours: dataRetention.valueAsNumber,
             enhancedMonitoring: enhancedMonitoring.valueAsString
+        });
+
+        //---------------------------------------------------------------------
+        // Monitoring (dashboard and alarms) configuration
+        new ApplicationMonitoring(this, 'Monitoring', {
+            applicationName: kda.ApplicationName,
+            logGroupName: kda.LogGroupName,
+            inputStreamName: kds.Stream.streamName
         });
 
         //---------------------------------------------------------------------

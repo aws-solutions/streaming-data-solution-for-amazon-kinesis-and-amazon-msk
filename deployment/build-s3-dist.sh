@@ -95,7 +95,7 @@ echo "--------------------------------------------------------------------------
 echo "[Init] Generate jar files for demo Java applications"
 echo "------------------------------------------------------------------------------"
 cd $source_dir/kinesis
-flink_version=1.13.2
+flink_version=1.15.4
 
 for folder in */ ; do
     cd "$folder"

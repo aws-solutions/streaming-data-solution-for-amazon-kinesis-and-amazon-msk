@@ -128,7 +128,7 @@ export class ApiGwKdsLambda extends cdk.Stack {
             createCloudWatchAlarms: false,
             deploySqsDlqQueue: true,
             lambdaFunctionProps: {
-                runtime: lambda.Runtime.NODEJS_18_X,
+                runtime: lambda.Runtime.NODEJS_20_X,
                 handler: 'index.handler',
                 code: lambda.Code.fromAsset('lambda/kds-lambda-consumer'),
                 timeout: cdk.Duration.minutes(5)

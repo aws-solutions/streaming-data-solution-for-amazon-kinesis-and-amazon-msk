@@ -61,7 +61,7 @@ export class DataStream extends Construct {
         });
 
         const customResourceFunction = new lambda.Function(this, 'CustomResource', {
-            runtime: lambda.Runtime.PYTHON_3_10,
+            runtime: lambda.Runtime.PYTHON_3_12,
             handler: 'lambda_function.handler',
             role: customResouceRole.Role,
             code: lambda.Code.fromAsset('lambda/kds-enhanced-monitoring'),
