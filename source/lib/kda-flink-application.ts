@@ -16,6 +16,7 @@ import { Construct } from 'constructs';
 import { aws_kinesisanalytics as analytics, aws_iam as iam } from 'aws-cdk-lib';
 
 import { CfnNagHelper } from './cfn-nag-helper';
+import { CfnGuardHelper } from './cfn-guard-helper';
 import { FlinkBase, FlinkBaseProps } from './kda-base';
 
 export interface FlinkApplicationProps extends FlinkBaseProps {
@@ -33,6 +34,7 @@ export class FlinkApplication extends FlinkBase {
     constructor(scope: Construct, id: string, props: FlinkApplicationProps) {
         super(scope, id, props);
         this.addCfnNagSuppressions();
+        this.addCfnGuardSuppressions();
     }
 
     protected createApplication(props: FlinkApplicationProps): analytics.CfnApplicationV2 {
@@ -139,5 +141,10 @@ export class FlinkApplication extends FlinkBase {
             Id: 'W11',
             Reason: 'EC2 actions in VPC policy do not support resource level permissions'
         });
+    }
+
+    private addCfnGuardSuppressions() {
+        const cfnRole = this.Role.node.defaultChild as iam.CfnRole;
+        CfnGuardHelper.addSuppressions(cfnRole, ['IAM_NO_INLINE_POLICY_CHECK']);
     }
 }

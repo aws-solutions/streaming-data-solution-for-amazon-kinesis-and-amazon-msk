@@ -1,5 +1,5 @@
 /*********************************************************************************************************************
- *  Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.                                      *
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                      *
  *                                                                                                                    *
  *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
  *  with the License. A copy of the License is located at                                                             *
@@ -13,44 +13,39 @@
 
 import * as cdk  from 'aws-cdk-lib';
 
-export interface CfnNagSuppression {
-    Id: string;
-    Reason: string;
-}
-
-export class CfnNagHelper {
-    public static addSuppressions(resource: cdk.CfnResource, suppressions: CfnNagSuppression | CfnNagSuppression[]) {
+export class CfnGuardHelper {
+    public static addSuppressions(resource: cdk.CfnResource, suppressions: string | string[]) {
         let rules = [];
 
         if (suppressions instanceof Array) {
             for (const suppression of suppressions) {
-                rules.push({ id: suppression.Id, reason: suppression.Reason });
+                rules.push(suppression);
             }
         } else {
-            rules.push({ id: suppressions.Id, reason: suppressions.Reason });
+            rules.push(suppressions);
         }
 
-        if (resource.cfnOptions.metadata?.cfn_nag) {
+        // Ensure that the metadata property exists.
+        if (!resource.cfnOptions.metadata) {
+            resource.cfnOptions.metadata = {};
+        }
+
+        if (resource.cfnOptions.metadata.guard?.SuppressedRules) {
             // If the CfnResource already contains some suppressions, we don't want to erase them.
-            const existingRules = resource.cfnOptions.metadata.cfn_nag.rules_to_suppress;
+            const existingRules = resource.cfnOptions.metadata.guard.SuppressedRules;
             rules = [...existingRules, ...rules];
         }
 
         // It's possible that multiple constructs try to add the same suppression.
         // We only keep one occurrence (last) of each.
-        // Based on https://stackoverflow.com/a/56768137
         const uniqueRules = [
             ...new Map(
-                rules.map(rule => [rule.id, rule])
+                rules.map(rule => [rule, rule])
             ).values()
         ];
 
-        if (!resource.cfnOptions.metadata) {
-            resource.cfnOptions.metadata = {};
-        }
-
-        resource.cfnOptions.metadata.cfn_nag = {
-            rules_to_suppress: uniqueRules
+        resource.cfnOptions.metadata.guard = {
+            SuppressedRules: uniqueRules
         }
     }
 }

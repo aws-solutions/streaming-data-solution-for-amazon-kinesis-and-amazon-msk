@@ -13,7 +13,7 @@
 
 import * as cdk  from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import { aws_lambda as lambda, aws_apigateway as apigw, aws_cognito as cognito } from 'aws-cdk-lib';
+import { aws_lambda as lambda, aws_apigateway as apigw, aws_cognito as cognito, CfnResource } from 'aws-cdk-lib';
 
 import { ApiGatewayToKinesisStreams } from '@aws-solutions-constructs/aws-apigateway-kinesisstreams';
 import { KinesisStreamsToLambda } from '@aws-solutions-constructs/aws-kinesisstreams-lambda';
@@ -22,6 +22,7 @@ import { DataStream } from '../lib/kds-data-stream';
 import { SolutionHelper } from '../lib/solution-helper';
 import { SolutionStackProps } from '../bin/solution-props';
 import { DataStreamMonitoring } from '../lib/kds-monitoring';
+import { CfnGuardHelper } from '../lib/cfn-guard-helper';
 
 export class ApiGwKdsLambda extends cdk.Stack {
     constructor(scope: Construct, id: string, props: SolutionStackProps) {
@@ -100,6 +101,9 @@ export class ApiGwKdsLambda extends cdk.Stack {
             existingStreamObj: kds.Stream
         });
 
+        CfnGuardHelper.addSuppressions(apiGwToKds.apiGateway.deploymentStage.node.defaultChild as CfnResource, 'API_GW_CACHE_ENABLED_AND_ENCRYPTED');
+        CfnGuardHelper.addSuppressions(apiGwToKds.apiGatewayCloudWatchRole?.node.defaultChild as CfnResource, 'IAM_NO_INLINE_POLICY_CHECK');
+
         //---------------------------------------------------------------------
         // Lambda function configuration
         const batchSize = new cdk.CfnParameter(this, 'BatchSize', {
@@ -141,6 +145,10 @@ export class ApiGwKdsLambda extends cdk.Stack {
                 bisectBatchOnError: true
             }
         });
+
+        //---------------------------------------------------------------------
+        // cfn-guard suppression
+        CfnGuardHelper.addSuppressions(kdsToLambda.lambdaFunction.role?.node.defaultChild as cdk.CfnResource, 'IAM_NO_INLINE_POLICY_CHECK')
 
         //---------------------------------------------------------------------
         // Monitoring (dashboard and alarms) configuration

@@ -16,6 +16,8 @@ import { Construct } from 'constructs';
 import { aws_iam as iam, aws_s3 as s3, aws_kinesis as kinesis,  aws_kinesisfirehose as firehose} from 'aws-cdk-lib';
 import { NagSuppressions } from 'cdk-nag';
 import { EncryptedBucket } from './s3-bucket';
+import { CfnGuardHelper } from './cfn-guard-helper';
+
 
 export interface DeliveryStreamProps {
     readonly inputDataStream: kinesis.Stream;
@@ -76,6 +78,8 @@ export class DeliveryStream extends Construct {
             }
         });
 
+        CfnGuardHelper.addSuppressions(firehoseRole.node.defaultChild as cdk.CfnResource, 'IAM_NO_INLINE_POLICY_CHECK');
+
         this.Output = new EncryptedBucket(this, 'Output', {
             enableIntelligentTiering: true
         });
@@ -121,6 +125,10 @@ export class DeliveryStream extends Construct {
                 ...commonDestinationProps
             }
         });
+
+        CfnGuardHelper.addSuppressions(
+            kdfWithoutDP,
+            ['KINESIS_FIREHOSE_REDSHIFT_DESTINATION_CONFIGURATION_NO_PLAINTEXT_PASSWORD', 'KINESIS_FIREHOSE_SPLUNK_DESTINATION_CONFIGURATION_NO_PLAINTEXT_PASSWORD']);
 
         NagSuppressions.addResourceSuppressions(kdfWithoutDP, [
             {
@@ -177,6 +185,10 @@ export class DeliveryStream extends Construct {
                 }
             }
         });
+
+        CfnGuardHelper.addSuppressions(
+            kdfWithDp,
+            ['KINESIS_FIREHOSE_REDSHIFT_DESTINATION_CONFIGURATION_NO_PLAINTEXT_PASSWORD', 'KINESIS_FIREHOSE_SPLUNK_DESTINATION_CONFIGURATION_NO_PLAINTEXT_PASSWORD']);
 
         NagSuppressions.addResourceSuppressions(kdfWithDp, [
             {
