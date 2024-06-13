@@ -14,6 +14,8 @@
 import * as cdk  from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { aws_iam as iam } from 'aws-cdk-lib';
+import { CfnGuardHelper } from './cfn-guard-helper';
+import { CfnRole } from 'aws-cdk-lib/aws-iam';
 
 export interface ExecutionRoleProps {
     readonly inlinePolicyName: string;
@@ -45,5 +47,8 @@ export class ExecutionRole extends Construct {
             assumedBy: new iam.ServicePrincipal('lambda.amazonaws.com'),
             inlinePolicies
         });
+
+        // Add suppressions
+        CfnGuardHelper.addSuppressions(this.Role.node.defaultChild as CfnRole, 'IAM_NO_INLINE_POLICY_CHECK');
     }
 }

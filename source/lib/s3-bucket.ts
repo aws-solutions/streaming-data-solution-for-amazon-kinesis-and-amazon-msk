@@ -16,6 +16,7 @@ import { Construct } from 'constructs';
 import { aws_iam as iam, aws_s3 as s3 } from 'aws-cdk-lib';
 
 import { CfnNagHelper } from './cfn-nag-helper';
+import { CfnGuardHelper } from './cfn-guard-helper';
 
 export interface EncryptedBucketProps {
     readonly enableIntelligentTiering: boolean;
@@ -62,6 +63,8 @@ export class EncryptedBucket extends Construct {
             lifecycleRules: rules
         });
 
+        CfnGuardHelper.addSuppressions(this.Bucket.node.defaultChild as s3.CfnBucket, 'S3_BUCKET_NO_PUBLIC_RW_ACL');
+
         // remove ACL and add S3 bucket policy to write to access logging bucket
         (accessLogsBucket.node.defaultChild as s3.CfnBucket).addDeletionOverride('Properties.AccessControl');
         accessLogsBucket.addToResourcePolicy(
@@ -83,5 +86,7 @@ export class EncryptedBucket extends Construct {
         CfnNagHelper.addSuppressions(accessLogsBucket.node.defaultChild as s3.CfnBucket, [
             { Id: 'W35', Reason: 'This bucket is used to store access logs for another bucket' }
         ]);
+
+        CfnGuardHelper.addSuppressions(accessLogsBucket.node.defaultChild as s3.CfnBucket, 'S3_BUCKET_NO_PUBLIC_RW_ACL');
     }
 }

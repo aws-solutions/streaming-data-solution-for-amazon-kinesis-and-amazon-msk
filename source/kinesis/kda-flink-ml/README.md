@@ -33,5 +33,5 @@ By default, the sample application will read data from a Kinesis data stream and
 
 ### 4. Build the application using Apache Maven
 ```
-mvn clean package --quiet -Dflink.version=1.13.2
+mvn clean package --quiet -Dflink.version=1.15.4
 ```

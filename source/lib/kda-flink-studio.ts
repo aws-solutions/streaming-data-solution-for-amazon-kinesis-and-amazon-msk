@@ -16,6 +16,7 @@ import { Construct } from 'constructs';
 import { aws_kinesisanalytics as analytics, aws_iam as iam, aws_glue as glue } from 'aws-cdk-lib';
 
 import { CfnNagHelper } from './cfn-nag-helper';
+import { CfnGuardHelper } from './cfn-guard-helper';
 import { FlinkBase, FlinkBaseProps } from './kda-base';
 
 export interface FlinkStudioProps extends FlinkBaseProps {
@@ -28,6 +29,7 @@ export class FlinkStudio extends FlinkBase {
     constructor(scope: Construct, id: string, props: FlinkStudioProps) {
         super(scope, id, props);
         this.addCfnNagSuppressions();
+        this.addCfnGuardSuppressions();
     }
 
     protected createRole(_props: FlinkStudioProps): iam.IRole {
@@ -201,5 +203,10 @@ export class FlinkStudio extends FlinkBase {
             Id: 'W11',
             Reason: 'EC2 actions do not support resource level permissions / Studio uses default Glue database'
         });
+    }
+
+    private addCfnGuardSuppressions() {
+        const cfnRole = this.Role.node.defaultChild as iam.CfnRole;
+        CfnGuardHelper.addSuppressions(cfnRole, ['IAM_NO_INLINE_POLICY_CHECK']);
     }
 }

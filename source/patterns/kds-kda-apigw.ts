@@ -13,7 +13,7 @@
 
 import * as cdk  from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import { aws_iam as iam, aws_logs as cwlogs,  aws_lambda as lambda, aws_apigateway as apigw } from 'aws-cdk-lib';
+import { aws_iam as iam, aws_logs as cwlogs,  aws_lambda as lambda, aws_apigateway as apigw, CfnResource } from 'aws-cdk-lib';
 
 import { ApiGatewayToLambda } from '@aws-solutions-constructs/aws-apigateway-lambda';
 import crypto = require('crypto');
@@ -26,6 +26,7 @@ import { SolutionStackProps } from '../bin/solution-props';
 import { ApplicationMonitoring } from '../lib/kda-monitoring';
 import { ExecutionRole } from '../lib/lambda-role-cloudwatch';
 import { FlinkLogLevels, FlinkMetricLevels } from '../lib/kda-base';
+import { CfnGuardHelper } from '../lib/cfn-guard-helper';
 
 export class KdsKdaApiGw extends cdk.Stack {
     private readonly BinaryOptions = ['true', 'false'];
@@ -275,6 +276,9 @@ export class KdsKdaApiGw extends cdk.Stack {
             },
             existingLambdaObj: predictFareLambda
         });
+
+        CfnGuardHelper.addSuppressions(pattern.apiGateway.deploymentStage.node.defaultChild as CfnResource, 'API_GW_CACHE_ENABLED_AND_ENCRYPTED');
+        CfnGuardHelper.addSuppressions(pattern.apiGatewayCloudWatchRole?.node.defaultChild as CfnResource, 'IAM_NO_INLINE_POLICY_CHECK');
 
         const predictFareModel = pattern.apiGateway.addModel('PredictFareModel', {
             schema: {

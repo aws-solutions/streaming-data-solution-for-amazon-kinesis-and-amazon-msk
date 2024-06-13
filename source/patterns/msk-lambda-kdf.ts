@@ -20,6 +20,7 @@ import { SolutionStackProps } from '../bin/solution-props';
 import { EncryptedBucket } from '../lib/s3-bucket';
 import { KafkaConsumer } from '../lib/msk-consumer';
 import { KinesisFirehoseToS3 } from '@aws-solutions-constructs/aws-kinesisfirehose-s3';
+import { CfnGuardHelper } from '../lib/cfn-guard-helper';
 
 export class MskLambdaKdf extends cdk.Stack {
     constructor(scope: Construct, id: string, props: SolutionStackProps) {
@@ -70,7 +71,11 @@ export class MskLambdaKdf extends cdk.Stack {
             }
         });
 
-        //---------------------------------------------------------------------
+        CfnGuardHelper.addSuppressions(
+            kdfToS3.kinesisFirehose,
+            ['KINESIS_FIREHOSE_REDSHIFT_DESTINATION_CONFIGURATION_NO_PLAINTEXT_PASSWORD', 'KINESIS_FIREHOSE_SPLUNK_DESTINATION_CONFIGURATION_NO_PLAINTEXT_PASSWORD']);
+
+            //---------------------------------------------------------------------
         // Lambda function configuration
         const clusterArn = new cdk.CfnParameter(this, 'ClusterArn', {
             type: 'String',
