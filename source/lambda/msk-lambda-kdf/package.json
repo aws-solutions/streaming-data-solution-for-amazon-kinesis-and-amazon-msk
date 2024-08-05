@@ -1,6 +1,6 @@
 {
   "name": "msk-lambda-kdf",
-  "version": "1.6.0",
+  "version": "1.9.2",
   "description": "lambda consumer that publishes MSK events to KDF",
   "main": "index.js",
   "scripts": {
@@ -33,5 +33,8 @@
   },
   "dependencies": {
     "@aws-sdk/client-firehose": "3.382.0"
+  },
+  "overrides": {
+    "fast-xml-parser": "^4.4.1"
   }
 }

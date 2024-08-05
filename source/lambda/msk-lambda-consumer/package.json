@@ -1,6 +1,6 @@
 {
   "name": "msk-lambda-consumer",
-  "version": "1.6.0",
+  "version": "1.9.2",
   "description": "sample lambda consumer for MSK",
   "main": "index.js",
   "scripts": {
