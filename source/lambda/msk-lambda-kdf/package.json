@@ -1,6 +1,6 @@
 {
   "name": "msk-lambda-kdf",
-  "version": "1.9.2",
+  "version": "1.9.3",
   "description": "lambda consumer that publishes MSK events to KDF",
   "main": "index.js",
   "scripts": {
@@ -17,8 +17,9 @@
     "aws-sdk-client-mock": "3.0.0",
     "chai": "4.3.4",
     "jest": "^29.7.0",
-    "sinon": "12.0.1"
+    "sinon": "^18.0.1"
   },
+  
   "jest": {
     "testEnvironment": "node",
     "collectCoverage": true,
@@ -35,6 +36,8 @@
     "@aws-sdk/client-firehose": "3.382.0"
   },
   "overrides": {
-    "fast-xml-parser": "^4.4.1"
+    "fast-xml-parser": "^4.4.1",
+    "micromatch": "^4.0.8",
+    "sinon": "^18.0.1"
   }
 }
