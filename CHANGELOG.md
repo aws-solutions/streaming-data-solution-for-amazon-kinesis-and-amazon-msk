@@ -5,26 +5,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.3] - 2024-09-19
+
+### Security
+
+- Patched path-to-regex and micromatch vulnerabilities
+
 ## [1.9.2] - 2024-08-05
 
 ### Security
+
 - Patched fast-xml-parser vulnerability
 
 ## [1.9.1] - 2024-06-13
 
 ### Added
+
 - Onboarded to CloudFormation Guard scanning
 
-### Updated
+### Fixed
+
 - Upgraded and patched dependencies
 
 ## [1.9.0] - 2024-02-21
 
 ### Added
+
 - Encrypt Glue Data Catalog data at-rest
 - Add custom CloudWatch dashboard
 
-### Updated
+### Fixed
+
 - Fix SASL authentication deployment
 - Upgrade MSK to 3.5.1
 - Upgrade Apache Flink to Flink 1.15
@@ -33,12 +44,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.8.1] - 2023-10-18
 
-### Updated
+### Fixed
+
 - Patch critical security vulnerabilities
 
 ## [1.8.0] - 2023-09-14
 
-### Updated
+### Fixed
 
 - Migrate to AWS SDKv3
 - Migrate to CDKv2
@@ -47,27 +59,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.7.8] - 2023-07-13
 
-### Updated
+### Fixed
+
 - Set urllib3 version to address security issue
 - Remove vm2 dependency
 - Patch word-wrap and tough-cookie vulnerability
 
 ## [1.7.7] - 2023-06-14
 
-### Updated
+### Fixed
 
 - python package security patching - (`requests` bumped to v2.31.0)
 - Changed logical ID of AWS AppRegistry application and attribute group
 
 ## [1.7.6] - 2023-05-16
 
-### Updated
+### Fixed
 
 - npm package security patching (vm2)
 
 ## [1.7.5] - 2023-04-20
 
-### Updated
+### Fixed
 
 - npm package security patching (vm2)
 
@@ -82,18 +95,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Update AWS-SDK V2 that addresses the security issue identified in xml2js (https://github.com/aws/aws-sdk-js/issues/4387)
+- Update AWS-SDK V2 that addresses the security issue identified in [xml2js](https://github.com/aws/aws-sdk-js/issues/4387)
 
 ## [1.7.2] - 2023-01-10
 
-### Updated
+### Fixed
 
 - npm package security patching (json5)
 - python security patching (requests)
 
 ## [1.7.1] - 2022-12-19
 
-### Updated
+### Fixed
 
 - Fixes [Issue #74](https://github.com/aws-solutions/streaming-data-solution-for-amazon-kinesis-and-amazon-msk/issues/74).
 - AppRegistry application name now has 'App' prepended to it, to prevent any failures if the stack name starts with 'AWS'.
@@ -102,7 +115,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.7.0] - 2022-11-17
 
-### Updated
+### Fixed
 
 - [AWS Service Catalog AppRegistry](https://docs.aws.amazon.com/servicecatalog/latest/arguide/intro-app-registry.html) integration. When a stack is deployed, an Service Catalog application is created where all associated resources collections and attribute groups can be viewed.
 - To monitor costs of resources used by the stack, the tag `AppManagerCFNStackKey` is added to the solution by AWS Systems Manager Application Manager.
@@ -110,13 +123,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.6.2] - 2022-09-28
 
-### Updated
+### Fixed
 
 - npm package security patching (vm2)
 
 ## [1.6.1] - 2022-07-14
 
-### Updated
+### Fixed
 
 - npm package security patching (minimist, vm2)
 - Gson 2.8.9
