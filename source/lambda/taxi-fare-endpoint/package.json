@@ -1,6 +1,6 @@
 {
   "name": "taxi-fare-endpoint",
-  "version": "1.9.3",
+  "version": "1.9.4",
   "description": "sample endpoint for taxi fare prediction",
   "main": "index.js",
   "scripts": {

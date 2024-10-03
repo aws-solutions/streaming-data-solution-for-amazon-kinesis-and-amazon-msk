@@ -42,6 +42,7 @@ staging_dist_dir="$template_dir/staging"
 template_dist_dir="$template_dir/global-s3-assets"
 build_dist_dir="$template_dir/regional-s3-assets"
 source_dir="$template_dir/../source"
+solution_root_dir="$template_dir/.."
 
 echo "------------------------------------------------------------------------------"
 echo "[Init] Remove any old dist files from previous runs"
@@ -54,6 +55,19 @@ mkdir -p $build_dist_dir
 
 rm -rf $staging_dist_dir
 mkdir -p $staging_dist_dir
+
+echo "------------------------------------------------------------------------------"
+echo "[Create Solution Manifest] Create solution manifest file"
+echo "------------------------------------------------------------------------------"
+if [ ${SOLUTION_NAME} == "streaming-data-solution-for-amazon-kinesis" ]; then
+    echo "Creating Kinesis Solution Manifest"
+    cp ${solution_root_dir}/solution-manifest-kinesis.yaml ${solution_root_dir}/solution-manifest.yaml
+elif [ ${SOLUTION_NAME} == "streaming-data-solution-for-amazon-msk" ]; then
+    echo "Creating MSK Solution Manifest"
+    cp ${solution_root_dir}/solution-manifest-msk.yaml ${solution_root_dir}/solution-manifest.yaml
+else
+    echo "WARN: Cannot create solution-manifest.yaml."
+fi
 
 echo "------------------------------------------------------------------------------"
 echo "[Init] Get version of the AWS CDK"
