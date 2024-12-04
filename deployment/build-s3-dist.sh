@@ -129,7 +129,7 @@ cd $source_dir/kinesis
 
 application_name=amazon-kinesis-replay
 application_version=0.1.0
-wget https://github.com/aws-samples/$application_name/archive/refs/tags/release-$application_version.zip
+wget https://github.com/aws-samples/$application_name/archive/refs/heads/release-$application_version.zip
 unzip -q release-$application_version.zip
 
 cd $application_name-release-$application_version
