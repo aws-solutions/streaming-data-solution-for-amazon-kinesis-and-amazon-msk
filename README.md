@@ -1,5 +1,11 @@
 # Streaming Data Solution for Amazon Kinesis and Streaming Data Solution for Amazon MSK
 
+---
+
+⚠️ This repository has been archived by the owner. It is now read-only.
+
+---
+
 Streaming data use cases follow a similar pattern where data flows from data producers through streaming storage and data consumers to storage destinations. Sources continuously generate data, which is delivered via the ingest stage to the stream storage layer, where it's durably captured and made available for streaming processing. The stream processing layer processes the data in the stream storage layer and sends the processed information to a specified destination.
 
 The challenge with these use cases is the set up time and effort that developers require to create the resources and establish the best practices needed by the streaming data services (such as access control, logging capabilities, and data integrations).
